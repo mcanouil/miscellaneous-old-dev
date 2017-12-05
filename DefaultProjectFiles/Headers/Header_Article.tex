@@ -1,0 +1,559 @@
+\documentclass[11pt, a4paper]{article}
+\pdfpageattr{/Group << /S /Transparency /I true /CS /DeviceRGB>>}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[usenames, dvipsnames, svgnames, x11names, hyperref, RGB]{xcolor}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{pifont}
+\usepackage{multicol}
+\usepackage{setspace}
+\renewcommand{\baselinestretch}{1.5}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{longtable}
+\usepackage[format=plain, font=normalsize, labelfont=bf, hang]{caption}
+\usepackage[hmargin=2.5cm, vmargin=2.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{indentfirst} % add indent in first paragraph
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[L]{\slshape \rightmark}
+% \fancyhead[R]{\slshape \leftmark}
+% \fancyhead[L]{\today}
+
+\definecolor{dodgerblue}{RGB}{30,144,255}
+\definecolor{springgreen3}{RGB}{0,139,69}
+% \definecolor{springgreen2}{RGB}{0,205,102}
+\definecolor{firebrick2}{RGB}{238,44,44}
+\definecolor{maroon2}{RGB}{238,48,167}
+\definecolor{goldenrod2}{RGB}{238,180,34}
+\definecolor{deepskyblue}{RGB}{0,191,255}
+
+\usepackage{textcomp}
+\usepackage{listings}
+\usepackage{courier}
+\lstset{ %
+    backgroundcolor=\color{dodgerblue!2.5!white},       % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+    basicstyle={\tiny\ttfamily\mdseries},               % the size of the fonts that are used for the code
+    breakatwhitespace=true,                             % sets if automatic breaks should only happen at whitespace
+    breaklines=true,                                    % sets automatic line breaking
+    captionpos=t,                                       % sets the caption-position to bottom
+    commentstyle=\color{springgreen3},                  % comment style
+    deletekeywords={...},                               % if you want to delete keywords from the given language
+    escapeinside={!*}{*!},                              % if you want to add LaTeX within your code
+    extendedchars=true,                                 % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+    frame=single,                                       % adds a frame around the code
+    keepspaces=true,                                    % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+    keywordstyle={\color{dodgerblue}\textbf},           % keyword style
+    morekeywords={*,...},                               % if you want to add more keywords to the set
+    numbers=none,                                       % where to put the line-numbers; possible values are (none, left, right)
+    numbersep=10pt,                                     % how far the line-numbers are from the code
+    numberstyle=\tiny\color{goldenrod2},                % the style that is used for the line-numbers
+    rulecolor=\color{dodgerblue},                       % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+    showspaces=false,                                   % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+    showstringspaces=false,                             % underline spaces within strings only
+    showtabs=false,                                     % show tabs within strings adding particular underscores
+    stepnumber=1,                                       % the step between two line-numbers. If it's 1, each line will be numbered
+    stringstyle=\color{maroon2},                        % string literal style
+    tabsize=2,                                          % sets default tabsize to 2 spaces
+    title=\lstname,                                     % show the filename of files included with \lstinputlisting; also try caption instead of title
+    showlines=false,                                    % prints empty lines at the end of listings
+    xleftmargin=9mm,                                    % The dimensions are used as extra margins on the left and right
+    xrightmargin=9mm,
+    upquote=true,
+    lineskip=-0.05ex,                                   % Specifies additional space between lines in listings
+    aboveskip=0ex,                                      % Define the space above and below displayed listings
+    belowskip=0ex,                                      % Define the space above and below displayed listings
+}
+\lstdefinelanguage{JuliaConsole}{
+    backgroundcolor=\color{gray!2.5!white},             % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+    rulecolor=\color{gray!50!white},                    % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+    alsoletter={>},
+    literate=%
+    *{\$}{{{\color{black}\bfseries \$}}}1
+    {julia>}{{{\color{black}\bfseries julia>}}}6
+}
+\lstdefinelanguage{Julia}{
+    keywordsprefix=\@,
+    morekeywords={
+        exit, whos, edit, load, is, isa, isequal, typeof, tuple, ntuple, uid, hash, finalizer, convert, promote,
+        subtype, typemin, typemax, realmin, realmax, sizeof, eps, promote_type, method_exists, applicable,
+        invoke, dlopen, dlsym, system, error, throw, assert, new, Inf, Nan, pi, im, begin, while, for, in, return,
+        break, continue, macro, quote, let, if, elseif, else, try, catch, end, bitstype, ccall, do, using, module,
+        import, export, importall, baremodule, immutable, local, global, const, Bool, Int, Int8, Int16, Int32,
+        Int64, Uint, Uint8, Uint16, Uint32, Uint64, Float32, Float64, Complex64, Complex128, Any, Nothing, None,
+        function, type, typealias, abstract, include, require
+    },
+    alsoletter={>},
+    sensitive=true,
+    morecomment=[l]{\#},
+    morecomment=[s]{\#=}{=\#},
+    morestring=[b]',
+    morestring=[b]",
+    literate=%
+    *{0}{{{\color{goldenrod2}\textbf{0}}}}1
+    {1}{{{\color{goldenrod2}\textbf{1}}}}1
+    {2}{{{\color{goldenrod2}\textbf{2}}}}1
+    {3}{{{\color{goldenrod2}\textbf{3}}}}1
+    {4}{{{\color{goldenrod2}\textbf{4}}}}1
+    {5}{{{\color{goldenrod2}\textbf{5}}}}1
+    {6}{{{\color{goldenrod2}\textbf{6}}}}1
+    {7}{{{\color{goldenrod2}\textbf{7}}}}1
+    {8}{{{\color{goldenrod2}\textbf{8}}}}1
+    {9}{{{\color{goldenrod2}\textbf{9}}}}1
+    {0.0}{{{\color{goldenrod2}\textbf{0.0}}}}3
+    {1.0}{{{\color{goldenrod2}\textbf{1.0}}}}3
+    {2.0}{{{\color{goldenrod2}\textbf{2.0}}}}3
+    {3.0}{{{\color{goldenrod2}\textbf{3.0}}}}3
+    {4.0}{{{\color{goldenrod2}\textbf{4.0}}}}3
+    {5.0}{{{\color{goldenrod2}\textbf{5.0}}}}3
+    {6.0}{{{\color{goldenrod2}\textbf{6.0}}}}3
+    {7.0}{{{\color{goldenrod2}\textbf{7.0}}}}3
+    {8.0}{{{\color{goldenrod2}\textbf{8.0}}}}3
+    {9.0}{{{\color{goldenrod2}\textbf{9.0}}}}3
+    {0.1}{{{\color{goldenrod2}\textbf{0.1}}}}3
+    {1.1}{{{\color{goldenrod2}\textbf{1.1}}}}3
+    {2.1}{{{\color{goldenrod2}\textbf{2.1}}}}3
+    {3.1}{{{\color{goldenrod2}\textbf{3.1}}}}3
+    {4.1}{{{\color{goldenrod2}\textbf{4.1}}}}3
+    {5.1}{{{\color{goldenrod2}\textbf{5.1}}}}3
+    {6.1}{{{\color{goldenrod2}\textbf{6.1}}}}3
+    {7.1}{{{\color{goldenrod2}\textbf{7.1}}}}3
+    {8.1}{{{\color{goldenrod2}\textbf{8.1}}}}3
+    {9.1}{{{\color{goldenrod2}\textbf{9.1}}}}3
+    {0.2}{{{\color{goldenrod2}\textbf{0.2}}}}3
+    {1.2}{{{\color{goldenrod2}\textbf{1.2}}}}3
+    {2.2}{{{\color{goldenrod2}\textbf{2.2}}}}3
+    {3.2}{{{\color{goldenrod2}\textbf{3.2}}}}3
+    {4.2}{{{\color{goldenrod2}\textbf{4.2}}}}3
+    {5.2}{{{\color{goldenrod2}\textbf{5.2}}}}3
+    {6.2}{{{\color{goldenrod2}\textbf{6.2}}}}3
+    {7.2}{{{\color{goldenrod2}\textbf{7.2}}}}3
+    {8.2}{{{\color{goldenrod2}\textbf{8.2}}}}3
+    {9.2}{{{\color{goldenrod2}\textbf{9.2}}}}3
+    {0.3}{{{\color{goldenrod2}\textbf{0.3}}}}3
+    {1.3}{{{\color{goldenrod2}\textbf{1.3}}}}3
+    {2.3}{{{\color{goldenrod2}\textbf{2.3}}}}3
+    {3.3}{{{\color{goldenrod2}\textbf{3.3}}}}3
+    {4.3}{{{\color{goldenrod2}\textbf{4.3}}}}3
+    {5.3}{{{\color{goldenrod2}\textbf{5.3}}}}3
+    {6.3}{{{\color{goldenrod2}\textbf{6.3}}}}3
+    {7.3}{{{\color{goldenrod2}\textbf{7.3}}}}3
+    {8.3}{{{\color{goldenrod2}\textbf{8.3}}}}3
+    {9.3}{{{\color{goldenrod2}\textbf{9.3}}}}3
+    {0.4}{{{\color{goldenrod2}\textbf{0.4}}}}3
+    {1.4}{{{\color{goldenrod2}\textbf{1.4}}}}3
+    {2.4}{{{\color{goldenrod2}\textbf{2.4}}}}3
+    {3.4}{{{\color{goldenrod2}\textbf{3.4}}}}3
+    {4.4}{{{\color{goldenrod2}\textbf{4.4}}}}3
+    {5.4}{{{\color{goldenrod2}\textbf{5.4}}}}3
+    {6.4}{{{\color{goldenrod2}\textbf{6.4}}}}3
+    {7.4}{{{\color{goldenrod2}\textbf{7.4}}}}3
+    {8.4}{{{\color{goldenrod2}\textbf{8.4}}}}3
+    {9.4}{{{\color{goldenrod2}\textbf{9.4}}}}3
+    {0.5}{{{\color{goldenrod2}\textbf{0.5}}}}3
+    {1.5}{{{\color{goldenrod2}\textbf{1.5}}}}3
+    {2.5}{{{\color{goldenrod2}\textbf{2.5}}}}3
+    {3.5}{{{\color{goldenrod2}\textbf{3.5}}}}3
+    {4.5}{{{\color{goldenrod2}\textbf{4.5}}}}3
+    {5.5}{{{\color{goldenrod2}\textbf{5.5}}}}3
+    {6.5}{{{\color{goldenrod2}\textbf{6.5}}}}3
+    {7.5}{{{\color{goldenrod2}\textbf{7.5}}}}3
+    {8.5}{{{\color{goldenrod2}\textbf{8.5}}}}3
+    {9.5}{{{\color{goldenrod2}\textbf{9.5}}}}3
+    {0.6}{{{\color{goldenrod2}\textbf{0.6}}}}3
+    {1.6}{{{\color{goldenrod2}\textbf{1.6}}}}3
+    {2.6}{{{\color{goldenrod2}\textbf{2.6}}}}3
+    {3.6}{{{\color{goldenrod2}\textbf{3.6}}}}3
+    {4.6}{{{\color{goldenrod2}\textbf{4.6}}}}3
+    {5.6}{{{\color{goldenrod2}\textbf{5.6}}}}3
+    {6.6}{{{\color{goldenrod2}\textbf{6.6}}}}3
+    {7.6}{{{\color{goldenrod2}\textbf{7.6}}}}3
+    {8.6}{{{\color{goldenrod2}\textbf{8.6}}}}3
+    {9.6}{{{\color{goldenrod2}\textbf{9.6}}}}3
+    {0.7}{{{\color{goldenrod2}\textbf{0.7}}}}3
+    {1.7}{{{\color{goldenrod2}\textbf{1.7}}}}3
+    {2.7}{{{\color{goldenrod2}\textbf{2.7}}}}3
+    {3.7}{{{\color{goldenrod2}\textbf{3.7}}}}3
+    {4.7}{{{\color{goldenrod2}\textbf{4.7}}}}3
+    {5.7}{{{\color{goldenrod2}\textbf{5.7}}}}3
+    {6.7}{{{\color{goldenrod2}\textbf{6.7}}}}3
+    {7.7}{{{\color{goldenrod2}\textbf{7.7}}}}3
+    {8.7}{{{\color{goldenrod2}\textbf{8.7}}}}3
+    {9.7}{{{\color{goldenrod2}\textbf{9.7}}}}3
+    {0.8}{{{\color{goldenrod2}\textbf{0.8}}}}3
+    {1.8}{{{\color{goldenrod2}\textbf{1.8}}}}3
+    {2.8}{{{\color{goldenrod2}\textbf{2.8}}}}3
+    {3.8}{{{\color{goldenrod2}\textbf{3.8}}}}3
+    {4.8}{{{\color{goldenrod2}\textbf{4.8}}}}3
+    {5.8}{{{\color{goldenrod2}\textbf{5.8}}}}3
+    {6.8}{{{\color{goldenrod2}\textbf{6.8}}}}3
+    {7.8}{{{\color{goldenrod2}\textbf{7.8}}}}3
+    {8.8}{{{\color{goldenrod2}\textbf{8.8}}}}3
+    {9.8}{{{\color{goldenrod2}\textbf{9.8}}}}3
+    {0.9}{{{\color{goldenrod2}\textbf{0.9}}}}3
+    {1.9}{{{\color{goldenrod2}\textbf{1.9}}}}3
+    {2.9}{{{\color{goldenrod2}\textbf{2.9}}}}3
+    {3.9}{{{\color{goldenrod2}\textbf{3.9}}}}3
+    {4.9}{{{\color{goldenrod2}\textbf{4.9}}}}3
+    {5.9}{{{\color{goldenrod2}\textbf{5.9}}}}3
+    {6.9}{{{\color{goldenrod2}\textbf{6.9}}}}3
+    {7.9}{{{\color{goldenrod2}\textbf{7.9}}}}3
+    {8.9}{{{\color{goldenrod2}\textbf{8.9}}}}3
+    {9.9}{{{\color{goldenrod2}\textbf{9.9}}}}3
+    {Inf}{{{\color{goldenrod2}\textbf{Inf}}}}3
+    {+}{{{\color{deepskyblue!85!black}\textbf{+}}}}1
+    {-}{{{\color{deepskyblue!85!black}\textbf{-}}}}1
+    {*}{{{\color{deepskyblue!85!black}\textbf{*}}}}1
+    {/}{{{\color{deepskyblue!85!black}\textbf{/}}}}1
+    {\%>\%}{{{\color{deepskyblue!85!black}\textbf{\%>\%}}}}3
+    {R>}{{{\color{black}\bfseries R>}}}2
+    {<-}{{{\color{black}\bfseries <-}}}2
+    {(}{{{\color{deepskyblue!85!black}\textbf{(}}}}1
+    {)}{{{\color{deepskyblue!85!black}\textbf{)}}}}1
+    {[}{{{\color{deepskyblue!85!black}\textbf{[}}}}1
+    {]}{{{\color{deepskyblue!85!black}\textbf{]}}}}1
+    {\{}{{{\color{deepskyblue!85!black}\textbf{\{}}}}1
+    {\}}{{{\color{deepskyblue!85!black}\textbf{\}}}}}1
+    {julia>}{{{\color{black}\bfseries julia>}}}6
+}
+\lstdefinelanguage{R}{
+    backgroundcolor=\color{dodgerblue!2.5!white},       % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+    rulecolor=\color{dodgerblue!50!white},              % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+    commentstyle=\color{springgreen3},                  % comment style
+    keywordstyle={\color{dodgerblue}\textbf},           % keyword style
+    numberstyle=\scriptsize\color{goldenrod2},          % the style that is used for the line-numbers
+    stringstyle=\color{maroon2},                        % string literal style
+    morekeywords={
+        if, else, repeat, while, function, for, in, next, break, TRUE, FALSE, NULL, NA, NaN, abbreviate, abline, abs, acf, acos, acosh, addmargins, aggregate, agrep,
+        alarm, alias, alist, all, anova, any, aov, aperm, append, apply, approx, approxfun, apropos, ar, args, arima, array, arrows, asin, asinh, assign, assocplot, atan,
+        atanh, attach, attr, attributes, autoload, autoloader, ave, axis, backsolve, barplot, basename, beta, bindtextdomain, binomial, biplot, bitmap, bmp, body, box,
+        boxplot, bquote, break, browser, builtins, bxp, by, bzfile, c call, cancor, capabilities, casefold, cat, category, cbind, ccf, ceiling, character, charmatch,
+        chartr, chol, choose, chull, citation, class, close, cm, cmdscale, codes, coef, coefficients, col, colnames, colors, colorspaces, colours, comment, complex,
+        confint, conflicts, contour, contrasts, contributors, convolve, cophenetic, coplot, cor, cos, cosh, cov, covratio, cpgram, crossprod, cummax, cummin, cumprod,
+        cumsum, curve, cut, cutree, cycle, data, dataentry, date, dbeta, dbinom, dcauchy, dchisq, de, debug, debugger, decompose, delay, deltat, demo, dendrapply,
+        density, deparse, deriv, det, detach, determinant, deviance, dexp, df, dfbeta, dfbetas, dffits, dgamma, dgeom, dget, dhyper, diag, diff, diffinv, difftime,
+        digamma, dim, dimnames, dir, dirname, dist, dlnorm, dlogis, dmultinom, dnbinom, dnorm, dotchart, double, dpois, dput, drop, dsignrank, dt, dump, dunif, duplicated,
+        dweibull, dwilcox, eapply, ecdf, edit, effects, eigen, emacs, embed, end, environment, eval, evalq, example, exists, exp, expression, factanal, factor, factorial,
+        family, fft, fifo, file, filter, find, fitted, fivenum, fix, floor, flush, for, force, formals, format, formula, forwardsolve, fourfoldplot, frame, frequency,
+        ftable, function, gamma, gaussian, gc, gcinfo, gctorture, get, getenv, geterrmessage, gettext, gettextf, getwd, gl, glm, globalenv, gray, grep, grey, grid, gsub,
+        gzcon, gzfile, hat, hatvalues, hcl, hclust, head, heatmap, help, hist, history, hsv, httpclient, iconv, iconvlist, identical, identify, if, ifelse, image,
+        influence, inherits, integer, integrate, interaction, interactive, intersect, invisible, isoreg, jitter, jpeg, julian, kappa, kernapply, kernel, kmeans, knots,
+        kronecker, ksmooth, labels, lag, lapply, layout, lbeta, lchoose, lcm, legend, length, letters, levels, lfactorial, lgamma, library, licence, license, line, lines,
+        list, lm, load, loadhistory, loadings, local, locator, loess, log, logb, logical, loglin, lowess, ls, lsfit, machine, mad, mahalanobis, makepredictcall, manova,
+        mapply, match, matlines, matplot, matpoints, matrix, max, mean, median, medpolish, menu, merge, message, methods, mget, min, missing, mode, monthplot, months,
+        mosaicplot, mtext, mvfft, names, napredict, naprint, naresid, nargs, nchar, ncol, next, nextn, ngettext, nlevels, nlm, nls, noquote, nrow, numeric, objects, offset,
+        open, optim, optimise, optimize, options, order, ordered, outer, pacf, page, pairlist, pairs, palette, par, parse, paste, pbeta, pbinom, pbirthday, pcauchy, pchisq,
+        pdf, pentagamma, person, persp, pexp, pf, pgamma, pgeom, phyper, pi, pico, pictex, pie, piechart, pipe, plclust, plnorm, plogis, plot, pmatch, pmax, pmin, pnbinom,
+        png, pnorm, points, poisson, poly, polygon, polym, polyroot, postscript, power, ppoints, ppois, ppr, prcomp, predict, preplot, pretty, princomp, print, prmatrix,
+        prod, profile, profiler, proj, promax, prompt, provide, psigamma, psignrank, pt, ptukey, punif, pweibull, pwilcox, q qbeta, qbinom, qbirthday, qcauchy, qchisq, qexp,
+        qf, qgamma, qgeom, qhyper, qlnorm, qlogis, qnbinom, qnorm, qpois, qqline, qqnorm, qqplot, qr, qsignrank, qt, qtukey, quantile, quarters, quasi, quasibinomial,
+        quasipoisson, quit, qunif, quote, qweibull, qwilcox, rainbow, range, rank, raw, rbeta, rbind, rbinom, rcauchy, rchisq, readline, real, recover, rect, reformulate,
+        regexpr, relevel, remove, reorder, rep, repeat, replace, replicate, replications, require, reshape, resid, residuals, restart, return, rev, rexp, rf, rgamma, rgb,
+        rgeom, rhyper, rle, rlnorm, rlogis, rm, rmultinom, rnbinom, rnorm, round, row, rownames, rowsum, rpois, rsignrank, rstandard, rstudent, rt, rug, runif, runmed,
+        rweibull, rwilcox, sample, sapply, save, savehistory, scale, scan, screen, screeplot, sd, search, searchpaths, seek, segments, seq, sequence, serialize, setdiff,
+        setequal, setwd, shell, sign, signif, sin, single, sinh, sink, smooth, solve, sort, source, spectrum, spline, splinefun, split, sprintf, sqrt, stack, stars, start,
+        stderr, stdin, stdout, stem, step, stepfun, stl, stop, stopifnot, str, strftime, strheight, stripchart, strptime, strsplit, strtrim, structure, strwidth, strwrap,
+        sub, subset, substitute, substr, substring, sum, summary, sunflowerplot, supsmu, svd, sweep, switch, symbols, symnum, system, t table, tabulate, tail, tan, tanh,
+        tapply, tempdir, tempfile, termplot, terms, tetragamma, text, time, title, toeplitz, tolower, topenv, toupper, trace, traceback, transform, trigamma, trunc,
+        truncate, try, ts, tsdiag, tsp, typeof, unclass, undebug, union, unique, uniroot, unix, unlink, unlist, unname, unserialize, unsplit, unstack, untrace, unz,
+        update, upgrade, url, var, varimax, vcov, vector, version, vi, vignette, warning, warnings, weekdays, weights, which, while, window, windows, with, write,
+        wsbrowser, xedit, xemacs, xfig, xinch, xor, xtabs, xyinch, yinch, zapsmall,
+        ggplot, ggvis
+    },
+    sensitive=true,
+    morecomment=[l]{\#},
+    morestring=[b]',
+    morestring=[b]",
+    literate=%
+    *{0}{{{\color{goldenrod2}\textbf{0}}}}1
+    {1}{{{\color{goldenrod2}\textbf{1}}}}1
+    {2}{{{\color{goldenrod2}\textbf{2}}}}1
+    {3}{{{\color{goldenrod2}\textbf{3}}}}1
+    {4}{{{\color{goldenrod2}\textbf{4}}}}1
+    {5}{{{\color{goldenrod2}\textbf{5}}}}1
+    {6}{{{\color{goldenrod2}\textbf{6}}}}1
+    {7}{{{\color{goldenrod2}\textbf{7}}}}1
+    {8}{{{\color{goldenrod2}\textbf{8}}}}1
+    {9}{{{\color{goldenrod2}\textbf{9}}}}1
+    {0.0}{{{\color{goldenrod2}\textbf{0.0}}}}3
+    {1.0}{{{\color{goldenrod2}\textbf{1.0}}}}3
+    {2.0}{{{\color{goldenrod2}\textbf{2.0}}}}3
+    {3.0}{{{\color{goldenrod2}\textbf{3.0}}}}3
+    {4.0}{{{\color{goldenrod2}\textbf{4.0}}}}3
+    {5.0}{{{\color{goldenrod2}\textbf{5.0}}}}3
+    {6.0}{{{\color{goldenrod2}\textbf{6.0}}}}3
+    {7.0}{{{\color{goldenrod2}\textbf{7.0}}}}3
+    {8.0}{{{\color{goldenrod2}\textbf{8.0}}}}3
+    {9.0}{{{\color{goldenrod2}\textbf{9.0}}}}3
+    {0.1}{{{\color{goldenrod2}\textbf{0.1}}}}3
+    {1.1}{{{\color{goldenrod2}\textbf{1.1}}}}3
+    {2.1}{{{\color{goldenrod2}\textbf{2.1}}}}3
+    {3.1}{{{\color{goldenrod2}\textbf{3.1}}}}3
+    {4.1}{{{\color{goldenrod2}\textbf{4.1}}}}3
+    {5.1}{{{\color{goldenrod2}\textbf{5.1}}}}3
+    {6.1}{{{\color{goldenrod2}\textbf{6.1}}}}3
+    {7.1}{{{\color{goldenrod2}\textbf{7.1}}}}3
+    {8.1}{{{\color{goldenrod2}\textbf{8.1}}}}3
+    {9.1}{{{\color{goldenrod2}\textbf{9.1}}}}3
+    {0.2}{{{\color{goldenrod2}\textbf{0.2}}}}3
+    {1.2}{{{\color{goldenrod2}\textbf{1.2}}}}3
+    {2.2}{{{\color{goldenrod2}\textbf{2.2}}}}3
+    {3.2}{{{\color{goldenrod2}\textbf{3.2}}}}3
+    {4.2}{{{\color{goldenrod2}\textbf{4.2}}}}3
+    {5.2}{{{\color{goldenrod2}\textbf{5.2}}}}3
+    {6.2}{{{\color{goldenrod2}\textbf{6.2}}}}3
+    {7.2}{{{\color{goldenrod2}\textbf{7.2}}}}3
+    {8.2}{{{\color{goldenrod2}\textbf{8.2}}}}3
+    {9.2}{{{\color{goldenrod2}\textbf{9.2}}}}3
+    {0.3}{{{\color{goldenrod2}\textbf{0.3}}}}3
+    {1.3}{{{\color{goldenrod2}\textbf{1.3}}}}3
+    {2.3}{{{\color{goldenrod2}\textbf{2.3}}}}3
+    {3.3}{{{\color{goldenrod2}\textbf{3.3}}}}3
+    {4.3}{{{\color{goldenrod2}\textbf{4.3}}}}3
+    {5.3}{{{\color{goldenrod2}\textbf{5.3}}}}3
+    {6.3}{{{\color{goldenrod2}\textbf{6.3}}}}3
+    {7.3}{{{\color{goldenrod2}\textbf{7.3}}}}3
+    {8.3}{{{\color{goldenrod2}\textbf{8.3}}}}3
+    {9.3}{{{\color{goldenrod2}\textbf{9.3}}}}3
+    {0.4}{{{\color{goldenrod2}\textbf{0.4}}}}3
+    {1.4}{{{\color{goldenrod2}\textbf{1.4}}}}3
+    {2.4}{{{\color{goldenrod2}\textbf{2.4}}}}3
+    {3.4}{{{\color{goldenrod2}\textbf{3.4}}}}3
+    {4.4}{{{\color{goldenrod2}\textbf{4.4}}}}3
+    {5.4}{{{\color{goldenrod2}\textbf{5.4}}}}3
+    {6.4}{{{\color{goldenrod2}\textbf{6.4}}}}3
+    {7.4}{{{\color{goldenrod2}\textbf{7.4}}}}3
+    {8.4}{{{\color{goldenrod2}\textbf{8.4}}}}3
+    {9.4}{{{\color{goldenrod2}\textbf{9.4}}}}3
+    {0.5}{{{\color{goldenrod2}\textbf{0.5}}}}3
+    {1.5}{{{\color{goldenrod2}\textbf{1.5}}}}3
+    {2.5}{{{\color{goldenrod2}\textbf{2.5}}}}3
+    {3.5}{{{\color{goldenrod2}\textbf{3.5}}}}3
+    {4.5}{{{\color{goldenrod2}\textbf{4.5}}}}3
+    {5.5}{{{\color{goldenrod2}\textbf{5.5}}}}3
+    {6.5}{{{\color{goldenrod2}\textbf{6.5}}}}3
+    {7.5}{{{\color{goldenrod2}\textbf{7.5}}}}3
+    {8.5}{{{\color{goldenrod2}\textbf{8.5}}}}3
+    {9.5}{{{\color{goldenrod2}\textbf{9.5}}}}3
+    {0.6}{{{\color{goldenrod2}\textbf{0.6}}}}3
+    {1.6}{{{\color{goldenrod2}\textbf{1.6}}}}3
+    {2.6}{{{\color{goldenrod2}\textbf{2.6}}}}3
+    {3.6}{{{\color{goldenrod2}\textbf{3.6}}}}3
+    {4.6}{{{\color{goldenrod2}\textbf{4.6}}}}3
+    {5.6}{{{\color{goldenrod2}\textbf{5.6}}}}3
+    {6.6}{{{\color{goldenrod2}\textbf{6.6}}}}3
+    {7.6}{{{\color{goldenrod2}\textbf{7.6}}}}3
+    {8.6}{{{\color{goldenrod2}\textbf{8.6}}}}3
+    {9.6}{{{\color{goldenrod2}\textbf{9.6}}}}3
+    {0.7}{{{\color{goldenrod2}\textbf{0.7}}}}3
+    {1.7}{{{\color{goldenrod2}\textbf{1.7}}}}3
+    {2.7}{{{\color{goldenrod2}\textbf{2.7}}}}3
+    {3.7}{{{\color{goldenrod2}\textbf{3.7}}}}3
+    {4.7}{{{\color{goldenrod2}\textbf{4.7}}}}3
+    {5.7}{{{\color{goldenrod2}\textbf{5.7}}}}3
+    {6.7}{{{\color{goldenrod2}\textbf{6.7}}}}3
+    {7.7}{{{\color{goldenrod2}\textbf{7.7}}}}3
+    {8.7}{{{\color{goldenrod2}\textbf{8.7}}}}3
+    {9.7}{{{\color{goldenrod2}\textbf{9.7}}}}3
+    {0.8}{{{\color{goldenrod2}\textbf{0.8}}}}3
+    {1.8}{{{\color{goldenrod2}\textbf{1.8}}}}3
+    {2.8}{{{\color{goldenrod2}\textbf{2.8}}}}3
+    {3.8}{{{\color{goldenrod2}\textbf{3.8}}}}3
+    {4.8}{{{\color{goldenrod2}\textbf{4.8}}}}3
+    {5.8}{{{\color{goldenrod2}\textbf{5.8}}}}3
+    {6.8}{{{\color{goldenrod2}\textbf{6.8}}}}3
+    {7.8}{{{\color{goldenrod2}\textbf{7.8}}}}3
+    {8.8}{{{\color{goldenrod2}\textbf{8.8}}}}3
+    {9.8}{{{\color{goldenrod2}\textbf{9.8}}}}3
+    {0.9}{{{\color{goldenrod2}\textbf{0.9}}}}3
+    {1.9}{{{\color{goldenrod2}\textbf{1.9}}}}3
+    {2.9}{{{\color{goldenrod2}\textbf{2.9}}}}3
+    {3.9}{{{\color{goldenrod2}\textbf{3.9}}}}3
+    {4.9}{{{\color{goldenrod2}\textbf{4.9}}}}3
+    {5.9}{{{\color{goldenrod2}\textbf{5.9}}}}3
+    {6.9}{{{\color{goldenrod2}\textbf{6.9}}}}3
+    {7.9}{{{\color{goldenrod2}\textbf{7.9}}}}3
+    {8.9}{{{\color{goldenrod2}\textbf{8.9}}}}3
+    {9.9}{{{\color{goldenrod2}\textbf{9.9}}}}3
+    {Inf}{{{\color{goldenrod2}\textbf{Inf}}}}3
+    {+}{{{\color{deepskyblue!85!black}\textbf{+}}}}1
+    {-}{{{\color{deepskyblue!85!black}\textbf{-}}}}1
+    {*}{{{\color{deepskyblue!85!black}\textbf{*}}}}1
+    {/}{{{\color{deepskyblue!85!black}\textbf{/}}}}1
+    {\%>\%}{{{\color{deepskyblue!85!black}\textbf{\%>\%}}}}3
+    {R>}{{{\color{black}\bfseries R>}}}2
+    {<-}{{{\color{black}\bfseries <-}}}2
+    {(}{{{\color{deepskyblue!85!black}\textbf{(}}}}1
+    {)}{{{\color{deepskyblue!85!black}\textbf{)}}}}1
+    {[}{{{\color{deepskyblue!85!black}\textbf{[}}}}1
+    {]}{{{\color{deepskyblue!85!black}\textbf{]}}}}1
+    {\{}{{{\color{deepskyblue!85!black}\textbf{\{}}}}1
+    {\}}{{{\color{deepskyblue!85!black}\textbf{\}}}}}1
+}
+\lstdefinelanguage{md}{
+    backgroundcolor=\color{dodgerblue!2.5!white},       % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+    rulecolor=\color{dodgerblue!50!white},              % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+    commentstyle=\color{springgreen3},                  % comment style
+    keywordstyle={\color{dodgerblue}\textbf},           % keyword style
+    numberstyle=\scriptsize\color{goldenrod2},          % the style that is used for the line-numbers
+    stringstyle=\color{maroon2},                        % string literal style
+    morecomment=[l][\color{dodgerblue}\textbf]{\#},
+    sensitive=true,
+    literate=%
+    {à}{{\`a}}1
+    {è}{{\`e}}1
+    {é}{{\'e}}1
+    {ê}{{\^e}}1
+    {`}{{{\color{dodgerblue}\textbf{`}}}}1
+    {*}{{{\color{dodgerblue}\textbf{*}}}}1
+    {(}{{{\color{deepskyblue!85!black}\textbf{(}}}}1
+    {)}{{{\color{deepskyblue!85!black}\textbf{)}}}}1
+    {[}{{{\color{deepskyblue!85!black}\textbf{[}}}}1
+    {]}{{{\color{deepskyblue!85!black}\textbf{]}}}}1
+    {\{}{{{\color{deepskyblue!85!black}\textbf{\{}}}}1
+    {\}}{{{\color{deepskyblue!85!black}\textbf{\}}}}}1
+}
+\lstdefinelanguage{yaml}{
+    morecomment=[s]{<!--}{-->},
+    morekeywords={
+        output, word_document, html_document, pdf_document, beamer_presentation
+    }
+}
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\lsthk@SelectCharTable}{%
+  \lst@ifbreaklines\lst@Def{`)}{\lst@breakProcessOther)}\fi
+}{%
+}{
+}{
+}
+\makeatother
+
+\newif\ifblacked\blackedfalse
+\ifblacked
+    \usepackage[colorlinks=true,
+        linkcolor=black,
+        urlcolor=black,
+        citecolor=black,
+        filecolor=black,
+        menucolor=black,
+        pdftex=true,
+        bookmarks=true,
+        bookmarksopen=true,
+        hyperfootnotes=true,
+        pdfauthor={Mickaël Canouil},
+        pdfcreator={Mickaël Canouil}]{hyperref}
+    \renewcommand{\thefootnote}{\textcolor{black}{\arabic{footnote}}}
+\else
+    \usepackage[colorlinks=true,
+        linkcolor=firebrick2,
+        urlcolor=maroon2,
+        citecolor=dodgerblue,
+        filecolor=goldenrod2,
+        menucolor=dodgerblue,
+        pdftex=true,
+        bookmarks=true,
+        bookmarksopen=true,
+        hyperfootnotes=true,
+        pdfauthor={Mickaël Canouil},
+        pdfcreator={Mickaël Canouil}]{hyperref}
+    \renewcommand{\thefootnote}{\textcolor{springgreen3}{\arabic{footnote}}}
+\fi
+
+\usepackage[all]{hypcap}
+
+\renewcommand{\baselinestretch}{1.5}
+
+\setlength{\headheight}{15pt}
+\setlength{\abovecaptionskip}{0pt}
+\setlength{\tabcolsep}{10pt} % default
+
+\newlength{\wideitemsep}
+\setlength{\wideitemsep}{.5\itemsep}
+\addtolength{\wideitemsep}{-7pt}
+\let\olditem\item
+\newcommand{\items}{\setlength{\itemsep}{\wideitemsep}\olditem}
+
+\usepackage[square, authoryear]{natbib}
+\bibliographystyle{apalike}
+
+\makeatletter
+	\def\maketitle{
+        \hypersetup{pageanchor=false}
+		\begin{titlepage}
+			\begin{center}
+				{\setlength{\baselineskip}{0.5\baselineskip}
+					{\Large{\@institute}\linebreak}
+				\par}
+					\vskip 0cm
+				{\setlength{\baselineskip}{0.5\baselineskip}
+					{\small{\@address}\linebreak}
+				\par}
+					\vfill
+                {\setlength{\baselineskip}{1.5\baselineskip}
+                    {\Huge{\bf\@title}}
+                \par}
+					\vskip 2cm
+				{\Large{\@author}}
+					\vskip 0.25cm
+				{\setlength{\baselineskip}{0.5\baselineskip}
+					{\small{\@grade}}
+				\par}
+					\vskip 0cm
+				{\setlength{\baselineskip}{0.5\baselineskip}
+					{\footnotesize{(\@email)}}
+				\par}
+                    \vskip 1cm
+				{\setlength{\baselineskip}{0.75\baselineskip}
+					{\small{\@cst}\linebreak}
+				\par}
+					\vfill
+				{\large{\@date}}
+					\vskip 2cm
+				{\includegraphics[height=60pt, keepaspectratio]{./Logos/logo_cnrs.pdf} \hfill \includegraphics[height=60pt, keepaspectratio]{./Logos/UL2-WEB-2014.png} \hfill \includegraphics[height=60pt, keepaspectratio]{./Logos/Institut-Pasteur-de-Lille.png} \hfill \includegraphics[height=60pt, keepaspectratio]{./Logos/logo_egid.pdf}}
+			\end{center}
+		\end{titlepage}
+        \hypersetup{pageanchor=true}
+	}
+	\def\email#1{\def\@email{#1}}
+	\def\institute#1{\def\@institute{#1}}
+	\def\address#1{\def\@address{#1}}
+	\def\grade#1{\def\@grade{#1}}
+	\def\cst#1{\def\@cst{#1}}
+\makeatother
+
+
+\newcommand\bref[2]{\hyperref[#1]{#2~\ref*{#1}}}
+\newcommand\cmd[1]{\texttt{\color{black}\textbf{#1}}}
+\newcommand\cmdb[1]{\texttt{\color{dodgerblue}\textbf{#1}}}
+\newcommand\cmdr[1]{\texttt{\color{firebrick2}\textbf{#1}}}
+\newcommand\cmdg[1]{\texttt{\color{springgreen3}\textbf{#1}}}
+\newcommand\cmdy[1]{\texttt{\color{goldenrod2}\textbf{#1}}}
+\newcommand\blue[1]{{\color{dodgerblue}\textbf{#1}}}
+\newcommand\red[1]{{\color{firebrick2}\textbf{#1}}}
+\newcommand\green[1]{{\color{springgreen3}\textbf{#1}}}
+\newcommand\yellow[1]{{\color{goldenrod2}\textbf{#1}}}
+\newcommand\pql{{\rmfamily \textbf{\color{goldenrod2}``}}}
+\newcommand\pqr{{\rmfamily \textbf{\color{goldenrod2}''}}}
+\newcommand\pq[3]{{\rmfamily \textbf{\color{#3}``}}#1{\rmfamily \textbf{\color{#3}''}} - \textcolor{#3}{#2}}
+\newenvironment{bquote}[1]
+    {\begin{quotation}
+    \vspace{10pt}
+    \newcommand{\bqauthor}{\normalfont \begin{quote}\begin{flushright}--- #1\end{flushright}\end{quote}}
+    \rmfamily \itshape {\huge\textbf{``}}
+    }
+    {{\huge\textbf{''}}
+    \bqauthor
+    \end{quotation}
+    }
+\newcommand\lettrine[1]{{\huge{$\mathcal{#1}$}}}
+
+\newcommand{\R}{\protect\includegraphics[height=0.5cm, keepaspectratio]{./Logos/logo_R.pdf}}
+\newcommand{\Julia}{\protect{\raisebox{-0.5ex}{\includegraphics[height=0.5cm, keepaspectratio]{./Logos/logo_julia.pdf}}}}

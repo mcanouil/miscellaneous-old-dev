@@ -23,7 +23,7 @@ setwd("/disks/DATA/PRJCT/")
     library(ggrepel)
     library(flashpcaR)
     
-    null <- sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rscripts/", full.names = TRUE), source)
+    null <- sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source)
     
     theme_dark <- TRUE
     if (theme_dark) {

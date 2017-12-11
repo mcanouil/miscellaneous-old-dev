@@ -23,6 +23,7 @@ cd /disks/PROJECT/$projectName/
 git init
 git add .
 git commit -m 'Initialise'
+git remote add origin git@gitlab.egid.local:BioStat/$projectName.git
 
 cd $currentdir
 unset currentdir

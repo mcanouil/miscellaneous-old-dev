@@ -16,6 +16,7 @@ mkdir /disks/DATA/$projectName/
 ln -s /disks/DATA/$projectName/ /disks/PROJECT/$projectName/Data
 
 cat /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/defaultScript.R | sed -e "s/PRJCT/$projectName/g" > "/disks/PROJECT/$projectName/Scripts/00-${projectName}.R"
+cat /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/defaultScript.Rmd | sed -e "s/PRJCT/$projectName/g" > "/disks/PROJECT/$projectName/Scripts/00-${projectName}.Rmd"
 
 cp /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/gitignore.txt /disks/PROJECT/$projectName/.gitignore
 

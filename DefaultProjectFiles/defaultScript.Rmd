@@ -1,0 +1,78 @@
+---
+title: 'PRJCT'
+author: 'Mickaël Canouil, *Ph.D.*'
+date: '`r format(Sys.Date(), "%d %B %Y")`'
+monofont: "Source Code Pro"
+monofontoptions: "Scale=0.7"
+params:
+    outputCode: TRUE
+    nCores: '`r parallel::detectCores()`'
+    theme_dark: TRUE
+output:
+    bookdown::html_document2:
+        theme: simplex
+        toc: true
+        toc_depth: 5
+        toc_float: true
+        number_sections: true
+        self_containd: true
+    bookdown::pdf_document2:
+        toc: true
+        toc_depth: 5
+        toc_float: true
+        number_sections: true
+---
+
+```{r setup, include=FALSE}
+# rm(list = ls())
+options(stringsAsFactors = FALSE)
+
+library(knitr)
+opts_chunk$set(
+    echo = TRUE,
+    size = 'small',
+    include = params$outputCode
+)
+
+# Code to resize font size of R code chunks output according to 'size' option (only LATEX)
+if (knitr:::is_latex_output()) {
+    def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+    knitr::knit_hooks$set(chunk = function(x, options) {
+        x <- def.chunk.hook(x, options)
+        ifelse(options$size != "normalsize", paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+    })
+} else {}
+
+### Define nCores
+    nCores <- params$nCores
+
+
+### Load packages
+    library(parallel)
+    library(grid)
+    library(scales)
+    library(tidyverse)
+    library(broom)
+    library(viridis)
+    library(readxl)
+    library(writexl)
+    library(cowplot)
+    library(ggrepel)
+    library(flashpcaR)
+    
+    null <- sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source)
+    
+    theme_dark <- params$theme_dark
+    if (theme_dark) {
+        ## Theme Black ON ##
+        theme_set(theme_black(base_size = 14))
+        plot_grid <- hijack(plot_grid, theme_dark = theme_dark)
+        scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
+        scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
+    } else {
+        theme_set(theme_light(base_size = 14))
+        scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 0, end = 4/5)
+        scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 0, end = 4/5)
+    }    
+
+```

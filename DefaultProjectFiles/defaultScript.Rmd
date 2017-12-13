@@ -8,7 +8,6 @@ params:
     outputCode: FALSE
     nCores: '`r parallel::detectCores()`'
     theme_dark: FALSE
-    ccRatio: 3
     dpi: 120
     ggFontSize: 9
 output:

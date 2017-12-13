@@ -14,24 +14,46 @@ output:
         toc: true
         toc_depth: 5
         toc_float: true
+        fig_width: 7.5
+        fig_height: 6
         number_sections: true
         self_containd: true
+        df_print: kable
     bookdown::pdf_document2:
         toc: true
         toc_depth: 5
         toc_float: true
+        fig_width: 7.5
+        fig_height: 6
         number_sections: true
+        df_print: kable
+        latex_engine: "pdflatex"
 ---
 
 ```{r setup, include=FALSE}
 # rm(list = ls())
 options(stringsAsFactors = FALSE)
 
+dir.create(gsub("/PROJECT/", "/DATA/", gsub("Scripts", "KnitrFiles", getwd())), recursive = TRUE, showWarnings = FALSE)
+
 library(knitr)
 opts_chunk$set(
-    echo = TRUE,
     size = 'small',
-    include = params$outputCode
+    include = params$outputCode,
+    echo = params$outputCode,
+    warning = params$outputCode,
+    message = params$outputCode,
+    tidy = FALSE,
+    crop = TRUE,
+    autodep = TRUE,
+    fig.height = 6,
+    fig.width = 7.5,
+    fig.align = 'center',
+    fig.pos = 'H',
+    dpi = 300,
+    fig.path = paste0(gsub("/PROJECT/", "/DATA/", getwd()), "KnitrFiles/"),
+    cache = FALSE,
+    cache.path = paste0(gsub("/PROJECT/", "/DATA/", getwd()), "KnitrFiles/")
 )
 
 # Code to resize font size of R code chunks output according to 'size' option (only LATEX)

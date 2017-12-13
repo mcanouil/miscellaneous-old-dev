@@ -5,14 +5,17 @@ date: '`r format(Sys.Date(), "%d %B %Y")`'
 monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
 params:
-    outputCode: TRUE
+    outputCode: FALSE
     nCores: '`r parallel::detectCores()`'
-    theme_dark: TRUE
+    theme_dark: FALSE
+    ccRatio: 3
+    dpi: 120
+    ggFontSize: 9
 output:
     bookdown::html_document2:
         theme: simplex
         toc: true
-        toc_depth: 5
+        toc_depth: 2
         toc_float: true
         fig_width: 7.5
         fig_height: 6
@@ -21,7 +24,7 @@ output:
         df_print: kable
     bookdown::pdf_document2:
         toc: true
-        toc_depth: 5
+        toc_depth: 2
         toc_float: true
         fig_width: 7.5
         fig_height: 6
@@ -39,18 +42,18 @@ dir.create(gsub("/PROJECT/", "/DATA/", gsub("Scripts", "KnitrFiles", getwd())), 
 library(knitr)
 opts_chunk$set(
     size = 'small',
-    include = params$outputCode,
+    include = TRUE, #params$outputCode,
     echo = params$outputCode,
     warning = params$outputCode,
     message = params$outputCode,
     tidy = FALSE,
     crop = TRUE,
     autodep = TRUE,
-    fig.height = 6,
     fig.width = 7.5,
+    fig.height = 6,
     fig.align = 'center',
     fig.pos = 'H',
-    dpi = 300,
+    dpi = params$dpi,
     fig.path = paste0(gsub("/PROJECT/", "/DATA/", getwd()), "KnitrFiles/"),
     cache = FALSE,
     cache.path = paste0(gsub("/PROJECT/", "/DATA/", getwd()), "KnitrFiles/")

@@ -22,6 +22,10 @@ setwd("/disks/DATA/PRJCT/")
     library(cowplot)
     library(ggrepel)
     library(flashpcaR)
+    library(ggsignif)
+    library(qdap)
+    library(tableone)
+    library(Hmisc)
     
     null <- sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source)
     

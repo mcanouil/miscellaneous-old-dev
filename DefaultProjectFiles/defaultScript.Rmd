@@ -16,17 +16,17 @@ output:
         toc: true
         toc_depth: 2
         toc_float: true
-        fig_width: 7.5
-        fig_height: 6
+        fig_width: 5
+        fig_height: 4
         number_sections: true
         self_containd: true
+        mathjax: default
         df_print: kable
     bookdown::pdf_document2:
         toc: true
         toc_depth: 2
-        toc_float: true
-        fig_width: 7.5
-        fig_height: 6
+        fig_width: 5
+        fig_height: 4
         number_sections: true
         df_print: kable
         latex_engine: "pdflatex"
@@ -48,8 +48,8 @@ opts_chunk$set(
     tidy = FALSE,
     crop = TRUE,
     autodep = TRUE,
-    fig.width = 7.5,
-    fig.height = 6,
+    # fig.width = 7.5,
+    # fig.height = 6,
     fig.align = 'center',
     fig.pos = 'H',
     dpi = params$dpi,
@@ -66,6 +66,36 @@ if (knitr:::is_latex_output()) {
         ifelse(options$size != "normalsize", paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
     })
 } else {}
+
+library(kableExtra)
+library(Hmisc)
+mykable <- function (
+    data, 
+    font_size = params$ggFontSize, 
+    format.args = list(scientific = -1, digits = 3, big.mark = ","), 
+    ...
+) {
+    colnames(data) <- capitalize(colnames(data))
+    if (knitr:::is_latex_output()) {
+        options(knitr.table.format = "latex")
+        kable(x = data, booktabs = TRUE, format.args = format.args, ...) %>%
+            kable_styling(
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE,
+                position = "center",
+                font_size = font_size
+            )
+    } else {
+        options(knitr.table.format = "html")
+        kable(x = data, format.args = format.args, ...) %>%
+            kable_styling(
+                bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                full_width = TRUE,
+                position = "center",
+                font_size = font_size
+            )
+    }
+}
 
 ### Define nCores
     nCores <- params$nCores
@@ -85,6 +115,8 @@ if (knitr:::is_latex_output()) {
     library(flashpcaR)
     library(ggsignif)
     library(qdap)
+    library(tableone)
+    library(Hmisc)
     
     null <- sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source)
     

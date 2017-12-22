@@ -1,7 +1,7 @@
 ---
 title: 'PRJCT'
 author: 'Mickaël Canouil, *Ph.D.*'
-date: '`r format(Sys.Date(), "%d %B %Y")`'
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
 monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
 params:
@@ -15,7 +15,8 @@ output:
         theme: simplex
         toc: true
         toc_depth: 2
-        toc_float: true
+        toc_float: 
+            collapsed: false
         fig_width: 5
         fig_height: 4
         number_sections: true
@@ -98,39 +99,39 @@ mykable <- function (
 }
 
 ### Define nCores
-    nCores <- params$nCores
+nCores <- params$nCores
 
 
 ### Load packages
-    library(parallel)
-    library(grid)
-    library(scales)
-    library(tidyverse)
-    library(broom)
-    library(viridis)
-    library(readxl)
-    library(writexl)
-    library(cowplot)
-    library(ggrepel)
-    library(flashpcaR)
-    library(ggsignif)
-    library(qdap)
-    library(tableone)
-    library(Hmisc)
-    
-    null <- sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source)
-    
-    theme_dark <- params$theme_dark
-    if (theme_dark) {
-        ## Theme Black ON ##
-        theme_set(theme_black(base_size = 14))
-        plot_grid <- hijack(plot_grid, theme_dark = theme_dark)
-        scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
-        scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
-    } else {
-        theme_set(theme_light(base_size = 14))
-        scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 0, end = 4/5)
-        scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 0, end = 4/5)
-    }    
+library(parallel)
+library(grid)
+library(scales)
+library(tidyverse)
+library(broom)
+library(viridis)
+library(readxl)
+library(writexl)
+library(cowplot)
+library(ggrepel)
+library(flashpcaR)
+library(ggsignif)
+library(qdap)
+library(tableone)
+library(Hmisc)
+
+null <- sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source)
+
+theme_dark <- params$theme_dark
+if (theme_dark) {
+    ## Theme Black ON ##
+    theme_set(theme_black(base_size = params$ggFontSize))
+    plot_grid <- hijack(plot_grid, theme_dark = theme_dark)
+    scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
+    scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
+} else {
+    theme_set(theme_light(base_size = params$ggFontSize))
+    scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 0, end = 4/5)
+    scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 0, end = 4/5)
+}    
 
 ```

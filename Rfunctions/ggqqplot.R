@@ -44,7 +44,7 @@ ggqqplot <- function (pvalue, lambdaNames = NULL, pt.size = 1) {
     p <- ggplot(data = res) +
         geom_abline(intercept = 0, slope = 1) +
         geom_point(aes_string(x = "logexppval", y = "logobspval", colour = "labnames", shape = "labnames"), size = pt.size) +
-        scale_colour_viridis(name = NULL) +
+        scale_colour_viridis(name = NULL, discrete = TRUE) +
         scale_shape_discrete(name = NULL, solid = FALSE) +
         labs(x = bquote(Expected -log[10](P[value])), y = bquote(Observed - log[10](P[value])), title = "Q-Q plot")
     axisLim <- range(pretty_breaks()(range(unlist(lapply(seq_len(ncol(pvalue)),

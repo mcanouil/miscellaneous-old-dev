@@ -184,11 +184,11 @@ calculate_gap <- function(d, sum, gap_total, mode=c("quantitative", "threshold")
     mapping <- match.arg(mapping)
     if(mapping == "linear"){
       # linear mapping
-      gap = map(h, 0, sum, 0, gap_total)
+      gap = ggmap(h, 0, sum, 0, gap_total)
     }else if(mapping == "exponential"){
       #exponential mapping      
       h.exp = map.exp(h, 0, max_height, 0, 1, scale = scale)
-      gap = map(h.exp, 0, sum, 0, gap_total)
+      gap = ggmap(h.exp, 0, sum, 0, gap_total)
     }
   }else if(mode =="threshold"){
     if(h > threshold){
@@ -442,7 +442,7 @@ map.exp <- function(value, start1, stop1, start2, stop2, scale = 0.5) {
 #' }
 #' @rdname map
 #' @export 
-map <- function(value, start1, stop1, start2, stop2) {
+ggmap <- function(value, start1, stop1, start2, stop2) {
   return (start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1)))
 }
 

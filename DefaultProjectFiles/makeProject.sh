@@ -7,6 +7,23 @@ currentdir=`pwd`
 
 printf "Engineer: Mickaël Canouil  " >> /disks/PROJECT/$projectName/README.md
 
+printf "Version: 1.0
+
+RestoreWorkspace: Default
+SaveWorkspace: Default
+AlwaysSaveHistory: Default
+
+EnableCodeIndexing: Yes
+UseSpacesForTab: Yes
+NumSpacesForTab: 4
+Encoding: UTF-8
+
+RnwWeave: knitr
+LaTeX: pdfLaTeX
+
+AutoAppendNewline: Yes
+" >> /disks/PROJECT/$projectName/$projectName.Rprof
+
 for iFile in "Docs" "Report" "Scripts"
 do
    mkdir /disks/PROJECT/$projectName/$iFile

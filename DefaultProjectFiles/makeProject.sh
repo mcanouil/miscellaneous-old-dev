@@ -22,7 +22,7 @@ RnwWeave: knitr
 LaTeX: pdfLaTeX
 
 AutoAppendNewline: Yes
-" >> /disks/PROJECT/$projectName/$projectName.Rprof
+" >> /disks/PROJECT/$projectName/$projectName.Rproj
 
 for iFile in "Docs" "Report" "Scripts"
 do

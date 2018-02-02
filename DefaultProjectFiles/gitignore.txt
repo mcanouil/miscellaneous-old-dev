@@ -8,6 +8,7 @@
 **.Ruserdata
 **.rdb
 **.rdx
+**.rds
 
 **.glo
 **.ist
@@ -19,6 +20,8 @@
 **.aux
 **.toc
 **.snm
+**.html
+**.pdf
 
 !/Scripts/
 !README.md

@@ -27,7 +27,7 @@ library(qdap)
 library(tableone)
 library(Hmisc)
 
-null <- sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source)
+sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source) %>% invisible()
 
 theme_dark <- TRUE
 if (theme_dark) {

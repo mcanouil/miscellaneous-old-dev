@@ -40,8 +40,7 @@ scriptName <- ""
 mainDir <- gsub("/PROJECT/", "/DATA/", gsub("Scripts", "", getwd()))
 outputDir <- paste0(mainDir, "/", scriptName)
 
-dir.create(gsub("/PROJECT/", "/DATA/", gsub("Scripts", "KnitrFiles", getwd())), recursive = TRUE, showWarnings = FALSE)
-dir.create(outputDir, recursive = TRUE, showWarnings = FALSE)
+dir.create(paste0(outputDir, , "/KnitrFiles"), recursive = TRUE, showWarnings = FALSE)
 
 
 ### Load packages and fucntions
@@ -82,9 +81,9 @@ opts_chunk$set(
     fig.align = 'center',
     fig.pos = 'H',
     dpi = params$dpi,
-    fig.path = paste0(gsub("/PROJECT/", "/DATA/", getwd()), "KnitrFiles/"),
+    fig.path = paste0(outputDir, , "/KnitrFiles"),
     cache = FALSE,
-    cache.path = paste0(gsub("/PROJECT/", "/DATA/", getwd()), "KnitrFiles/")
+    cache.path = paste0(outputDir, , "/KnitrFiles")
 )
 
 

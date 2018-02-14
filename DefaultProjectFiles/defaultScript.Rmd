@@ -97,36 +97,6 @@ if (knitr:::is_latex_output()) {
 } else {}
 
 
-### Custom kable function to output table
-mykable <- function (
-    data, 
-    font_size = params$ggFontSize, 
-    format.args = list(scientific = -1, digits = 3, big.mark = ","), 
-    ...
-) {
-    colnames(data) <- capitalize(colnames(data))
-    if (knitr:::is_latex_output()) {
-        options(knitr.table.format = "latex")
-        kable(x = data, booktabs = TRUE, format.args = format.args, ...) %>%
-            kable_styling(
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE,
-                position = "center",
-                font_size = font_size
-            )
-    } else {
-        options(knitr.table.format = "html")
-        kable(x = data, format.args = format.args, ...) %>%
-            kable_styling(
-                bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-                full_width = TRUE,
-                position = "center",
-                font_size = font_size
-            )
-    }
-}
-
-
 ### Define nCores
 nCores <- params$nCores
 

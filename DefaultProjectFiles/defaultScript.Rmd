@@ -43,7 +43,7 @@ outputDir <- paste0(mainDir, "/", scriptName)
 dir.create(paste0(outputDir, "/KnitrFiles"), recursive = TRUE, showWarnings = FALSE)
 
 
-### Load packages and fucntions
+### Load packages and functions
 library(parallel)
 library(grid)
 library(scales)

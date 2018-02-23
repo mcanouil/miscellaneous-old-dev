@@ -89,6 +89,6 @@ ggmanhattan <- function (data, chr, position, y, title = "Manhattan plot", xlab 
         labs(title = title, y = ylab, x = xlab) +
         expand_limits(y = 10^-(1.05*-log10(data[, y]))) +
         scale_y_continuous(trans = pval_trans(), expand = c(0, 0)) +
-        scale_colour_viridis()
+        scale_colour_viridis(discrete = TRUE)
     return(p)
 }

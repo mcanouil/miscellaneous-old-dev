@@ -47,7 +47,6 @@ dir.create(paste0(outputDir, "/KnitrFiles"), recursive = TRUE, showWarnings = FA
 library(parallel)
 library(grid)
 library(scales)
-library(tidyverse)
 library(broom)
 library(viridis)
 library(readxl)
@@ -62,6 +61,7 @@ library(Hmisc)
 library(knitr)
 library(rmarkdown)
 library(kableExtra)
+library(tidyverse)
 
 sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source) %>% invisible()
 

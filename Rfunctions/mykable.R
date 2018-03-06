@@ -7,7 +7,7 @@ mykable <- function (
     ...
 ) {
     if (!is.null(pval_cols)) {
-        data[, pval_cols] <- format.pval(
+        data[, pval_cols] <- format_pval(
             x = data[, pval_cols], 
             digits = format.args$digits
         )

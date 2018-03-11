@@ -6,6 +6,16 @@ mykable <- function (
     pval_cols = NULL,
     ...
 ) {
+	require(knitr)
+	require(kableExtra)
+	require(Hmisc)
+	format_pval <- function (x, thresh = 10^-2, digits = 3, eps = 1e-50) {
+		ifelse(
+			x>=thresh, 
+			Hmisc::format.pval(x, digits = digits, eps = eps, nsmall = digits), 
+			base::format.pval(x, digits = digits, eps = eps, scientific = TRUE, nsmall = digits)
+		)
+	}
     if (!is.null(pval_cols)) {
         data[, pval_cols] <- format_pval(
             x = data[, pval_cols], 

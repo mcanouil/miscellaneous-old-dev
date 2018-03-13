@@ -1,7 +1,9 @@
-pca_report <- function (data, design, techvars, outliers.comp = c(1, 2), outliers.thresh = 3, ncomp = 5, theme_dark = FALSE, title.level = 2) {
+pca_report <- function (data, design, techvars, outliers.comp = c(1, 2), outliers.thresh = 3, ncomp = 5, theme_dark = FALSE, title.level = 2, max.comp = 50) {
 	require(flashpcaR)
 	require(scales)
 	require(tidyverse)
+	
+	pca.res <- new.env()
 	
 	pca.dfxy <- data %>% 
 		as.data.frame() %>% 
@@ -13,10 +15,10 @@ pca_report <- function (data, design, techvars, outliers.comp = c(1, 2), outlier
 					method = "eigen",
 					transpose = TRUE,
 					stand = "sd",
-					ndim = ncol(.)-1,
+					ndim = max(max.comp, ncol(.)-1),
 					maxiter = 100
 				) %>%
-				assign(x = "pca.res", value = ., envir = .GlobalEnv) %>% 
+				assign(x = "x", value = ., envir = pca.res) %>% 
 				`[[`("projection") %>%
 				`rownames<-`(colnames(.data)) %>%
 				`colnames<-`(paste0("PC", seq_len(ncol(.)))) %>% 
@@ -25,6 +27,27 @@ pca_report <- function (data, design, techvars, outliers.comp = c(1, 2), outlier
 		})(.)) %>% 
 		merge(x = design, y = ., by = "row.names", all = TRUE) %>% 
 		column_to_rownames(var = "Row.names")
+		
+	# pca.res <- data %>% 
+		# as.matrix() %>% 
+		# flashpca(
+			# X = .,
+			# method = "eigen",
+			# transpose = TRUE,
+			# stand = "sd",
+			# ndim = max(max.comp, ncol(.)-1),
+			# maxiter = 100
+		# )
+	# pca.dfxy <- merge(
+			# x = design, 
+			# y = pca.res %>% 
+				# `[[`("projection") %>%
+				# `rownames<-`(colnames(data)) %>%
+				# `colnames<-`(paste0("PC", seq_len(ncol(.)))) %>% 
+				# as.data.frame(), 
+			# by = "row.names", 
+			# all = TRUE) %>% 
+		# column_to_rownames(var = "Row.names")
 
 	pca.outliers <- pca.dfxy[, paste0("PC", outliers.comp), drop = FALSE] %>% 
 		`^`(2) %>% 
@@ -48,7 +71,7 @@ pca_report <- function (data, design, techvars, outliers.comp = c(1, 2), outlier
 
 
 	cat(paste0("\n", paste(rep("#", title.level), collapse = ""), " PCA inertia contribution {-}\n"))
-	p <- data.frame(y = (pca.res$values/sum(pca.res$values)), x = seq_along(pca.res$values)) %>%
+	p <- data.frame(y = (pca.res$x$values/sum(pca.res$x$values)), x = seq_along(pca.res$x$values)) %>%
 		mutate(cumsum = cumsum(y)) %>%
 		ggplot(aes(x = x, y = y)) +
 			geom_bar(stat = "identity", width = 1, colour = "white", fill = viridis_pal(option = "viridis", begin = 0.25, end = 0.25)(1)) +

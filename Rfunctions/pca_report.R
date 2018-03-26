@@ -1,53 +1,34 @@
-pca_report <- function (data, design, techvars, outliers.comp = c(1, 2), outliers.thresh = 3, ncomp = 5, theme_dark = FALSE, title.level = 2, max.comp = 50) {
+pca_report <- function (
+    data, 
+    design, 
+    techvars, 
+    n.comp = 5, 
+    max.comp = ncol(data)-1-n.comp,
+    outliers.comp = c(1, 2), 
+    outliers.thresh = 3, 
+    title.level = 2,
+    theme_dark = FALSE
+) {
 	require(flashpcaR)
 	require(scales)
 	require(tidyverse)
-	
-	pca.res <- new.env()
-	
-	pca.dfxy <- data %>% 
-		as.data.frame() %>% 
-		do((function(.data) {
-			.data %>% 
-				as.matrix() %>% 
-				flashpca(
-					X = .,
-					method = "eigen",
-					transpose = TRUE,
-					stand = "sd",
-					ndim = max(max.comp, ncol(.)-1),
-					maxiter = 100
-				) %>%
-				assign(x = "x", value = ., envir = pca.res) %>% 
-				`[[`("projection") %>%
-				`rownames<-`(colnames(.data)) %>%
-				`colnames<-`(paste0("PC", seq_len(ncol(.)))) %>% 
-				as.data.frame() %>% 
-				return()
-		})(.)) %>% 
-		merge(x = design, y = ., by = "row.names", all = TRUE) %>% 
-		column_to_rownames(var = "Row.names")
-		
-	# pca.res <- data %>% 
-		# as.matrix() %>% 
-		# flashpca(
-			# X = .,
-			# method = "eigen",
-			# transpose = TRUE,
-			# stand = "sd",
-			# ndim = max(max.comp, ncol(.)-1),
-			# maxiter = 100
-		# )
-	# pca.dfxy <- merge(
-			# x = design, 
-			# y = pca.res %>% 
-				# `[[`("projection") %>%
-				# `rownames<-`(colnames(data)) %>%
-				# `colnames<-`(paste0("PC", seq_len(ncol(.)))) %>% 
-				# as.data.frame(), 
-			# by = "row.names", 
-			# all = TRUE) %>% 
-		# column_to_rownames(var = "Row.names")
+
+	pca.res <-flashpca(
+	    X = as.matrix(data),
+	    method = "eigen",
+	    transpose = TRUE,
+	    stand = "sd",
+	    ndim = n.comp,
+	    nextra = max.comp,
+	    maxiter = 100
+	) 
+	pca.dfxy <- pca.res %>% 
+	    `[[`("projection") %>%
+	    `rownames<-`(colnames(data)) %>%
+	    `colnames<-`(paste0("PC", seq_len(ncol(.)))) %>% 
+	    as.data.frame() %>% 
+	    merge(x = design, y = ., by = "row.names", all = TRUE) %>% 
+	    column_to_rownames(var = "Row.names")
 
 	pca.outliers <- pca.dfxy[, paste0("PC", outliers.comp), drop = FALSE] %>% 
 		`^`(2) %>% 

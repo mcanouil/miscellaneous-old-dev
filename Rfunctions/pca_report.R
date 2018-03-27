@@ -81,7 +81,7 @@ pca_report <- function (
 			scale_colour_viridis(discrete = TRUE) +
 			labs(x = NULL, y = NULL) +
 			facet_grid(Y.PC~X.PC, scales = "free") +
-			guides(colour = ifelse(length(unique(pca.dfxy[, ivar]))<=12, "legend", "none")
+			guides(colour = ifelse(length(unique(pca.dfxy[, ivar]))<=12, "legend", "none"))
 		print(p)
 		cat("\n")
 	}

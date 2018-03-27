@@ -13,7 +13,7 @@ pca_report <- function (
 	require(scales)
 	require(tidyverse)
 
-	pca.res <-flashpca(
+	pca.res <- flashpca(
 	    X = as.matrix(data),
 	    method = "eigen",
 	    transpose = TRUE,
@@ -57,12 +57,12 @@ pca_report <- function (
 		ggplot(aes(x = x, y = y)) +
 			geom_bar(stat = "identity", width = 1, colour = "white", fill = viridis_pal(option = "viridis", begin = 0.25, end = 0.25)(1)) +
 			scale_y_continuous(labels = percent) +
-			scale_x_continuous(breaks = seq_len(10), limits = c(0, 11), expand = c(0, 0)) +
+			scale_x_continuous(breaks = seq_len(n.comp), limits = c(0, 11), expand = c(0, 0)) +
 			labs(y = "Inertia", x = "PCA Components")
 	print(p)
 	cat("\n")
 	
-	cat(paste0("\n", paste(rep("#", title.level), collapse = ""), " PCA  factorial planes {-}\n"))
+	cat(paste0("\n", paste(rep("#", title.level), collapse = ""), " PCA  factorial planes {-, .tabset}\n"))
 	for (ivar in techvars) {
 		cat(paste0("\n", paste(rep("#", title.level+1), collapse = ""), " ", ivar, " {-}\n"))
 		p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(n.comp)), 2)), 1, function (icoord) {
@@ -78,7 +78,7 @@ pca_report <- function (
 			geom_vline(aes(xintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
 			geom_point(shape = 4, size = 2) +
 			stat_ellipse(type = "norm") +
-			scale_colour_viridis(discrete = TRUE) +
+			scale_colour_viridis(discrete = TRUE, guide = length(unique(pca.dfxy[, ivar]))<=12) +
 			labs(x = NULL, y = NULL) +
 			facet_grid(Y.PC~X.PC, scales = "free")
 		print(p)

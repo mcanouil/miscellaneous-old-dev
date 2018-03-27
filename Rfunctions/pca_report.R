@@ -78,9 +78,10 @@ pca_report <- function (
 			geom_vline(aes(xintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
 			geom_point(shape = 4, size = 2) +
 			stat_ellipse(type = "norm") +
-			scale_colour_viridis(discrete = TRUE, guide = length(unique(pca.dfxy[, ivar]))<=12) +
+			scale_colour_viridis(discrete = TRUE) +
 			labs(x = NULL, y = NULL) +
-			facet_grid(Y.PC~X.PC, scales = "free")
+			facet_grid(Y.PC~X.PC, scales = "free") +
+			guides(colour = ifelse(length(unique(pca.dfxy[, ivar]))<=12, "legend", "none")
 		print(p)
 		cat("\n")
 	}

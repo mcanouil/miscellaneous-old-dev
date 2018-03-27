@@ -24,10 +24,10 @@ pca_report <- function (
 	) 
 	pca.dfxy <- pca.res %>% 
 	    `[[`("projection") %>%
+	    as.data.frame() %>% 
 	    `rownames<-`(colnames(data)) %>%
 	    `colnames<-`(paste0("PC", seq_len(ncol(.)))) %>% 
-	    as.data.frame() %>% 
-	    merge(x = design, y = ., by = "row.names", all = TRUE) %>% 
+	    merge(x = design, y = ., by = "row.names", all.y = TRUE) %>% 
 	    column_to_rownames(var = "Row.names")
 
 	pca.outliers <- pca.dfxy[, paste0("PC", outliers.comp), drop = FALSE] %>% 
@@ -65,7 +65,7 @@ pca_report <- function (
 	cat(paste0("\n", paste(rep("#", title.level), collapse = ""), " PCA  factorial planes {-}\n"))
 	for (ivar in techvars) {
 		cat(paste0("\n", paste(rep("#", title.level+1), collapse = ""), " ", ivar, " {-}\n"))
-		p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(ncomp)), 2)), 1, function (icoord) {
+		p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(n.comp)), 2)), 1, function (icoord) {
 			tmp <- pca.dfxy[, c(ivar, icoord)]
 			tmp[, ivar] <- as.factor(tmp[, ivar])
 			colnames(tmp)[-seq_len(ncol(tmp)-2)] <- c("X", "Y")
@@ -88,7 +88,7 @@ pca_report <- function (
 	cat(paste0("\n", paste(rep("#", title.level), collapse = ""), " PCA association {-}\n"))
 	p <- pca.dfxy %>%
 		(function (.data) {
-			lapply(seq_len(ncomp), function (i) {
+			lapply(seq_len(n.comp), function (i) {
 				form <- as.formula(paste0("PC", i, " ~ ", paste(paste0("factor(", techvars, ")"), collapse = " + ")))
 				lm(form, data = .data) %>% anova %>% rownames_to_column(var = "term") %>% mutate(PC = i)
 			}) %>%
@@ -110,7 +110,7 @@ pca_report <- function (
 	
 	cat(paste0("\n", paste(rep("#", title.level), collapse = ""), " PCA Outliers {-}\n"))
 	ivar <- "BadSamples"
-	p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(ncomp)), 2)), 1, function (icoord) {
+	p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(n.comp)), 2)), 1, function (icoord) {
 			tmp <- pca.dfxy[, c(ivar, icoord)]
 			tmp[, ivar] <- as.factor(tmp[, ivar])
 			colnames(tmp)[-seq_len(ncol(tmp)-2)] <- c("X", "Y")

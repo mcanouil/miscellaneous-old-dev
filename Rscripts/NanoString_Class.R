@@ -495,9 +495,9 @@ pow_trans <- function(power, n = 5) {
     negpow_breaks <- function(n = 5) {
         function(x, y = power) {
             rng <- range(x, na.rm = TRUE) ^ y
-            max <- ceiling(rng[2])
-            min <- floor(rng[1])
-            signif(seq(min, max, length.out = n) ^ (1 / y), digits = 2)
+            max <- signif(rng[2], digits = 3)
+            min <- signif(rng[1], digits = 3)
+            signif(seq(min, max, length.out = n) ^ (1 / y), digits = 3)
         }
     }
     
@@ -512,8 +512,7 @@ pow_trans <- function(power, n = 5) {
         breaks = negpow_breaks(n = n), 
         domain = c(0, Inf),
         format = function(x) {
-            scientific(x)
-            # parse(text = gsub("e", " %*% 10^", scientific(x)))
+            parse(text = gsub("e", " %*% 10^", scientific(x)))
         }
     )
 }

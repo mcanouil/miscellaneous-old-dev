@@ -491,6 +491,34 @@ read_plexset <- function (samplesheetpath, design, verbose = TRUE) {
     return(NanoStringData = NanoStringData)
 }
 
+pow_trans <- function(power, n = 5) {
+    negpow_breaks <- function(n = 5) {
+        function(x, y = power) {
+            rng <- range(x, na.rm = TRUE) ^ y
+            max <- ceiling(rng[2])
+            min <- floor(rng[1])
+            signif(seq(min, max, length.out = n) ^ (1 / y), digits = 2)
+        }
+    }
+    
+    trans_new(
+        name = "pow", 
+        transform = function(x, y = power) {
+            ifelse(x<=0, 0, x ^ y)
+        }, 
+        inverse = function(x, y = power) {
+            ifelse(x<=0, 0, x ^ (1 / y))
+        }, 
+        breaks = negpow_breaks(n = n), 
+        domain = c(0, Inf),
+        format = function(x) {
+            scientific(x)
+            # parse(text = gsub("e", " %*% 10^", scientific(x)))
+        }
+    )
+}
+
+
 plotControls <- function (NanoStringData, kit = c("PlexSet", "miRNA"), normalised = TRUE, yScalePower = 1) {
     kit <- kit[1]
     
@@ -570,39 +598,45 @@ plotControls <- function (NanoStringData, kit = c("PlexSet", "miRNA"), normalise
             )
         
         p <- cowplot::plot_grid(
-            ggplot(data = ggdata_neg, aes(x = ID, y = Value^yScalePower, colour = G)) +
+            ggplot(data = ggdata_neg, aes(x = ID, y = Value, colour = G)) +
                 geom_line() +
-                facet_grid(Control~., scales = "free_y") +
+                facet_grid(Control~.) +
                 scale_colour_viridis(name = "Negative", discrete = TRUE) +
-                labs(x = NULL, y = bquote(("NanoString count")^.(yScalePower))),
-            ggplot(data = ggdata_neg, aes(x = G, y = Value^yScalePower, colour = G)) +
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+            ggplot(data = ggdata_neg, aes(x = G, y = Value, colour = G)) +
                 geom_boxplot(outlier.shape = NA, fill = NA) +
                 geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
-                facet_grid(Control~., scales = "free_y") +
+                facet_grid(Control~.) +
                 scale_colour_viridis(name = "Negative", discrete = TRUE) +
-                labs(x = NULL, y = bquote(("NanoString count")^.(yScalePower))),
-            ggplot(data = ggdata_pos, aes(x = ID, y = Value^yScalePower, colour = G)) +
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+            ggplot(data = ggdata_pos, aes(x = ID, y = Value, colour = G)) +
                 geom_line() +
-                facet_grid(Control~., scales = "free_y") +
+                facet_grid(Control~.) +
                 scale_colour_viridis(name = "Positive", discrete = TRUE) +
-                labs(x = NULL, y = bquote(("NanoString count")^.(yScalePower))),
-            ggplot(data = ggdata_pos, aes(x = G, y = Value^yScalePower, colour = G)) +
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+            ggplot(data = ggdata_pos, aes(x = G, y = Value, colour = G)) +
                 geom_boxplot(outlier.shape = NA, fill = NA) +
                 geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
-                facet_grid(Control~., scales = "free_y") +
+                facet_grid(Control~.) +
                 scale_colour_viridis(name = "Positive", discrete = TRUE) +
-                labs(x = NULL, y = bquote(("NanoString count")^.(yScalePower))),
-            ggplot(data = ggdata_hk, aes(x = ID, y = Value^yScalePower, colour = G)) +
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+            ggplot(data = ggdata_hk, aes(x = ID, y = Value, colour = G)) +
                 geom_line() +
-                facet_grid(Control~., scales = "free_y") +
+                facet_grid(Control~.) +
                 scale_colour_viridis(name = "Housekeeping", discrete = TRUE) +
-                labs(x = NULL, y = bquote(("NanoString count")^.(yScalePower))),
-            ggplot(data = ggdata_hk, aes(x = G, y = Value^yScalePower, colour = G)) +
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+            ggplot(data = ggdata_hk, aes(x = G, y = Value, colour = G)) +
                 geom_boxplot(outlier.shape = NA, fill = NA) +
                 geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
-                facet_grid(Control~., scales = "free_y") +
+                facet_grid(Control~.) +
                 scale_colour_viridis(name = "Housekeeping", discrete = TRUE) +
-                labs(x = NULL, y = bquote(("NanoString count")^.(yScalePower))),
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
             nrow = 3,
             ncol = 2,
             labels = LETTERS, 
@@ -611,22 +645,32 @@ plotControls <- function (NanoStringData, kit = c("PlexSet", "miRNA"), normalise
         )
     } else {
         p <- plot_grid(
-            ggplot(data = ggdata_neg, aes(x = ID, y = Value^yScalePower, colour = G)) +
+            ggplot(data = ggdata_neg, aes(x = ID, y = Value, colour = G)) +
                 geom_line() +
-                facet_grid(Control~., scales = "free_y") +
+                facet_grid(Control~.) +
                 scale_colour_viridis(name = "Negative", discrete = TRUE) +
-                labs(x = NULL, y = bquote(("NanoString count")^.(yScalePower))),
-            ggplot(data = ggdata_pos, aes(x = ID, y = Value^yScalePower, colour = G)) +
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+            ggplot(data = ggdata_pos, aes(x = ID, y = Value, colour = G)) +
                 geom_line() +
-                facet_grid(Control~., scales = "free_y") +
+                facet_grid(Control~.) +
                 scale_colour_viridis(name = "Positive", discrete = TRUE) +
-                labs(x = NULL, y = bquote(("NanoString count")^.(yScalePower))),
-            ggplot(data = ggdata, aes(x = G, y = Value^yScalePower, colour = G)) +
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+            ggplot(data = ggdata_neg, aes(x = G, y = Value, colour = G)) +
                 geom_boxplot(outlier.shape = NA, fill = NA) +
                 geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
-                facet_grid(Control~., scales = "free_y") +
-                scale_colour_viridis(name = "Controls", discrete = TRUE) +
-                labs(x = NULL, y = bquote(("NanoString count")^.(yScalePower))),
+                facet_grid(Control~.) +
+                scale_colour_viridis(name = "Negative", discrete = TRUE) +
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+            ggplot(data = ggdata_pos, aes(x = G, y = Value, colour = G)) +
+                geom_boxplot(outlier.shape = NA, fill = NA) +
+                geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
+                facet_grid(Control~.) +
+                scale_colour_viridis(name = "Positive", discrete = TRUE) +
+                labs(x = NULL, y = "Count") +
+                scale_y_continuous(trans = pow_trans(power = yScalePower)),
             nrow = 2,
             ncol = 2,
             labels = LETTERS, 

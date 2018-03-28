@@ -11,5 +11,14 @@ pval_trans <- function () {
             10^-seq(min, max, by = by)
         }
     }
-    trans_new(name = "pval", transform = function (x) {-log(x, 10)}, inverse = function (x) {10^-x}, breaks = neglog10_breaks(), domain = c(1e-100, Inf))
+    trans_new(
+        name = "pval", 
+        transform = function (x) {-log(x, 10)}, 
+        inverse = function (x) {10^-x}, 
+        breaks = neglog10_breaks(), 
+        domain = c(1e-100, Inf),
+        format = function(x) {
+            parse(text = gsub("e", " %*% 10^", scientific_format()(x)))
+        }
+    )
 }

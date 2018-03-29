@@ -6,7 +6,7 @@ monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
 params:
     outputCode: FALSE
-    nCores: '`r parallel::detectCores()`'
+    nCores: !r parallel::detectCores()
     theme_dark: FALSE
     dpi: 120
     ggFontSize: 9

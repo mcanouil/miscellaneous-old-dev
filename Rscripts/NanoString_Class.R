@@ -510,10 +510,10 @@ pow_trans <- function(power, n = 5) {
             ifelse(x<=0, 0, x ^ (1 / y))
         }, 
         breaks = negpow_breaks(n = n), 
-        domain = c(0, Inf),
-        format = function(x) {
-            parse(text = gsub("e", " %*% 10^", scientific(x)))
-        }
+        domain = c(0, Inf)#,
+        # format = function(x) {
+        #     parse(text = gsub("e", " %*% 10^", scientific(x)))
+        # }
     )
 }
 
@@ -597,45 +597,45 @@ plotControls <- function (NanoStringData, kit = c("PlexSet", "miRNA"), normalise
             )
         
         p <- cowplot::plot_grid(
-            ggplot(data = ggdata_neg, aes(x = ID, y = Value, colour = G)) +
+            ggplot(data = ggdata_neg, aes(x = ID, y = Value^yScalePower, colour = G)) +
                 geom_line() +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Negative", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
-            ggplot(data = ggdata_neg, aes(x = G, y = Value, colour = G)) +
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
+            ggplot(data = ggdata_neg, aes(x = G, y = Value^yScalePower, colour = G)) +
                 geom_boxplot(outlier.shape = NA, fill = NA) +
                 geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Negative", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
-            ggplot(data = ggdata_pos, aes(x = ID, y = Value, colour = G)) +
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
+            ggplot(data = ggdata_pos, aes(x = ID, y = Value^yScalePower, colour = G)) +
                 geom_line() +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Positive", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
-            ggplot(data = ggdata_pos, aes(x = G, y = Value, colour = G)) +
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
+            ggplot(data = ggdata_pos, aes(x = G, y = Value^yScalePower, colour = G)) +
                 geom_boxplot(outlier.shape = NA, fill = NA) +
                 geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Positive", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
-            ggplot(data = ggdata_hk, aes(x = ID, y = Value, colour = G)) +
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
+            ggplot(data = ggdata_hk, aes(x = ID, y = Value^yScalePower, colour = G)) +
                 geom_line() +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Housekeeping", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
-            ggplot(data = ggdata_hk, aes(x = G, y = Value, colour = G)) +
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
+            ggplot(data = ggdata_hk, aes(x = G, y = Value^yScalePower, colour = G)) +
                 geom_boxplot(outlier.shape = NA, fill = NA) +
                 geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Housekeeping", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
             nrow = 3,
             ncol = 2,
             labels = LETTERS, 
@@ -644,32 +644,32 @@ plotControls <- function (NanoStringData, kit = c("PlexSet", "miRNA"), normalise
         )
     } else {
         p <- plot_grid(
-            ggplot(data = ggdata_neg, aes(x = ID, y = Value, colour = G)) +
+            ggplot(data = ggdata_neg, aes(x = ID, y = Value^yScalePower, colour = G)) +
                 geom_line() +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Negative", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
-            ggplot(data = ggdata_pos, aes(x = ID, y = Value, colour = G)) +
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
+            ggplot(data = ggdata_pos, aes(x = ID, y = Value^yScalePower, colour = G)) +
                 geom_line() +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Positive", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
-            ggplot(data = ggdata_neg, aes(x = G, y = Value, colour = G)) +
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
+            ggplot(data = ggdata_neg, aes(x = G, y = Value^yScalePower, colour = G)) +
                 geom_boxplot(outlier.shape = NA, fill = NA) +
                 geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Negative", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
-            ggplot(data = ggdata_pos, aes(x = G, y = Value, colour = G)) +
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
+            ggplot(data = ggdata_pos, aes(x = G, y = Value^yScalePower, colour = G)) +
                 geom_boxplot(outlier.shape = NA, fill = NA) +
                 geom_point(shape = 21, alpha = 0.25, position = position_jitter(width = 0.2)) +
                 facet_grid(Control~.) +
                 scale_colour_viridis(name = "Positive", discrete = TRUE) +
                 labs(x = NULL, y = "Count") +
-                scale_y_continuous(trans = pow_trans(power = yScalePower)),
+                scale_y_continuous(labels = (function(x) {ifelse(x<0, NA, round(x^(1/yScalePower), digits = 3))})),
             nrow = 2,
             ncol = 2,
             labels = LETTERS, 

@@ -5,32 +5,32 @@ date: '`r format(Sys.Date(), "%B %d, %Y")`'
 monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
 params:
-    outputCode: FALSE
-    nCores: !r parallel::detectCores()
-    theme_dark: FALSE
-    dpi: 120
-    ggFontSize: 9
+  outputCode: FALSE
+  nCores: !r parallel::detectCores()
+  theme_dark: FALSE
+  dpi: 120
+  ggFontSize: 9
 output:
-    bookdown::html_document2:
-        theme: simplex
-        toc: true
-        toc_depth: 2
-        toc_float: 
-            collapsed: false
-        fig_width: 5
-        fig_height: 4
-        number_sections: true
-        self_containd: true
-        mathjax: default
-        df_print: kable
-    bookdown::pdf_document2:
-        toc: true
-        toc_depth: 2
-        fig_width: 5
-        fig_height: 4
-        number_sections: true
-        df_print: kable
-        latex_engine: "pdflatex"
+  bookdown::html_document2:
+    theme: simplex
+    toc: true
+    toc_depth: 2
+    toc_float: 
+      collapsed: false
+    fig_width: 6.3
+    fig_height: 4.7
+    number_sections: true
+    self_containd: true
+    mathjax: default
+    df_print: kable
+  bookdown::pdf_document2:
+    toc: true
+    toc_depth: 2
+    fig_width: 6.3
+    fig_height: 4.7
+    number_sections: true
+    df_print: kable
+    latex_engine: "pdflatex"
 ---
 
 ```{r setup, include=FALSE}
@@ -61,6 +61,9 @@ library(Hmisc)
 library(knitr)
 library(rmarkdown)
 library(kableExtra)
+
+
+
 library(tidyverse)
 
 sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source) %>% invisible()
@@ -68,32 +71,30 @@ sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = 
 
 ### Set knitr rmarkdown chunk options
 opts_chunk$set(
-    size = 'small',
-    include = TRUE, #params$outputCode,
-    echo = params$outputCode,
-    warning = params$outputCode,
-    message = params$outputCode,
-    tidy = FALSE,
-    crop = TRUE,
-    autodep = TRUE,
-    # fig.width = 7.5,
-    # fig.height = 6,
-    fig.align = 'center',
-    fig.pos = 'H',
-    dpi = params$dpi,
-    fig.path = paste0(outputDir, "/KnitrFiles"),
-    cache = FALSE,
-    cache.path = paste0(outputDir, "/KnitrFiles")
+  size = 'small',
+  include = TRUE,
+  echo = params$outputCode,
+  warning = params$outputCode,
+  message = params$outputCode,
+  tidy = FALSE,
+  crop = TRUE,
+  autodep = TRUE,
+  fig.align = 'center',
+  fig.pos = 'H',
+  dpi = params$dpi,
+  fig.path = paste0(outputDir, "/KnitrFiles"),
+  cache = FALSE,
+  cache.path = paste0(outputDir, "/KnitrFiles")
 )
 
 
 ### Code to resize font size of R code chunks output according to 'size' option (only LATEX)
 if (knitr:::is_latex_output()) {
-    def.chunk.hook  <- knitr::knit_hooks$get("chunk")
-    knitr::knit_hooks$set(chunk = function(x, options) {
-        x <- def.chunk.hook(x, options)
-        ifelse(options$size != "normalsize", paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
-    })
+  def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+  knitr::knit_hooks$set(chunk = function(x, options) {
+    x <- def.chunk.hook(x, options)
+    ifelse(options$size != "normalsize", paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+  })
 } else {}
 
 
@@ -104,15 +105,15 @@ nCores <- params$nCores
 ### Define theme
 theme_dark <- params$theme_dark
 if (theme_dark) {
-    ## Theme Black ON ##
-    theme_set(theme_black(base_size = params$ggFontSize))
-    plot_grid <- hijack(plot_grid, theme_dark = theme_dark)
-    scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
-    scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
+  ## Theme Black ON ##
+  theme_set(theme_black(base_size = params$ggFontSize))
+  plot_grid <- hijack(plot_grid, theme_dark = theme_dark)
+  scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
+  scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
 } else {
-    theme_set(theme_light(base_size = params$ggFontSize))
-    scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 0, end = 4/5)
-    scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 0, end = 4/5)
+  theme_set(theme_light(base_size = params$ggFontSize))
+  scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 0, end = 4/5)
+  scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 0, end = 4/5)
 }    
 
 ```

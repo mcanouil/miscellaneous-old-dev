@@ -53,16 +53,16 @@ header.S4 <- function (name, file = paste0(name, "-Class.R"), append = TRUE) {
 setClass.S4 <- function (name, field, type, file = paste0(name, "-Class.R"), append = TRUE) {
     lengthField <- length(field)
     code <- c("### Class definition ###\n",
-        "setClass(\n\tClass = \"", name, "\", \n\trepresentation = representation(\n",
-        paste0(paste0(sapply(seq(lengthField), function (i) { paste0("\t\t", field[i], " = \"", type[i], "\"") }), collapse = ", \n"), "\n"),
-        "\t), \n\tprototype = prototype(\n",
+        "setClass(\n  Class = \"", name, "\", \n  representation = representation(\n",
+        paste0(paste0(sapply(seq(lengthField), function (i) { paste0("    ", field[i], " = \"", type[i], "\"") }), collapse = ", \n"), "\n"),
+        "  ), \n  prototype = prototype(\n",
         paste0(paste0(sapply(seq(lengthField), function (i) {
             if(type[i]=="matrix") {
-                paste0("\t\t", field[i], " = ", "matrix(, nrow = 0, ncol = 0)")
+                paste0("    ", field[i], " = ", "matrix(, nrow = 0, ncol = 0)")
             } else {
-                paste0("\t\t", field[i], " = ", type[i], "()")
+                paste0("    ", field[i], " = ", type[i], "()")
             } }), collapse = ", \n"), "\n"),
-        "\t)# , \n\t# validity = function (object) {\n\t\t# cat(\"**** validity ", name, " <empty> ****\\n\")\n\t\t# return(TRUE)\n\t# }\n)\n\n\n")
+        "  )# , \n  # validity = function (object) {\n    # cat(\"**** validity ", name, " <empty> ****\\n\")\n    # return(TRUE)\n  # }\n)\n\n\n")
     cat(code, sep = "", file = file, append = append)
     return(invisible(code))
 }
@@ -92,8 +92,8 @@ new.S4 <- function (name, field, type, file = paste0(name, "-Class.R"), append =
             "), definition = function (", paste0(field, collapse = ", "), ") {new(\"", name, "\")})\n",
         paste0("setMethod(f = \"new.", name, "\", signature = c("),
         paste0(rep("\"ANY\"", lengthField), collapse = ", "), "), definition = function (", paste0(field, collapse = ", "), ") {\n",
-        paste0("\tif (missing(", field, ")) {", field, " <- ", type, "()} else {}\n", collapse = ""),
-        "\treturn(new(\"", name, "\"", paste0(", ", field, " = ", field, collapse = ""), "))\n})\n\n\n")
+        paste0("  if (missing(", field, ")) {", field, " <- ", type, "()} else {}\n", collapse = ""),
+        "  return(new(\"", name, "\"", paste0(", ", field, " = ", field, collapse = ""), "))\n})\n\n\n")
     cat(code, sep = "", file = file, append = append)
     return(invisible(code))
 }
@@ -117,15 +117,15 @@ is.S4 <- function (name, file = paste0(name, "-Class.R"), append = TRUE) {
     code <- c("### Is ###\n",
         "setGeneric(name = \"is.", name, "\", def = function (object) {standardGeneric(\"is.", name, "\")})\n",
         "setMethod(f = \"is.", name, "\", signature = \"ANY\", definition = function (object) {\n",
-        "\tif (length(object)>1) {\n",
-        "\t\treturn(sapply(object, is.", name, "))\n",
-        "\t} else {\n",
-        "\t\tif (class(object) == \"", name, "\") {\n",
-        "\t\t\treturn(TRUE)\n",
-        "\t\t} else {\n",
-        "\t\t\treturn(FALSE)\n",
-        "\t\t}\n",
-        "\t}\n",
+        "  if (length(object)>1) {\n",
+        "    return(sapply(object, is.", name, "))\n",
+        "  } else {\n",
+        "    if (class(object) == \"", name, "\") {\n",
+        "      return(TRUE)\n",
+        "    } else {\n",
+        "      return(FALSE)\n",
+        "    }\n",
+        "  }\n",
         "})\n\n\n")
     cat(code, sep = "", file = file, append = append)
     return(invisible(code))
@@ -149,121 +149,121 @@ is.S4 <- function (name, file = paste0(name, "-Class.R"), append = TRUE) {
 show.S4 <- function (name, file = paste0(name, "-Class.R"), append = TRUE) {
     code <- c("### Show ###\n",
         "setMethod(f = \"show\", signature = \"", name, "\", definition = function (object){\n",
-        # "\tcat(\"\t~~~ Class:\", class(object), \"~~~\\n\")\n",
-        "\tshowSlot <- function (slot) {\n",
-        "\t\tsNames <- gsub(\"^[^@]*@(.*)\", \"\\\\1\", slot)\n",
-        "\t\teSlot <- eval(parse(text = slot))\n",
-        "\t\ttmp <- switch(EXPR = class(eSlot),\n",
-        "\t\t\t\"matrix\" = {\n",
-        "\t\t\t\tcat(paste0(\" ~ \", sNames, \" : [\", nrow(eSlot), \"x\", ncol(eSlot), \"]\", collapse = \"\"))\n",
-        "\t\t\t\tif (all(dim(eSlot)==0)) {\n",
-        "\t\t\t\t\tcat(\"NA\")\n",
-        "\t\t\t\t} else {\n",
-        "\t\t\t\t\tcat(\"\\n",
+        # "  cat(\"  ~~~ Class:\", class(object), \"~~~\\n\")\n",
+        "  showSlot <- function (slot) {\n",
+        "    sNames <- gsub(\"^[^@]*@(.*)\", \"\\\\1\", slot)\n",
+        "    eSlot <- eval(parse(text = slot))\n",
+        "    tmp <- switch(EXPR = class(eSlot),\n",
+        "      \"matrix\" = {\n",
+        "        cat(paste0(\" ~ \", sNames, \" : [\", nrow(eSlot), \"x\", ncol(eSlot), \"]\", collapse = \"\"))\n",
+        "        if (all(dim(eSlot)==0)) {\n",
+        "          cat(\"NA\")\n",
+        "        } else {\n",
+        "          cat(\"\\n",
         "\")\n",
-        "\t\t\t\t\tnrowShow <- seq(min(5, nrow(eSlot)))\n",
-        "\t\t\t\t\tncolShow <- seq(min(5, ncol(eSlot)))\n",
-        "\t\t\t\t\tshortObject <- eSlot[nrowShow, ncolShow]\n",
-        "\t\t\t\t\tif (is.null(rownames(shortObject))) {\n",
-        "\t\t\t\t\t\trownames(shortObject) <- seq(nrow(shortObject))\n",
-        "\t\t\t\t\t} else {}\n",
-        "\t\t\t\t\tif (is.null(colnames(shortObject))) {\n",
-        "\t\t\t\t\t\tcolnames(shortObject) <- seq(ncol(shortObject))\n",
-        "\t\t\t\t\t} else {}\n",
-        "\t\t\t\t\tresFormat <- format(cbind(c(\"\", rownames(shortObject)), rbind(colnames(shortObject), format(shortObject, digits = 4))), justify = \"centre\")\n",
-        "\t\t\t\t\tif (nrow(shortObject)!=nrow(eSlot)) {\n",
-        "\t\t\t\t\t\tresFormat <- rbind(resFormat, c(\".\", sapply(seq(colnames(shortObject)), function (iCol) {paste0(rep(\".\", nchar(resFormat[1, 1])), collapse = \"\")})))\n",
-        "\t\t\t\t\t} else {}\n",
-        "\t\t\t\t\tif (ncol(shortObject)!=ncol(eSlot)) {\n",
-        "\t\t\t\t\t\tresFormat <- cbind(resFormat, c(\".\", rep(paste0(rep(\".\", nchar(resFormat[1, 1])), collapse = \"\"), nrow(resFormat)-1)))\n",
-        "\t\t\t\t\t} else {}\n",
-        "\t\t\t\t\tcat(paste0(\"     \", apply(format(resFormat, justify = \"centre\"), 1, paste, collapse = \" \"), \"\\n",
+        "          nrowShow <- seq(min(5, nrow(eSlot)))\n",
+        "          ncolShow <- seq(min(5, ncol(eSlot)))\n",
+        "          shortObject <- eSlot[nrowShow, ncolShow]\n",
+        "          if (is.null(rownames(shortObject))) {\n",
+        "            rownames(shortObject) <- seq(nrow(shortObject))\n",
+        "          } else {}\n",
+        "          if (is.null(colnames(shortObject))) {\n",
+        "            colnames(shortObject) <- seq(ncol(shortObject))\n",
+        "          } else {}\n",
+        "          resFormat <- format(cbind(c(\"\", rownames(shortObject)), rbind(colnames(shortObject), format(shortObject, digits = 4))), justify = \"centre\")\n",
+        "          if (nrow(shortObject)!=nrow(eSlot)) {\n",
+        "            resFormat <- rbind(resFormat, c(\".\", sapply(seq(colnames(shortObject)), function (iCol) {paste0(rep(\".\", nchar(resFormat[1, 1])), collapse = \"\")})))\n",
+        "          } else {}\n",
+        "          if (ncol(shortObject)!=ncol(eSlot)) {\n",
+        "            resFormat <- cbind(resFormat, c(\".\", rep(paste0(rep(\".\", nchar(resFormat[1, 1])), collapse = \"\"), nrow(resFormat)-1)))\n",
+        "          } else {}\n",
+        "          cat(paste0(\"     \", apply(format(resFormat, justify = \"centre\"), 1, paste, collapse = \" \"), \"\\n",
         "\", collapse = \"\"))\n",
-        "\t\t\t\t}\n",
-        "\t\t\t\tcat(\"\\n\")\n",
-        "\t\t\t},\n",
-        "\t\t\t\"data.frame\" = {\n",
-        "\t\t\t\tcat(paste0(\" ~ \", sNames, \" : [\", nrow(eSlot), \"x\", ncol(eSlot), \"]\", collapse = \"\"))\n",
-        "\t\t\t\tif (all(dim(eSlot)==0)) {\n",
-        "\t\t\t\t\tcat(\"NA\")\n",
-        "\t\t\t\t} else {\n",
-        "\t\t\t\t\tcat(\"\\n",
+        "        }\n",
+        "        cat(\"\\n\")\n",
+        "      },\n",
+        "      \"data.frame\" = {\n",
+        "        cat(paste0(\" ~ \", sNames, \" : [\", nrow(eSlot), \"x\", ncol(eSlot), \"]\", collapse = \"\"))\n",
+        "        if (all(dim(eSlot)==0)) {\n",
+        "          cat(\" NA\")\n",
+        "        } else {\n",
+        "          cat(\"\\n",
         "\")\n",
-        "\t\t\t\t\tnrowShow <- seq(min(5, nrow(eSlot)))\n",
-        "\t\t\t\t\tncolShow <- seq(min(5, ncol(eSlot)))\n",
-        "\t\t\t\t\tshortObject <- eSlot[nrowShow, ncolShow]\n",
-        "\t\t\t\t\tif (is.null(rownames(shortObject))) {\n",
-        "\t\t\t\t\t\trownames(shortObject) <- seq(nrow(shortObject))\n",
-        "\t\t\t\t\t} else {}\n",
-        "\t\t\t\t\tif (is.null(colnames(shortObject))) {\n",
-        "\t\t\t\t\t\tcolnames(shortObject) <- seq(ncol(shortObject))\n",
-        "\t\t\t\t\t} else {}\n",
-        "\t\t\t\t\tresFormat <- format(cbind(c(\"\", rownames(shortObject)), rbind(colnames(shortObject), format(shortObject, digits = 4))), justify = \"centre\")\n",
-        "\t\t\t\t\tif (nrow(shortObject)!=nrow(eSlot)) {\n",
-        "\t\t\t\t\t\tresFormat <- rbind(resFormat, c(\".\", sapply(seq(colnames(shortObject)), function (iCol) {paste0(rep(\".\", nchar(resFormat[1, 1])), collapse = \"\")})))\n",
-        "\t\t\t\t\t} else {}\n",
-        "\t\t\t\t\tif (ncol(shortObject)!=ncol(eSlot)) {\n",
-        "\t\t\t\t\t\tresFormat <- cbind(resFormat, c(\".\", rep(paste0(rep(\".\", nchar(resFormat[1, 1])), collapse = \"\"), nrow(resFormat)-1)))\n",
-        "\t\t\t\t\t} else {}\n",
-        "\t\t\t\t\tcat(paste0(\"     \", apply(format(resFormat, justify = \"centre\"), 1, paste, collapse = \" \"), \"\\n",
+        "          nrowShow <- seq(min(5, nrow(eSlot)))\n",
+        "          ncolShow <- seq(min(5, ncol(eSlot)))\n",
+        "          shortObject <- eSlot[nrowShow, ncolShow]\n",
+        "          if (is.null(rownames(shortObject))) {\n",
+        "            rownames(shortObject) <- seq(nrow(shortObject))\n",
+        "          } else {}\n",
+        "          if (is.null(colnames(shortObject))) {\n",
+        "            colnames(shortObject) <- seq(ncol(shortObject))\n",
+        "          } else {}\n",
+        "          resFormat <- format(cbind(c(\"\", rownames(shortObject)), rbind(colnames(shortObject), format(shortObject, digits = 4))), justify = \"centre\")\n",
+        "          if (nrow(shortObject)!=nrow(eSlot)) {\n",
+        "            resFormat <- rbind(resFormat, c(\".\", sapply(seq(colnames(shortObject)), function (iCol) {paste0(rep(\".\", nchar(resFormat[1, 1])), collapse = \"\")})))\n",
+        "          } else {}\n",
+        "          if (ncol(shortObject)!=ncol(eSlot)) {\n",
+        "            resFormat <- cbind(resFormat, c(\".\", rep(paste0(rep(\".\", nchar(resFormat[1, 1])), collapse = \"\"), nrow(resFormat)-1)))\n",
+        "          } else {}\n",
+        "          cat(paste0(\"     \", apply(format(resFormat, justify = \"centre\"), 1, paste, collapse = \" \"), \"\\n",
         "\", collapse = \"\"))\n",
-        "\t\t\t\t}\n",
-        "\t\t\t\tcat(\"\\n\")\n",
-        "\t\t\t},\n",
-        "\t\t\t\"numeric\" = {\n",
-        "\t\t\t\tcat(paste0(\" ~ \", sNames, \" : \", collapse = \"\"))\n",
-        "\t\t\t\tif (length(eSlot) == 0) {\n",
-        "\t\t\t\t\tcat(\"NA\")\n",
-        "\t\t\t\t} else {\n",
-        "\t\t\t\t\tif (length(eSlot)>1) {\n",
-        "\t\t\t\t\t\tcat(paste0(\"[\", length(eSlot), \"] \", paste0(format(head(eSlot), digits = 4), collapse = \" \")))\n",
-        "\t\t\t\t\t} else {\n",
-        "\t\t\t\t\t\tcat(format(eSlot, digits = 4))\n",
-        "\t\t\t\t\t}\n",
-        "\t\t\t\t}\n",
-        "\t\t\t\tcat(\"\\n",
+        "        }\n",
+        "        cat(\"\\n\")\n",
+        "      },\n",
+        "      \"numeric\" = {\n",
+        "        cat(paste0(\" ~ \", sNames, \" : \", collapse = \"\"))\n",
+        "        if (length(eSlot) == 0) {\n",
+        "          cat(\"NA\")\n",
+        "        } else {\n",
+        "          if (length(eSlot)>1) {\n",
+        "            cat(paste0(\"[\", length(eSlot), \"] \", paste0(format(head(eSlot), digits = 4), collapse = \" \")))\n",
+        "          } else {\n",
+        "            cat(format(eSlot, digits = 4))\n",
+        "          }\n",
+        "        }\n",
+        "        cat(\"\\n",
         "\")\n",
-        "\t\t\t},\n",
-        "\t\t\t\"character\" = {\n",
-        "\t\t\t\tcat(paste0(\" ~ \", sNames, \" : \", collapse = \"\"))\n",
-        "\t\t\t\tif (length(eSlot) == 0) {\n",
-        "\t\t\t\t\tcat(\"NA\")\n",
-        "\t\t\t\t} else {\n",
-        "\t\t\t\t\tif (length(eSlot)>1) {\n",
-        "\t\t\t\t\t\tcat(\"[\", length(eSlot), \"] \\\"\", paste0(head(eSlot), collapse = \"\\\" \\\"\"), \"\\\"\", sep = \"\")\n",
-        "\t\t\t\t\t} else {\n",
-        "\t\t\t\t\t\tcat(paste0(\"\\\"\", eSlot, \"\\\"\"))\n",
-        "\t\t\t\t\t}\n",
-        "\t\t\t\t}\n",
-        "\t\t\t\tcat(\"\\n",
+        "      },\n",
+        "      \"character\" = {\n",
+        "        cat(paste0(\" ~ \", sNames, \" : \", collapse = \"\"))\n",
+        "        if (length(eSlot) == 0) {\n",
+        "          cat(\"NA\")\n",
+        "        } else {\n",
+        "          if (length(eSlot)>1) {\n",
+        "            cat(\"[\", length(eSlot), \"] \\\"\", paste0(head(eSlot), collapse = \"\\\" \\\"\"), \"\\\"\", sep = \"\")\n",
+        "          } else {\n",
+        "            cat(paste0(\"\\\"\", eSlot, \"\\\"\"))\n",
+        "          }\n",
+        "        }\n",
+        "        cat(\"\\n",
         "\")\n",
-        "\t\t\t},\n",
-        "\t\t\t{\n",
-        "\t\t\t\tcat(paste0(\" ~ \", sNames, \" : \", collapse = \"\"))\n",
-        "\t\t\t\tif (length(eSlot) == 0) {\n",
-        "\t\t\t\t\tcat(\"NA\")\n",
-        "\t\t\t\t} else {\n",
-        "\t\t\t\t\tif (length(eSlot)>1) {\n",
-        "\t\t\t\t\t\tcat(paste0(\"[\", length(eSlot), \"] \", paste0(head(eSlot), collapse = \" \")))\n",
-        "\t\t\t\t\t} else {\n",
-        "\t\t\t\t\t\tcat(eSlot)\n",
-        "\t\t\t\t\t}\n",
-        "\t\t\t\t}\n",
-        "\t\t\t\tcat(\"\\n",
+        "      },\n",
+        "      {\n",
+        "        cat(paste0(\" ~ \", sNames, \" : \", collapse = \"\"))\n",
+        "        if (length(eSlot) == 0) {\n",
+        "          cat(\"NA\")\n",
+        "        } else {\n",
+        "          if (length(eSlot)>1) {\n",
+        "            cat(paste0(\"[\", length(eSlot), \"] \", paste0(head(eSlot), collapse = \" \")))\n",
+        "          } else {\n",
+        "            cat(eSlot)\n",
+        "          }\n",
+        "        }\n",
+        "        cat(\"\\n",
         "\")\n",
-        "\t\t\t}\n",
-        "\t\t)\n",
-        "\t\treturn(invisible())\n",
-        "\t}\n",
-        "\tshowObject <- function (object) {\n",
-        "\t\tcat(\"\t~~~ Class:\", class(object), \"~~~\\n",
+        "      }\n",
+        "    )\n",
+        "    return(invisible())\n",
+        "  }\n",
+        "  showObject <- function (object) {\n",
+        "    cat(\"  ~~~ Class:\", class(object), \"~~~\\n",
         "\")\n",
-        "\t\tsNames <- paste0(\"object@\", slotNames(object))\n",
-        "\t\ttrash <- sapply(sNames, showSlot)\n",
-        "\t\treturn(invisible())\n",
-        "\t}\n",
-        "\tshowObject(object)\n",
-        "\treturn(invisible(object))\n",
+        "    sNames <- paste0(\"object@\", slotNames(object))\n",
+        "    trash <- sapply(sNames, showSlot)\n",
+        "    return(invisible())\n",
+        "  }\n",
+        "  showObject(object)\n",
+        "  return(invisible(object))\n",
         "})\n\n\n")
     cat(code, sep = "", file = file, append = append)
     return(invisible(code))
@@ -289,23 +289,23 @@ show.S4 <- function (name, file = paste0(name, "-Class.R"), append = TRUE) {
 get.S4 <- function (name, field, type, file = paste0(name, "-Class.R"), append = TRUE) {
     lengthField <- length(field)
     code <- c("### Getteur ###\n",
-        "setMethod(f = \"[\", signature = \"", name, "\", definition = function (x, i, j, drop){\n\tswitch(EXPR = i, \n",
+        "setMethod(f = \"[\", signature = \"", name, "\", definition = function (x, i, j, drop){\n  switch(EXPR = i, \n",
         sapply(seq(lengthField), function (i) {
             if (type[i]=="list") {
-                paste0("\t\t\"", field[i], "\" = {\n\t\t\tif (missing(j)) {\n\t\t\t\treturn(x@", field[i], ")\n\t\t\t} else {\n",
-                    "\t\t\t\tif (j>length(x@", field[i], ")) {\n\t\t\t\t\tstop(\"[", name, ":get] indice out of limits\")\n\t\t\t\t} else {\n",
-                    "\t\t\t\t\treturn(x@", field[i], "[[j]])\n\t\t\t\t}\n\t\t\t}\n\t\t}, \n")
+                paste0("    \"", field[i], "\" = {\n      if (missing(j)) {\n        return(x@", field[i], ")\n      } else {\n",
+                    "        if (j>length(x@", field[i], ")) {\n          stop(\"[", name, ":get] indice out of limits\")\n        } else {\n",
+                    "          return(x@", field[i], "[[j]])\n        }\n      }\n    }, \n")
             } else {
                 if (type[i]=="matrix" | type[i]=="data.frame") {
-                    paste0("\t\t\"", field[i], "\" = {return(x@", field[i], ")}, \n")
+                    paste0("    \"", field[i], "\" = {return(x@", field[i], ")}, \n")
                 } else {
-                    paste0("\t\t\"", field[i], "\" = {\n\t\t\tif (missing(j)) {\n\t\t\t\treturn(x@", field[i], ")\n\t\t\t} else {\n",
-                        "\t\t\t\tif (j>length(x@", field[i], ")) {\n\t\t\t\t\tstop(\"[", name, ":get] indice out of limits\")\n",
-                        "\t\t\t\t} else {\n\t\t\t\t\treturn(x@", field[i], "[j])\n\t\t\t\t}\n\t\t\t}\n\t\t}, \n")
+                    paste0("    \"", field[i], "\" = {\n      if (missing(j)) {\n        return(x@", field[i], ")\n      } else {\n",
+                        "        if (j>length(x@", field[i], ")) {\n          stop(\"[", name, ":get] indice out of limits\")\n",
+                        "        } else {\n          return(x@", field[i], "[j])\n        }\n      }\n    }, \n")
                 }
             }
         }),
-        "\t\tstop(\"[", name, ":get] \", i, \" is not a \\\"", name, "\\\" slot\")\n\t)\n})\n\n\n")
+        "    stop(\"[", name, ":get] \", i, \" is not a \\\"", name, "\\\" slot\")\n  )\n})\n\n\n")
     cat(code, sep = "", file = file, append = append)
     return(invisible(code))
 }
@@ -333,21 +333,21 @@ set.S4 <- function (name, field, type, file = paste0(name, "-Class.R"), append =
         "setMethod(f = \"[<-\", signature = \"", name, "\", definition = function (x, i, j, value){\n    switch(EXPR = i, \n",
         sapply(seq(lengthField), function (i) {
             if (type[i]=="list") {
-                paste0("\t\t\"", field[i], "\" = {\n\t\t\tif (missing(j)) {\n\t\t\t\tx@", field[i], " <- value\n\t\t\t} else {\n",
-                    "\t\t\t\tif (j>length(x@", field[i], ")) {\n\t\t\t\t\tstop(\"[", name, ":set] indice out of limits\")\n",
-                    "\t\t\t\t} else {\n\t\t\t\t\tx@", field[i], "[[j]] <- value\n\t\t\t\t}\n\t\t\t}\n\t\t}, \n")
+                paste0("    \"", field[i], "\" = {\n      if (missing(j)) {\n        x@", field[i], " <- value\n      } else {\n",
+                    "        if (j>length(x@", field[i], ")) {\n          stop(\"[", name, ":set] indice out of limits\")\n",
+                    "        } else {\n          x@", field[i], "[[j]] <- value\n        }\n      }\n    }, \n")
             } else {
                 if (type[i]=="matrix" | type[i]=="data.frame") {
-                    paste0("\t\t\"", field[i], "\" = {x@", field[i], " <- value}, \n")
+                    paste0("    \"", field[i], "\" = {x@", field[i], " <- value}, \n")
                 } else {
-                    paste0("\t\t\"", field[i], "\" = {\n\t\t\tif (missing(j)) {\n\t\t\t\tx@", field[i], " <- value\n\t\t\t} else {\n",
-                    "\t\t\t\tif (j>length(x@", field[i], ")) {\n\t\t\t\t\tstop(\"[", name, ":set] indice out of limits\")\n",
-                    "\t\t\t\t} else {\n\t\t\t\t\tx@", field[i], "[j] <- value\n\t\t\t\t}\n\t\t\t}\n\t\t}, \n")
+                    paste0("    \"", field[i], "\" = {\n      if (missing(j)) {\n        x@", field[i], " <- value\n      } else {\n",
+                    "        if (j>length(x@", field[i], ")) {\n          stop(\"[", name, ":set] indice out of limits\")\n",
+                    "        } else {\n          x@", field[i], "[j] <- value\n        }\n      }\n    }, \n")
                 }
             }
         }),
-        "\t\tstop(\"[", name, ":set] \", i, \" is not a \\\"", name, "\\\" slot\")\n",
-        "\t)\n\tvalidObject(x)\n\treturn(invisible(x))\n})\n\n\n")
+        "    stop(\"[", name, ":set] \", i, \" is not a \\\"", name, "\\\" slot\")\n",
+        "  )\n  validObject(x)\n  return(invisible(x))\n})\n\n\n")
     cat(code, sep = "", file = file, append = append)
     return(invisible(code))
 }
@@ -370,12 +370,12 @@ set.S4 <- function (name, field, type, file = paste0(name, "-Class.R"), append =
 summary.S4 <- function (name, file = paste0(name, "-Class.R"), append = TRUE) {
     code <- c("### Summary ###\n",
         "setMethod(f = \"summary\", signature = \"", name , "\", definition = function (object){\n",
-        "\tif (missing(object)){\n",
-        "\t\tstop(\"[", name, ":summary] \\\"object\\\" is missing\", call. = FALSE)\n",
-        "\t\treturn(invisible())\n",
-        "\t} else {}\n",
-        "\twarning(\"[", name, ":summary] No summary method defined for \\\"", name, "\\\" object!\", call. = FALSE)\n",
-        "\treturn(invisible(object))\n",
+        "  if (missing(object)){\n",
+        "    stop(\"[", name, ":summary] \\\"object\\\" is missing\", call. = FALSE)\n",
+        "    return(invisible())\n",
+        "  } else {}\n",
+        "  warning(\"[", name, ":summary] No summary method defined for \\\"", name, "\\\" object!\", call. = FALSE)\n",
+        "  return(invisible(object))\n",
         "})\n")
     cat(code, sep = "", file = file, append = append)
     return(invisible(code))
@@ -528,8 +528,8 @@ helpClass.S4 <- function (clName, filename = NULL, where = topenv(parent.frame()
     .name <- paste0("\\name{", fullName, "}")
     .type <- paste0("\\docType{", type, "}")
     .alias <- paste0("\\alias{", fullName, "}")
-    .title <- paste0("\n\\title{Class \\code{\"", clName, "\"}}")
-    .desc <- paste0("\n\\description{", "\n%%\t~~ A concise (1-5 lines) description of what the class is. ~~\n}")
+    .title <- paste0("\n\  itle{Class \\code{\"", clName, "\"}}")
+    .desc <- paste0("\n\\description{", "\n%%  ~~ A concise (1-5 lines) description of what the class is. ~~\n}")
     slotclasses <- getSlots(clDef)
     slotnames <- names(slotclasses)
     slotclasses <- as.character(slotclasses)
@@ -557,15 +557,15 @@ helpClass.S4 <- function (clName, filename = NULL, where = topenv(parent.frame()
             argNames[[1L]] <- clNameQ
             callString <- .makeCallString(initMethod, "new", argNames)
         }
-        .usage <- paste0(.usage, "{\nObjects can be created by calls of the form \\code{", callString, "}.\n%%\t~~ describe objects here ~~ \n}")
+        .usage <- paste0(.usage, "{\nObjects can be created by calls of the form \\code{", callString, "}.\n%%  ~~ describe objects here ~~ \n}")
     }
 
     .slots <- if (nslots > 0) {
         slotclasses <- slotClassWithSource(clName)
         slotnames <- names(slotclasses)
-        .slots.head <- c("\n\\section{Slots}{", "\t\\describe{")
-        .slots.body <- paste0("\t\t\\item{\\code{", slotnames, "}}", "{[", slotclasses, "]: Object of class \\code{", slotclasses, "} }")
-        .slots.tail <- c("\t}", "}")
+        .slots.head <- c("\n\\section{Slots}{", "  \\describe{")
+        .slots.body <- paste0("    \\item{\\code{", slotnames, "}}", "{[", slotclasses, "]: Object of class \\code{", slotclasses, "} }")
+        .slots.tail <- c("  }", "}")
         c(.slots.head, .slots.body, .slots.tail)
     } else {
         character()
@@ -583,19 +583,19 @@ helpClass.S4 <- function (clName, filename = NULL, where = topenv(parent.frame()
     .methAliases <- ""
 
     if (nmeths > 0) {
-        .meths.body <- "\t\\describe{"
+        .meths.body <- "  \\describe{"
         for (i in 1L:nmeths) {
             .sig <- sigsList(methnms[i], where = whereClass)
             for (j in seq_along(.sig)) {
                 if (!all(is.na(match(.sig[[j]], clName)))) {
                     methn.i <- escape(methnms[i])
-                    .meths.body <- c(.meths.body, paste0("\t\t\\item{", methn.i, "}{\\code{signature", pastePar(.sig[[j]]), "}: ... }"))
+                    .meths.body <- c(.meths.body, paste0("    \\item{", methn.i, "}{\\code{signature", pastePar(.sig[[j]]), "}: ... }"))
                     cur <- paste(.sig[[j]], collapse = ",")
                     .methAliases <- paste0(.methAliases, "\\alias{", methn.i, ",", cur, "-method}\n")
                 } else {}
             }
         }
-        .meths.body <- c(.meths.body, "\t}")
+        .meths.body <- c(.meths.body, "  }")
     } else {
         .meths.head <- "\n\\section{Methods}{"
         .meths.body <- paste("No methods defined with class", clNameQ, "in the signature.")
@@ -614,10 +614,10 @@ helpClass.S4 <- function (clName, filename = NULL, where = topenv(parent.frame()
         `section{Slots}` = .slots,
         `section{Extends}` = .extends,
         `section{Methods}` = paste0(c(.meths.head, .meths.body, .meths.tail), collapse = "\n"),
-        references = "\n\\references{\n%%\t~~put references to the literature/web site here~~\n}",
-        author = "\n\\author{\n%%\t~~who you are~~\n}",
-        note = "\n\\note{\n%%\t~~further notes~~\n}\n\n%%  ~~Make other sections like Warning with \\section{Warning }{....} ~~",
-        seealso = "\n\\seealso{\n%%\t~~objects to See Also as \\code{\\link{~~fun~~}}, ~~~%%\t~~or \\code{\\linkS4class{CLASSNAME}} for links to other classes ~~~\n}",
+        references = "\n\\references{\n%%  ~~put references to the literature/web site here~~\n}",
+        author = "\n\\author{\n%%  ~~who you are~~\n}",
+        note = "\n\\note{\n%%  ~~further notes~~\n}\n\n%%  ~~Make other sections like Warning with \\section{Warning }{....} ~~",
+        seealso = "\n\\seealso{\n%%  ~~objects to See Also as \\code{\\link{~~fun~~}}, ~~~%%  ~~or \\code{\\linkS4class{CLASSNAME}} for links to other classes ~~~\n}",
         examples = paste0("\n\\examples{\nshowClass(", clNameQ, ")\n}"),
         keywords = .keywords
     )
@@ -761,8 +761,8 @@ helpMethod.S4 <- function (f, filename = NULL, where = topenv(parent.frame())) {
         labels[[i]] <- sprintf("\\code{signature(%s)}", paste(sprintf("%s = \"%s\"", args, escape(sigi)), collapse = ", "))
         aliases[[i]] <- paste0("\\alias{", utils:::topicName("method", c(f, signatures[i, ])), "}")
     }
-    text <- paste0("\t\t\\item{", labels, "}{ ~~describe this method here~~ }")
-    text <- c("\n\\section{Methods}{\n\t\\describe{", text, "\t}\n}")
+    text <- paste0("    \\item{", labels, "}{ ~~describe this method here~~ }")
+    text <- c("\n\\section{Methods}{\n  \\describe{", text, "  }\n}")
     aliasText <- c(paste0("\\alias{", escape(fullName), "}"), escape(aliases))
 
     if (identical(filename, FALSE)) {
@@ -777,7 +777,7 @@ helpMethod.S4 <- function (f, filename = NULL, where = topenv(parent.frame())) {
         name = paste0("\\name{", fullName, "}"),
         type = "\\docType{methods}",
         aliases = aliasText,
-        title = sprintf("\n\n\\title{Methods for Function \\code{%s} %s}", f, packageString),
+        title = sprintf("\n\n\  itle{Methods for Function \\code{%s} %s}", f, packageString),
         description = paste0("\n\\description{\n%%  ~~ Methods for function", " \\code{", f, "} ", sub("^in Package", "in package", packageString), " ~~\n}"),
         `section{Methods}` = text,
         keywords = c("\n\\keyword{methods}", "\\keyword{method}", "\\keyword{new}", paste0("\\keyword{", f, "}"))

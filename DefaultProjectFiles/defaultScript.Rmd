@@ -20,7 +20,7 @@ output:
     fig_width: 6.3
     fig_height: 4.7
     number_sections: true
-    self_containd: true
+    self_contained: true
     mathjax: default
     df_print: kable
   bookdown::pdf_document2:
@@ -37,10 +37,11 @@ output:
 options(stringsAsFactors = FALSE)
 
 scriptName <- ""
-mainDir <- gsub("/PROJECT/", "/DATA/", gsub("Scripts", "", getwd()))
-outputDir <- paste0(mainDir, "/", scriptName)
+mainDir <- gsub("Scripts", "", getwd())
+workingDir <- gsub("/PROJECT/", "/DATA/", mainDir)
+outputDir <- paste0(workingDir, "/", scriptName)
 
-dir.create(paste0(outputDir, "/KnitrFiles"), recursive = TRUE, showWarnings = FALSE)
+dir.create(paste0(outputDir, "/KnitrFiles/"), recursive = TRUE, showWarnings = FALSE)
 
 
 ### Load packages and functions
@@ -82,9 +83,9 @@ opts_chunk$set(
   fig.align = 'center',
   fig.pos = 'H',
   dpi = params$dpi,
-  fig.path = paste0(outputDir, "/KnitrFiles"),
+  fig.path = paste0(outputDir, "/KnitrFiles/"),
   cache = FALSE,
-  cache.path = paste0(outputDir, "/KnitrFiles")
+  cache.path = paste0(outputDir, "/KnitrFiles/")
 )
 
 

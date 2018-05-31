@@ -5,11 +5,11 @@ date: '`r format(Sys.Date(), "%B %d, %Y")`'
 monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
 params:
-  outputCode: FALSE
-  nCores: !r parallel::detectCores()
+  output_code: FALSE
+  n_cores: !r parallel::detectCores()
   theme_dark: FALSE
   dpi: 120
-  ggFontSize: 9
+  gg_fontsize: 9
 output:
   bookdown::html_document2:
     theme: simplex
@@ -33,15 +33,15 @@ output:
     latex_engine: "pdflatex"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 options(stringsAsFactors = FALSE)
 
-scriptName <- ""
-mainDir <- gsub("Scripts", "", getwd())
-workingDir <- gsub("/PROJECT/", "/DATA/", mainDir)
-outputDir <- paste0(workingDir, "/", scriptName)
+script_name <- ""
+main_directory <- gsub("Scripts", "", getwd())
+working_directory <- gsub("/PROJECT/", "/DATA/", main_directory)
+output_directory <- paste0(working_directory, "/", script_name)
 
-dir.create(paste0(outputDir, "/KnitrFiles/"), recursive = TRUE, showWarnings = FALSE)
+dir.create(paste0(output_directory, "/KnitrFiles/"), recursive = TRUE, showWarnings = FALSE)
 
 
 ### Load packages and functions
@@ -74,18 +74,18 @@ sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = 
 opts_chunk$set(
   size = 'small',
   include = TRUE,
-  echo = params$outputCode,
-  warning = params$outputCode,
-  message = params$outputCode,
+  echo = params$output_code,
+  warning = params$output_code,
+  message = params$output_code,
   tidy = FALSE,
   crop = TRUE,
   autodep = TRUE,
   fig.align = 'center',
   fig.pos = 'H',
   dpi = params$dpi,
-  fig.path = paste0(outputDir, "/KnitrFiles/"),
+  fig.path = paste0(output_directory, "/KnitrFiles/"),
   cache = FALSE,
-  cache.path = paste0(outputDir, "/KnitrFiles/")
+  cache.path = paste0(output_directory, "/KnitrFiles/")
 )
 
 
@@ -96,25 +96,24 @@ if (knitr:::is_latex_output()) {
     x <- def.chunk.hook(x, options)
     ifelse(options$size != "normalsize", paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
   })
-} else {}
+}
 
 
-### Define nCores
-nCores <- params$nCores
+### Define n_cores
+n_cores <- params$n_cores
 
 
 ### Define theme
 theme_dark <- params$theme_dark
 if (theme_dark) {
   ## Theme Black ON ##
-  theme_set(theme_black(base_size = params$ggFontSize))
+  theme_set(theme_black(base_size = params$gg_fontsize))
   plot_grid <- hijack(plot_grid, theme_dark = theme_dark)
   scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
   scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
 } else {
-  theme_set(theme_light(base_size = params$ggFontSize))
+  theme_set(theme_light(base_size = params$gg_fontsize))
   scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 0, end = 4/5)
   scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 0, end = 4/5)
-}    
-
+}
 ```

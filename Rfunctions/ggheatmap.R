@@ -819,8 +819,8 @@ ggheatmap <- function (
     r_order <- match(row_data$labels$label, rownames(data))
     c_order <- match(col_data$labels$label, colnames(data))
     M <- data[r_order, c_order]
-    rownames(M) <- as.character(as.numeric(factor(row_data$labels$x)))
-    colnames(M) <- as.character(as.numeric(factor(col_data$labels$x)))
+    rownames(M) <- row_data$labels$x
+    colnames(M) <- col_data$labels$x
     M <- reshape2::melt(M)
     colnames(M) <- c("y", "x", "value")
     center_item <- ggplot(data = M, aes_string(x = "x", y = "y")) +

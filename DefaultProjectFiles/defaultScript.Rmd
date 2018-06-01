@@ -81,7 +81,7 @@ opts_chunk$set(
   crop = TRUE,
   autodep = TRUE,
   fig.align = 'center',
-  fig.pos = 'H',
+  fig.pos = '!H',
   dpi = params$dpi,
   fig.path = paste0(output_directory, "/KnitrFiles/"),
   cache = FALSE,

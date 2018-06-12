@@ -10,6 +10,7 @@
 #' @param xlab PARAM_DESCRIPTION, Default: 'Chromosomes'
 #' @param ylab PARAM_DESCRIPTION, Default: 'P-Value'
 #' @param sep PARAM_DESCRIPTION, Default: 0.02
+#' @param ytrans PARAM_DESCRIPTION, Default: TRUE
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples 
@@ -20,7 +21,7 @@
 #' }
 #' @rdname ggmanhattan
 #' @export 
-ggmanhattan <- function (data, chr, position, y, title = "Manhattan plot", xlab = "Chromosomes", ylab = "P-Value", sep = 0.02) {
+ggmanhattan <- function (data, chr, position, y, title = "Manhattan plot", xlab = "Chromosomes", ylab = "P-Value", sep = 0.02, ytrans = TRUE) {
     data[, chr] <- gsub("chr", "", tolower(data[, chr]))
     data[, chr] <- factor(toupper(data[, chr]), levels = c(seq(22), "X", "Y"))
     data <- data[order(data[, chr], data[, position]), ]
@@ -78,6 +79,7 @@ ggmanhattan <- function (data, chr, position, y, title = "Manhattan plot", xlab 
         }
         trans_new(name = "pval", transform = function (x) {-log(x, 10)}, inverse = function (x) {10^-x}, breaks = neglog10_breaks(), domain = c(1e-100, Inf))
     }
+    
     p <- ggplot(data = data, aes_string(x = "xPos", y = y, colour = chr)) +
         geom_point(size = 1.5, shape = 1, na.rm = TRUE) +
         scale_x_continuous(
@@ -87,8 +89,15 @@ ggmanhattan <- function (data, chr, position, y, title = "Manhattan plot", xlab 
             expand = c(0.01, 0.01)
         ) +
         labs(title = title, y = ylab, x = xlab) +
-        expand_limits(y = 10^-(1.05*-log10(data[, y]))) +
-        scale_y_continuous(trans = pval_trans(), expand = c(0, 0)) +
         scale_colour_viridis(discrete = TRUE)
+    if(ytrans) {
+      p <- p +
+        expand_limits(y = 10^-(1.05*-log10(data[, y]))) +
+        scale_y_continuous(trans = pval_trans(), expand = c(0, 0))
+    } else {
+      p <- p +
+        scale_y_continuous()
+    }
+ 
     return(p)
 }

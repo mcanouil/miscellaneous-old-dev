@@ -80,7 +80,8 @@ read_metharray <- function(basenames, extended = FALSE, verbose = FALSE, force =
     stop("[read.metharray] Trying to parse IDAT files with different array size but seemingly all of the same type.\n  You can force this by 'force=TRUE', see the man page ?read.metharray")
   }
   commonAddresses <- as.character(Reduce("intersect", mclapply(
-    G.idats, mc.cores = nCores, mc.preschedule = FALSE,
+    G.idats,
+    mc.cores = nCores, mc.preschedule = FALSE,
     function(xx) rownames(xx$Quants)
   )))
   GreenMean <- do.call(cbind, mclapply(G.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
@@ -150,7 +151,8 @@ read_metharray_exp <- function(base = NULL, targets = NULL, extended = FALSE, re
       files <- targets$Basename
     }
     rgSet <- read_metharray(
-      files, extended = extended,
+      files,
+      extended = extended,
       verbose = verbose, force = force, nCores = nCores
     )
     pD <- targets
@@ -160,11 +162,13 @@ read_metharray_exp <- function(base = NULL, targets = NULL, extended = FALSE, re
     return(rgSet)
   }
   Grn.files <- list.files(
-    base, pattern = "_Grn.idat$", recursive = recursive,
+    base,
+    pattern = "_Grn.idat$", recursive = recursive,
     ignore.case = TRUE, full.names = TRUE
   )
   Red.files <- list.files(
-    base, pattern = "_Red.idat$", recursive = recursive,
+    base,
+    pattern = "_Red.idat$", recursive = recursive,
     ignore.case = TRUE, full.names = TRUE
   )
   if (length(Grn.files) == 0 || length(Red.files) == 0) {
@@ -213,7 +217,8 @@ read_metharray_sheet <- function(base, pattern = "csv$", ignore.case = TRUE, rec
       df[, nam] <- NULL
     }
     if (length(nam <- grep(
-      "Array[\\._]ID", names(df), ignore.case = TRUE,
+      "Array[\\._]ID", names(df),
+      ignore.case = TRUE,
       value = TRUE
     )) == 1) {
       df$Array <- as.character(df[, nam])
@@ -226,14 +231,16 @@ read_metharray_sheet <- function(base, pattern = "csv$", ignore.case = TRUE, rec
       ))
     }
     if (length(nam <- grep(
-      "Sentrix_ID", names(df), ignore.case = TRUE,
+      "Sentrix_ID", names(df),
+      ignore.case = TRUE,
       value = TRUE
     )) == 1) {
       df$Slide <- as.character(df[, nam])
       df[, nam] <- NULL
     }
     if (length(nam <- grep(
-      "Slide[\\._]ID", names(df), ignore.case = TRUE,
+      "Slide[\\._]ID", names(df),
+      ignore.case = TRUE,
       value = TRUE
     )) == 1) {
       df$Slide <- as.character(df[, nam])
@@ -248,7 +255,8 @@ read_metharray_sheet <- function(base, pattern = "csv$", ignore.case = TRUE, rec
       df[, "Slide"] <- as.character(df[, "Slide"])
     }
     if (length(nam <- grep(
-      "Plate[\\._]ID", names(df), ignore.case = TRUE,
+      "Plate[\\._]ID", names(df),
+      ignore.case = TRUE,
       value = TRUE
     )) == 1) {
       df$Plate <- as.character(df[, nam])
@@ -265,12 +273,14 @@ read_metharray_sheet <- function(base, pattern = "csv$", ignore.case = TRUE, rec
         df$Array
       )
       allfiles <- list.files(
-        dirname(file), recursive = recursive,
+        dirname(file),
+        recursive = recursive,
         full.names = TRUE
       )
       basenames <- sapply(patterns, function(xx) grep(
           xx,
-          allfiles, value = TRUE
+          allfiles,
+          value = TRUE
         ))
       names(basenames) <- NULL
       basenames <- sub(
@@ -290,7 +300,8 @@ read_metharray_sheet <- function(base, pattern = "csv$", ignore.case = TRUE, rec
   }
   if (all(info$isdir)) {
     csvfiles <- list.files(
-      base, recursive = recursive,
+      base,
+      recursive = recursive,
       pattern = pattern, ignore.case = ignore.case, full.names = TRUE
     )
     if (verbose) {
@@ -306,7 +317,8 @@ read_metharray_sheet <- function(base, pattern = "csv$", ignore.case = TRUE, rec
   df <- do.call(rbind, lapply(dfs, function(df) {
     newnames <- setdiff(namesUnion, names(df))
     newdf <- matrix(
-      NA, ncol = length(newnames), nrow = nrow(df),
+      NA,
+      ncol = length(newnames), nrow = nrow(df),
       dimnames = list(NULL, newnames)
     )
     cbind(df, as.data.frame(newdf))
@@ -332,7 +344,8 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
     nbcg <- nb
     locusNames <- getManifestInfo(x, "locusNames")
     bc_temp <- matrix(
-      NA_real_, ncol = ncol(x), nrow = length(locusNames),
+      NA_real_,
+      ncol = ncol(x), nrow = length(locusNames),
       dimnames = list(locusNames, sampleNames(x))
     )
     TypeII.Name <- getProbeInfo(x, type = "II")$Name

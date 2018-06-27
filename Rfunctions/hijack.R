@@ -4,19 +4,19 @@
 #' @param ... PARAM_DESCRIPTION
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
-#' @examples 
+#' @examples
 #' \dontrun{
 #' if(interactive()){
 #'  #EXAMPLE1
 #'  }
 #' }
 #' @rdname hijack
-#' @export 
-hijack <- function (FUN, ...) {
-    .FUN <- FUN
-    args <- list(...)
-    invisible(lapply(seq_along(args), function(i) {
-        formals(.FUN)[[names(args)[i]]] <<- args[[i]]
-    }))
-    .FUN
+#' @export
+hijack <- function(FUN, ...) {
+  .FUN <- FUN
+  args <- list(...)
+  invisible(lapply(seq_along(args), function(i) {
+    formals(.FUN)[[names(args)[i]]] <<- args[[i]]
+  }))
+  .FUN
 }

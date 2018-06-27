@@ -3,14 +3,12 @@
 #' @title FUNCTION_TITLE
 #' @description FUNCTION_DESCRIPTION
 #' @param data PARAM_DESCRIPTION
-#' @param chr PARAM_DESCRIPTION
-#' @param position PARAM_DESCRIPTION
-#' @param y PARAM_DESCRIPTION
-#' @param title PARAM_DESCRIPTION, Default: 'Manhattan plot'
-#' @param xlab PARAM_DESCRIPTION, Default: 'Chromosomes'
-#' @param ylab PARAM_DESCRIPTION, Default: 'P-Value'
-#' @param sep PARAM_DESCRIPTION, Default: 0.02
-#' @param ytrans PARAM_DESCRIPTION, Default: TRUE
+#' @param x_chr PARAM_DESCRIPTION
+#' @param x_pos PARAM_DESCRIPTION
+#' @param y_pval PARAM_DESCRIPTION
+#' @param y_trans PARAM_DESCRIPTION, Default: TRUE
+#' @param x_space PARAM_DESCRIPTION, Default: 5e7
+#' @param ... PARAM_DESCRIPTION
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -21,89 +19,133 @@
 #' }
 #' @rdname ggmanhattan
 #' @export
-ggmanhattan <- function(data, chr, position, y, title = "Manhattan plot", xlab = "Chromosomes", ylab = "P-Value", sep = 0.02, ytrans = TRUE) {
-  data[, chr] <- gsub("chr", "", tolower(data[, chr]))
-  data[, chr] <- factor(toupper(data[, chr]), levels = c(seq(22), "X", "Y"))
-  data <- data[order(data[, chr], data[, position]), ]
-  notNA <- apply(data[, c(chr, position)], 1, function(iRow) {
-    any(is.na(iRow))
-  })
-  data <- data[which(!notNA), ]
-  chrSize <- table(data[, chr])
-  if (length(chrSize) != 24 | any(chrSize == 0)) {
-    CHR <- c(seq(22), "X", "Y")
-    equalZero <- names(which(chrSize == 0))
-    notIn <- CHR[which(!CHR %in% names(chrSize))]
-    chr2Add <- unique(c(equalZero, notIn))
-    newLines <- data.frame(do.call("rbind", lapply(chr2Add, function(iChr) {
-      newLine <- matrix(as.numeric(rep(NA, ncol(data))), ncol = ncol(data), dimnames = list(NULL, colnames(data)))
-      newLine <- data.frame(newLine)
-      newLine[1, chr] <- iChr
-      return(newLine)
-    })))
-    colnames(newLines) <- colnames(data)
-    data <- rbind(data, newLines)
-    data <- data[order(data[, chr], data[, position]), ]
-  } else {}
-  chrSize <- chrSize[chrSize != 0]
-  data <- data[!is.na(data[, y]), ]
-  chrSizeNew <- table(data[, chr])
-  chrSizeNew <- chrSizeNew[chrSizeNew != 0]
-  chrStep <- floor(sum(chrSizeNew) * sep)
-  data[, "xPos"] <- unlist(sapply(seq_along(chrSizeNew), function(iSize) {
-    if (chrSizeNew[iSize] != 0) {
-      xPos <- seq_len(chrSizeNew[iSize])
-      range(xPos)
-      if (iSize > 1) {
-        xPos <- xPos + sum(chrSizeNew[seq(iSize - 1)]) + chrStep * (iSize - 1)
-        range(xPos)
-      } else {}
-      return(xPos)
-    } else {}
-  }), use.names = FALSE)
-  avoidZero <- rep(0, length(chrSize))
-  avoidZero[which(chrSize == 0)] <- chrStep
-  whichIsCenter <- ceiling(c(cumsum(chrSizeNew) - diff(c(0, cumsum(chrSizeNew))) / 2))
-  xBreaks <- data[whichIsCenter, "xPos"]
-
-  pval_trans <- function() {
-    neglog10_breaks <- function(n = 5) {
-      function(x) {
+ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e7, ...) {
+  require(tidyverse)
+  require(scales)
+  require(viridis)
+  all_args <- names(list(...))
+  old_args <- intersect(
+    all_args,
+    c("chr", "position", "y", "sep", "ytrans")
+  )
+  setdiff(
+    all_args, 
+    c("data", "x_chr", "x_pos", "y_pval", "y_trans", "x_space", "chr", "position", "y", "sep", "ytrans")
+  ) %>% 
+    map(.x = ., .f = ~message(paste0("Argument '", .x, "' is deprecated!")))
+  if (length(old_args)!=0) {
+    for (iarg in old_args) {
+      message(paste0(
+        "Argument '", 
+        iarg, 
+        "' is deprecated, use '", 
+        switch(
+          EXPR = iarg,
+          "chr" = {"x_chr"},
+          "position" = {"x_pos"},
+          "y" = {"y_pval"},
+          "sep" = {"x_space"},
+          "ytrans" = {"y_trans"}
+        ), 
+        "' instead!"
+      ))
+    }
+    
+    for (iexpr in intersect(old_args, c("chr", "position", "y", "sep", "ytrans"))) {
+      switch(
+        EXPR = iexpr,
+        "chr" = {x_chr <- chr},
+        "position" = {x_pos <- position},
+        "y" = {y_pval <- y},
+        "sep" = {x_space <- sep},
+        "ytrans" = {y_trans <- ytrans}
+      )
+    }
+  }
+    
+  pval_trans <- function () {
+    neglog10_breaks <- function (n = 5) {
+      function (x) {
         rng <- -log(range(x, na.rm = TRUE), base = 10)
         min <- ceiling(rng[2])
         max <- floor(rng[1])
         if (max == min) {
           return(10^-min)
-        } else {}
-        by <- floor((max - min) / n) + 1
-        10^-seq(min, max, by = by)
+        } else {
+          by <- floor((max - min)/n) + 1
+          return(10^-seq(min, max, by = by))
+        }
       }
     }
-    trans_new(name = "pval", transform = function(x) {
-      -log(x, 10)
-    }, inverse = function(x) {
-      10^-x
-    }, breaks = neglog10_breaks(), domain = c(1e-100, Inf))
+    trans_new(
+      name = "pval", 
+      transform = function (x) {-log(x, 10)}, 
+      inverse = function (x) {10^-x}, 
+      breaks = neglog10_breaks(), 
+      domain = c(1e-100, Inf),
+      format = function(x) {
+        parse(
+          text = scientific_format()(x) %>% 
+            gsub("1e+00", "1", ., fixed = TRUE) %>% 
+            gsub("e", " %*% 10^", .)
+        )
+      }
+    )
   }
 
-  p <- ggplot(data = data, aes_string(x = "xPos", y = y, colour = chr)) +
-    geom_point(size = 1.5, shape = 1, na.rm = TRUE) +
-    scale_x_continuous(
-      breaks = xBreaks,
-      labels = names(chrSize),
-      limits = c(min(data[, "xPos"]), max(data[, "xPos"]) + sum(avoidZero)),
-      expand = c(0.01, 0.01)
+  data <- data %>% 
+    rename(
+      x_chr = !!x_chr,
+      x_pos = !!x_pos,
+      y_pval = !!y_pval
+    ) %>% 
+    mutate(
+      x_chr = x_chr %>% 
+        toupper() %>% 
+        gsub("CHR", "", .) %>% 
+        factor(., levels = c(seq(22), "X", "Y")),
+      x_pos = as.integer(x_pos),
+      y_pval = as.numeric(y_pval)
+    ) %>% 
+    filter(!is.na(x_chr) & !is.na(x_pos)) %>% 
+    arrange(x_chr, x_pos) %>% 
+    group_by(x_chr) %>% 
+    mutate(x_pos = x_pos - min(x_pos) + 1) %>% 
+    ungroup()
+
+  data <- full_join(
+    x = data,
+    y = data %>% 
+      group_by(x_chr) %>% 
+      summarise(x_pos = max(x_pos)) %>% 
+      mutate(x_start = c(0, cumsum(x_pos[-length(x_pos)]+x_space))) %>% 
+      select(x_chr, x_start),
+    by = "x_chr"
+  ) %>% 
+    mutate(
+      x_pos = x_pos + x_start
+    )
+
+  x_breaks <- data %>% 
+    group_by(x_chr) %>% 
+    summarise(x_med = median(x_pos)) %>% 
+    select(x_chr, x_med)
+
+  p <- ggplot(data = data, aes(x = x_pos, y = y_pval, colour = x_chr)) +
+    geom_point(size = 1.5, shape = 21, na.rm = TRUE, show.legend = FALSE) +
+    scale_colour_manual(
+      values = rep(viridis_pal(begin = 1/4, end = 3/4)(2), 12)
     ) +
-    labs(title = title, y = ylab, x = xlab) +
-    scale_colour_viridis(discrete = TRUE)
-  if (ytrans) {
+    scale_x_continuous(
+      breaks = x_breaks[["x_med"]],
+      labels = x_breaks[["x_chr"]],
+      limits = range(data[["x_pos"]]),
+      expand = c(0.01, 0)
+    ) +
+    labs(y = y_pval, x = x_chr)
+  if (y_trans) {
     p <- p +
-      expand_limits(y = 10^-(1.05 * -log10(data[, y]))) +
-      scale_y_continuous(trans = pval_trans(), expand = c(0, 0))
-  } else {
-    p <- p +
-      scale_y_continuous()
+      scale_y_continuous(trans = pval_trans())
   }
-
   return(p)
 }

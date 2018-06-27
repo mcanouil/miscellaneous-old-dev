@@ -23,7 +23,8 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
   require(tidyverse)
   require(scales)
   require(viridis)
-  all_args <- names(list(...))
+  args_values <- list(...)
+  all_args <- names(args_values)
   old_args <- intersect(
     all_args,
     c("chr", "position", "y", "sep", "ytrans")
@@ -54,11 +55,11 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
     for (iexpr in intersect(old_args, c("chr", "position", "y", "sep", "ytrans"))) {
       switch(
         EXPR = iexpr,
-        "chr" = {x_chr <- chr},
-        "position" = {x_pos <- position},
-        "y" = {y_pval <- y},
-        "sep" = {x_space <- sep},
-        "ytrans" = {y_trans <- ytrans}
+        "chr" = {x_chr <- args_values[["chr"]]},
+        "position" = {x_pos <- args_values[["position"]]},
+        "y" = {y_pval <- args_values[["y"]]},
+        "sep" = {x_space <- args_values[["sep"]]},
+        "ytrans" = {y_trans <- args_values[["ytrans"]]}
       )
     }
   }

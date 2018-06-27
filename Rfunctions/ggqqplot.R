@@ -19,10 +19,11 @@ ggqqplot <- function(data, col_names = NULL, point_size = 1, ...) {
   require(tidyverse)
   require(scales)
   require(viridis)
-  all_args <- names(list(...))
+  args_values <- list(...)
+  all_args <- names(args_values)
   old_args <- intersect(
     all_args,
-    c()
+    c("pvalue", "lambdaNames", "pt.size")
   )
   setdiff(
     all_args, 
@@ -48,9 +49,9 @@ ggqqplot <- function(data, col_names = NULL, point_size = 1, ...) {
     for (iexpr in intersect(old_args, c("pvalue", "lambdaNames", "pt.size"))) {
       switch(
         EXPR = iexpr,
-        "pvalue" = {data <- data},
-        "lambdaNames" = {col_names <- lambdaNames},
-        "pt.size" = {point_size <- pt.size}
+        "pvalue" = {data <- args_values[["pvalue"]]},
+        "lambdaNames" = {col_names <- args_values[["lambdaNames"]]},
+        "pt.size" = {point_size <- args_values[["pt.size"]]}
       )
     }
   }
@@ -176,7 +177,4 @@ ggqqplot <- function(data, col_names = NULL, point_size = 1, ...) {
 # 0.169530221518836, 0.32914895678025, 0.192540846711352, 0.369981675410129,
 # 0.883757071864581, 0.230327033896926, 0.869679377611833)), .Names = c("P.Value",
 # "adj.P.Val"), row.names = c(NA, -100L), class = "data.frame")
-# cowplot::plot_grid(
-#   ggqqplot2(dta),
-#   ggqqplot(dta)
-# )
+# ggqqplot(pvalue = dta[, 1], lambdaNames = "XXXX")

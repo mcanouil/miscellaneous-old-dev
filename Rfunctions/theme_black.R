@@ -1,142 +1,5 @@
 #' @title FUNCTION_TITLE
 #' @description FUNCTION_DESCRIPTION
-#' @param plot PARAM_DESCRIPTION, Default: NULL
-#' @param xlim PARAM_DESCRIPTION, Default: c(0, 1)
-#' @param ylim PARAM_DESCRIPTION, Default: c(0, 1)
-#' @param theme_dark PARAM_DESCRIPTION, Default: FALSE
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname ggdraw
-#' @export
-ggdraw <- function(plot = NULL, xlim = c(0, 1), ylim = c(0, 1), theme_dark = FALSE) {
-  d <- data.frame(x = 0:1, y = 0:1)
-  p <- ggplot(d, aes_string(x = "x", y = "y")) +
-    scale_x_continuous(limits = xlim, expand = c(0, 0)) +
-    scale_y_continuous(limits = ylim, expand = c(0, 0)) +
-    theme_nothing() +
-    theme(plot.background = element_rect(colour = ifelse(theme_dark, "grey20", "white"), fill = ifelse(theme_dark, "grey20", "white"))) +
-    labs(x = NULL, y = NULL)
-  if (!is.null(plot)) {
-    p <- p + draw_plot(plot)
-  }
-  p
-}
-
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param ... PARAM_DESCRIPTION
-#' @param plotlist PARAM_DESCRIPTION, Default: NULL
-#' @param align PARAM_DESCRIPTION, Default: c("none", "h", "v", "hv")
-#' @param nrow PARAM_DESCRIPTION, Default: NULL
-#' @param ncol PARAM_DESCRIPTION, Default: NULL
-#' @param scale PARAM_DESCRIPTION, Default: 1
-#' @param rel_widths PARAM_DESCRIPTION, Default: 1
-#' @param rel_heights PARAM_DESCRIPTION, Default: 1
-#' @param labels PARAM_DESCRIPTION, Default: NULL
-#' @param label_size PARAM_DESCRIPTION, Default: 14
-#' @param hjust PARAM_DESCRIPTION, Default: -0.5
-#' @param vjust PARAM_DESCRIPTION, Default: 1.5
-#' @param cols PARAM_DESCRIPTION, Default: NULL
-#' @param rows PARAM_DESCRIPTION, Default: NULL
-#' @param theme_dark PARAM_DESCRIPTION, Default: FALSE
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @seealso
-#'  \code{\link[grid]{grobTree}}
-#' @rdname plot_grid
-#' @export
-#' @importFrom grid grobTree
-plot_grid <- function(..., plotlist = NULL, align = c("none", "h", "v", "hv"), nrow = NULL, ncol = NULL, scale = 1, rel_widths = 1, rel_heights = 1, labels = NULL, label_size = 14, hjust = -0.5, vjust = 1.5, cols = NULL, rows = NULL, theme_dark = FALSE) {
-  plots <- c(list(...), plotlist)
-  num_plots <- length(plots)
-  if (!is.null(cols)) {
-    warning("Argument 'cols' is deprecated. Use 'ncol' instead.")
-  }
-  if (!is.null(rows)) {
-    warning("Argument 'rows' is deprecated. Use 'nrow' instead.")
-  }
-  if (!is.null(ncol)) {
-    cols <- ncol
-  }
-  if (!is.null(nrow)) {
-    rows <- nrow
-  }
-  grobs <- align_plots(plotlist = plots, align = align)
-  if (is.null(cols) && is.null(rows)) {
-    cols <- ceiling(sqrt(num_plots))
-    rows <- ceiling(num_plots / cols)
-  }
-  if (is.null(cols)) {
-    cols <- ceiling(num_plots / rows)
-  }
-  if (is.null(rows)) {
-    rows <- ceiling(num_plots / cols)
-  }
-  if (length(scale) == 1) {
-    scale <- rep(scale, num_plots)
-  }
-  if ("AUTO" %in% labels) {
-    labels <- LETTERS[1:num_plots]
-  } else if ("auto" %in% labels) {
-    labels <- letters[1:num_plots]
-  }
-  if (length(hjust) == 1) {
-    hjust <- rep(hjust, length(labels))
-  }
-  if (length(vjust) == 1) {
-    vjust <- rep(vjust, length(labels))
-  }
-  rel_heights <- rep(rel_heights, length.out = rows)
-  rel_widths <- rep(rel_widths, length.out = cols)
-  x_deltas <- rel_widths / sum(rel_widths)
-  y_deltas <- rel_heights / sum(rel_heights)
-  xs <- cumsum(rel_widths) / sum(rel_widths) - x_deltas
-  ys <- 1 - cumsum(rel_heights) / sum(rel_heights)
-  p <- ggdraw(theme_dark = theme_dark)
-  col_count <- 0
-  row_count <- 1
-  for (i in 1:(rows * cols)) {
-    if (i > num_plots) {
-      break
-    }
-    x_delta <- x_deltas[col_count + 1]
-    y_delta <- y_deltas[row_count]
-    width <- x_delta * scale[i]
-    height <- y_delta * scale[i]
-    x_off <- (x_delta - width) / 2
-    y_off <- (y_delta - height) / 2
-    x <- xs[col_count + 1] + x_off
-    y <- ys[row_count] + y_off
-    p_next <- grobs[[i]]
-    if (!is.null(p_next)) {
-      p <- p + draw_grob(grid::grobTree(p_next), x, y, width, height)
-    }
-    if (i <= length(labels)) {
-      p <- p + draw_plot_label(labels[i], x - x_off, y + height - y_off, size = label_size, hjust = hjust[i], vjust = vjust[i], colour = ifelse(theme_dark, "white", "black"))
-    }
-    col_count <- col_count + 1
-    if (col_count >= cols) {
-      col_count <- 0
-      row_count <- row_count + 1
-    }
-  }
-  p
-}
-
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
 #' @param base_size PARAM_DESCRIPTION, Default: 11
 #' @param base_family PARAM_DESCRIPTION, Default: ''
 #' @param base_line_size PARAM_DESCRIPTION, Default: base_size/22
@@ -224,3 +87,59 @@ theme_black <- function(base_size = 11, base_family = "", base_line_size = base_
     complete = TRUE
   )
 }
+
+print.ggplot <- function (x, newpage = FALSE, vp = NULL, ...) {
+  if (is.null(x$theme$plot.background$colour)) {
+    base_colour <- theme_get()$plot.background$colour
+  } else {
+    base_colour <- x$theme$plot.background$colour
+  }
+  grid:::grid.rect(
+    gp = grid::gpar(
+      fill = base_colour, 
+      col = base_colour
+    )
+  )
+  ggplot2:::print.ggplot(x, newpage = newpage, ...)
+}
+plot.ggplot <- print.ggplot
+
+
+ggsave <- function(
+  filename, 
+  plot = ggplot2::last_plot(), 
+  device = NULL, 
+  path = NULL, 
+  scale = 1, 
+  width = NA, 
+  height = NA, 
+  units = c("in", "cm", "mm"), 
+  dpi = 300, 
+  limitsize = TRUE, 
+  ...
+) {
+  if (is.null(plot$theme$plot.background$colour)) {
+    base_colour <- theme_get()$plot.background$colour
+  } else {
+    base_colour <- plot$theme$plot.background$colour
+  }
+  
+  ggsave_args <- c("plot", "path", "scale", "width", "height", "units", "dpi", "limitsize")
+  args <- as.list(match.call())
+  args[[1]] <- NULL
+  args <- args[stats::na.omit(match(ggsave_args, names(args)))]
+  args_dotdotdot <- c(list(...), bg = base_colour)
+  if (is.null(device)) {
+    device <- tolower(tools::file_ext(filename))
+  }
+  if (identical(device, "pdf") || identical(device, grDevices::pdf)) {
+    if (!"useDingbats" %in% names(args_dotdotdot)) 
+      args_dotdotdot <- append(args_dotdotdot, list(useDingbats = FALSE))
+  }
+  args <- c(list(filename = filename), args, device = device, args_dotdotdot)
+  cur_dev <- grDevices::dev.cur()
+  x <- do.call(ggplot2::ggsave, args, envir = parent.frame())
+  grDevices::dev.set(cur_dev)
+  invisible(x)
+}
+  

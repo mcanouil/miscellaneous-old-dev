@@ -3,15 +3,15 @@
 #' @param x PARAM_DESCRIPTION
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
-#' @examples
+#' @examples 
 #' \dontrun{
 #' if(interactive()){
 #'  #EXAMPLE1
 #'  }
 #' }
 #' @rdname simpleCap
-#' @export
-simpleCap <- function(x) {
-  s <- strsplit(x, " ")[[1]]
-  return(paste(toupper(substring(s, 1, 1)), substring(s, 2), sep = "", collapse = " "))
+#' @export 
+simpleCap <- function (x) {
+    s <- strsplit(x, " ")[[1]]
+    return(paste(toupper(substring(s, 1, 1)), substring(s, 2), sep = "", collapse = " "))
 }

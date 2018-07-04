@@ -4,20 +4,20 @@
 #' @param na.rm PARAM_DESCRIPTION, Default: TRUE
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
-#' @examples
+#' @examples 
 #' \dontrun{
 #' if(interactive()){
 #'  #EXAMPLE1
 #'  }
 #' }
 #' @rdname colSe
-#' @export
-colSe <- function(x, na.rm = TRUE) {
-  if (na.rm) {
-    n <- colSums(!is.na(x))
-  } else {
-    n <- nrow(x)
-  }
-  colVar <- colMeans(x * x, na.rm = na.rm) - (colMeans(x, na.rm = na.rm))^2
-  return(sqrt(colVar / n))
+#' @export 
+colSe <- function (x, na.rm = TRUE) {
+    if (na.rm) {
+        n <- colSums(!is.na(x))
+    } else {
+        n <- nrow(x)
+    }
+    colVar <- colMeans(x*x, na.rm = na.rm) - (colMeans(x, na.rm = na.rm))^2
+    return(sqrt(colVar/n))
 }

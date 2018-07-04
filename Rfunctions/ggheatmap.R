@@ -608,20 +608,19 @@ get_segment_df <- function(x0, y0, x1, y1) {
 #' @export
 #' @importFrom reshape2 melt
 ggheatmap <- function(
-  data,
-  gap.ratio = 0.05,
-  grid.h.ratio = c(0.15, 0.60, 0.25),
-  grid.v.ratio = rev(grid.h.ratio),
-  legend.title = NULL,
-  legend.position = c(which.max(c(grid.h.ratio[1], 0, grid.h.ratio[3])), which.max(c(grid.v.ratio[1], 0, grid.v.ratio[3]))),
-  label.h.size = 3,
-  label.v.size = label.h.size,
-  label.h.colour = "black",
-  label.v.colour = "black",
-  theme_dark = FALSE,
-  segments.colour = FALSE,
-  print = TRUE
-) {
+                      data,
+                      gap.ratio = 0.05,
+                      grid.h.ratio = c(0.15, 0.60, 0.25),
+                      grid.v.ratio = rev(grid.h.ratio),
+                      legend.title = NULL,
+                      legend.position = c(which.max(c(grid.h.ratio[1], 0, grid.h.ratio[3])), which.max(c(grid.v.ratio[1], 0, grid.v.ratio[3]))),
+                      label.h.size = 3,
+                      label.v.size = label.h.size,
+                      label.h.colour = "black",
+                      label.v.colour = "black",
+                      theme_dark = FALSE,
+                      segments.colour = FALSE,
+                      print = TRUE) {
   if (!is.matrix(data)) {
     data <- as.matrix(data)
   } else {}
@@ -888,7 +887,7 @@ ggheatmap <- function(
 #' @rdname ggheatmap.show
 #' @export
 ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.ratio = rev(grid.h.ratio), legend.position = NULL, theme_dark = FALSE) {
-  ggdraw <- function(plot = NULL, xlim = c(0, 1), ylim = c(0, 1), theme_dark = FALSE) {
+  ggdraw <- function (plot = NULL, xlim = c(0, 1), ylim = c(0, 1), theme_dark = FALSE) {
     theme_nothing <- function(base_size = 14, base_family = "") {
       theme_void(base_size = base_size, base_family = base_family) %+replace%
         theme(
@@ -940,11 +939,11 @@ ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.rati
         )
     }
     d <- data.frame(x = 0:1, y = 0:1)
-    p <- ggplot(d, aes_string(x = "x", y = "y")) +
-      scale_x_continuous(limits = xlim, expand = c(0, 0)) +
-      scale_y_continuous(limits = ylim, expand = c(0, 0)) +
-      theme_nothing() +
-      theme(plot.background = element_rect(colour = ifelse(theme_dark, "grey20", "white"), fill = ifelse(theme_dark, "grey20", "white"))) +
+    p <- ggplot(d, aes_string(x = "x", y = "y")) + 
+      scale_x_continuous(limits = xlim, expand = c(0, 0)) + 
+      scale_y_continuous(limits = ylim, expand = c(0, 0)) + 
+      theme_nothing() + 
+      theme(plot.background = element_rect(colour = ifelse(theme_dark, "grey20", "white"), fill =  ifelse(theme_dark, "grey20", "white"))) +
       labs(x = NULL, y = NULL)
     if (!is.null(plot)) {
       p <- p + draw_plot(plot)

@@ -4,16 +4,16 @@
 #' @param na.rm PARAM_DESCRIPTION
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
-#' @examples
+#' @examples 
 #' \dontrun{
 #' if(interactive()){
 #'  #EXAMPLE1
 #'  }
 #' }
 #' @rdname sem
-#' @export
-sem <- function(x, na.rm = TRUE) {
-  sqrt(
-    (mean(x^2, na.rm = na.rm) - mean(x, na.rm = na.rm)^2) / sum(!is.na(x))
-  )
+#' @export 
+sem <- function (x, na.rm = TRUE) {
+    sqrt(
+        (mean(x^2, na.rm = na.rm)-mean(x, na.rm = na.rm)^2) / sum(!is.na(x))
+    )
 }

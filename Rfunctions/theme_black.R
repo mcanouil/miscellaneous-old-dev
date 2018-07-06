@@ -88,11 +88,15 @@ theme_black <- function(base_size = 11, base_family = "", base_line_size = base_
   )
 }
 
-print.ggplot <- function (x, newpage = FALSE, vp = NULL, ...) {
+print.ggplot <- function (x, newpage = is.null(vp), vp = NULL, ...) {
   if (is.null(x$theme$plot.background$colour)) {
     base_colour <- theme_get()$plot.background$colour
   } else {
     base_colour <- x$theme$plot.background$colour
+  }
+  set_last_plot(x)
+  if (newpage) {
+      grid.newpage()
   }
   grid:::grid.rect(
     gp = grid::gpar(
@@ -100,7 +104,25 @@ print.ggplot <- function (x, newpage = FALSE, vp = NULL, ...) {
       col = base_colour
     )
   )
-  ggplot2:::print.ggplot(x, newpage = newpage, ...)
+  grDevices::recordGraphics(
+    requireNamespace("ggplot2", quietly = TRUE), 
+    list(), 
+    getNamespace("ggplot2")
+  )
+  data <- ggplot_build(x)
+  gtable <- ggplot_gtable(data)
+  if (is.null(vp)) {
+      grid.draw(gtable)
+  } else {
+    if (is.character(vp)) {
+      seekViewport(vp)
+    } else {
+      pushViewport(vp)
+    }
+    grid.draw(gtable)
+    upViewport()
+  }
+  invisible(x)
 }
 plot.ggplot <- print.ggplot
 

@@ -72,6 +72,7 @@ sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = 
 
 ### Set knitr rmarkdown chunk options
 opts_chunk$set(
+  results = "asis",
   size = 'small',
   include = TRUE,
   echo = params$output_code,

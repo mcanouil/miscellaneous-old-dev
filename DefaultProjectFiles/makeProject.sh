@@ -15,7 +15,7 @@ AlwaysSaveHistory: Default
 
 EnableCodeIndexing: Yes
 UseSpacesForTab: Yes
-NumSpacesForTab: 4
+NumSpacesForTab: 2
 Encoding: UTF-8
 
 RnwWeave: knitr
@@ -29,8 +29,8 @@ do
    mkdir /disks/PROJECT/$projectName/$iFile
 done
 
-mkdir /disks/DATA/$projectName/
-ln -s /disks/DATA/$projectName/ /disks/PROJECT/$projectName/Data
+mkdir /disks/DATATMP/$projectName/
+ln -s /disks/DATATMP/$projectName/ /disks/PROJECT/$projectName/Data
 
 cat /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/defaultScript.R | sed -e "s/PRJCT/$projectName/g" > "/disks/PROJECT/$projectName/Scripts/00-${projectName}.R"
 cat /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/defaultScript.Rmd | sed -e "s/PRJCT/$projectName/g" > "/disks/PROJECT/$projectName/Scripts/00-${projectName}.Rmd"
@@ -43,7 +43,7 @@ git init
 git remote add origin git@gitlab.egid.local:BioStat/$projectName.git
 git add --all
 git commit -m 'Initial commit'
-git push -u origin master
+# git push -u origin master
 
 cd $currentdir
 unset currentdir

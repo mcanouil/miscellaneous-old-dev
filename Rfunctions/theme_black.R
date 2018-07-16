@@ -95,13 +95,28 @@ theme_black <- function(
   )
 }
 
-print.ggplot <- function (x, newpage = is.null(vp), vp = NULL, ...) {
+plot.ggplot <- print.ggplot <- function (x, newpage = is.null(vp), vp = NULL, ...) {
   if (is.null(x$theme$plot.background$colour)) {
     base_colour <- ggplot2::theme_get()$plot.background$colour
   } else {
     base_colour <- x$theme$plot.background$colour
   }
-  ggplot2::ggplot_build(x)
+  set_last_plot(x)
+  if (newpage) {
+     grid.newpage()
+  }
+  grid:::grid.rect(
+    gp = grid::gpar(
+      fill = base_colour, 
+      col = base_colour
+    )
+  )
+  grDevices::recordGraphics(
+    requireNamespace("ggplot2", quietly = TRUE), 
+    list(), 
+    getNamespace("ggplot2")
+  )
+  data <- ggplot2::ggplot_build(x)
   gtable <- ggplot2::ggplot_gtable(data)
   if (is.null(vp)) {
       grid::grid.draw(gtable)
@@ -116,7 +131,6 @@ print.ggplot <- function (x, newpage = is.null(vp), vp = NULL, ...) {
   }
   return(invisible(x))
 }
-plot.ggplot <- print.ggplot
 
 
 ggsave <- function(
@@ -189,9 +203,19 @@ theme_set <- function (new) {
     "scale_colour_viridis_c", "scale_colour_viridis_d", "scale_color_viridis_c", 
     "scale_color_viridis_d", "scale_fill_viridis_c", "scale_fill_viridis_d"
   )
-  invisble(lapply(X = scales_to_hijack, FUN = function(x) {
+  invisible(lapply(X = scales_to_hijack, FUN = function(x) {
     y <- hijack(
       FUN = eval(parse(text = paste0("ggplot2::", x))), 
+      option = scale_parameters[["option"]],
+      begin = scale_parameters[["begin"]],
+      end = scale_parameters[["end"]],
+      direction = scale_parameters[["direction"]]
+    )
+    assign(x = x, value = y, envir = .GlobalEnv)
+  }))
+  invisible(lapply(X = "viridis_pal", FUN = function(x) {
+    y <- hijack(
+      FUN = eval(parse(text = paste0("scales::", x))), 
       option = scale_parameters[["option"]],
       begin = scale_parameters[["begin"]],
       end = scale_parameters[["end"]],

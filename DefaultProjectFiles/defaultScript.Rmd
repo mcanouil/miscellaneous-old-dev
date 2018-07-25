@@ -11,7 +11,7 @@ params:
   dpi: 120
   gg_fontsize: 9
 output:
-  bookdown::html_document2:
+  html_document:
     theme: simplex
     toc: true
     toc_depth: 2
@@ -23,7 +23,7 @@ output:
     self_contained: true
     mathjax: default
     df_print: kable
-  bookdown::pdf_document2:
+  pdf_document:
     toc: true
     toc_depth: 2
     fig_width: 6.3
@@ -45,33 +45,25 @@ dir.create(paste0(output_directory, "/KnitrFiles/"), recursive = TRUE, showWarni
 
 
 ### Load packages and functions
+library(tidyverse)
+library(broom)
+library(scales)
 library(parallel)
 library(grid)
-library(scales)
-library(broom)
-library(viridis)
-library(readxl)
-library(writexl)
-library(cowplot)
-library(ggrepel)
-library(flashpcaR)
-library(ggsignif)
-library(qdap)
-library(tableone)
-library(Hmisc)
-library(knitr)
-library(rmarkdown)
-library(kableExtra)
 
+tidyverse_conflicts()
 
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/format_pval.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/ggheatmap.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/ggmanhattan.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/ggqqplot.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/pretty_kable.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/theme_black.R")
 
-library(tidyverse)
-
-sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source) %>% invisible()
 
 
 ### Set knitr rmarkdown chunk options
-opts_chunk$set(
+knitr::opts_chunk$set(
   results = "asis",
   size = 'small',
   include = TRUE,
@@ -92,10 +84,13 @@ opts_chunk$set(
 
 ### Code to resize font size of R code chunks output according to 'size' option (only LATEX)
 if (knitr:::is_latex_output()) {
-  def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+  # get_chunk <- knitr::knit_hooks$get("chunk")
   knitr::knit_hooks$set(chunk = function(x, options) {
-    x <- def.chunk.hook(x, options)
-    ifelse(options$size != "normalsize", paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+    # x <- get_chunk(x, options)
+    if (options$size != "normalsize") {
+      x <- paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize")
+    }
+    return(x)
   })
 }
 
@@ -109,12 +104,7 @@ theme_dark <- params$theme_dark
 if (theme_dark) {
   ## Theme Black ON ##
   theme_set(theme_black(base_size = params$gg_fontsize))
-  plot_grid <- hijack(plot_grid, theme_dark = theme_dark)
-  scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
-  scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
 } else {
   theme_set(theme_light(base_size = params$gg_fontsize))
-  scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 0, end = 4/5)
-  scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 0, end = 4/5)
 }
 ```

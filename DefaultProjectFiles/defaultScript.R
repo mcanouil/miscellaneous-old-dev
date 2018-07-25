@@ -2,45 +2,37 @@
 options(stringsAsFactors = FALSE)
 
 setwd("/disks/DATA/PRJCT/")
-# ggsave(file = "Pictures/.png", plot = p, width = 7.5, height = 6, units = "in", dpi = 300)
-# ggsave(file = "Pictures/.png", plot = p, width = 12, height = 6, units = "in", dpi = 300)
-
-
-### Define nCores
-nCores <- parallel::detectCores()
+# ggsave(file = "Pictures/.png", plot = p, width = 6.3, height = 4.7, units = "in", dpi = 300)
 
 
 ### Load packages
+library(tidyverse)
+library(broom)
+library(scales)
 library(parallel)
 library(grid)
-library(scales)
-library(broom)
-library(viridis)
-library(readxl)
-library(writexl)
-library(cowplot)
-library(ggrepel)
-library(flashpcaR)
-library(ggsignif)
-library(qdap)
-library(tableone)
-library(Hmisc)
-library(tidyverse)
 
-sapply(list.files(path = "/disks/PROJECT/Mickael/DEV/Rfunctions/", full.names = TRUE), source) %>% invisible()
+tidyverse_conflicts()
 
-theme_dark <- TRUE
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/format_pval.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/ggheatmap.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/ggmanhattan.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/ggqqplot.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/pretty_kable.R")
+source("/disks/PROJECT/Mickael/DEV/Rfunctions/theme_black.R")
+
+### Define n_cores
+n_cores <- params$n_cores
+
+
+### Define theme
+theme_dark <- params$theme_dark
 if (theme_dark) {
   ## Theme Black ON ##
-  theme_set(theme_black(base_size = 14))
-  plot_grid <- hijack(plot_grid, theme_dark = theme_dark)
-  scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
-  scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 2/5, end = 1, direction = -1)
+  theme_set(theme_black(base_size = params$gg_fontsize))
 } else {
-  theme_set(theme_light(base_size = 14))
-  scale_colour_viridis <- hijack(scale_colour_viridis, option = "viridis", begin = 0, end = 4/5)
-  scale_fill_viridis <- hijack(scale_fill_viridis, option = "viridis", begin = 0, end = 4/5)
-}    
+  theme_set(theme_light(base_size = params$gg_fontsize))
+} 
 
 
 ###

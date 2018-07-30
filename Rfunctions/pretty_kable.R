@@ -22,7 +22,7 @@ pretty_kable <- function (
   colnames(data) <- Hmisc::capitalize(colnames(data))
   if (knitr:::is_latex_output()) {
     options(knitr.table.format = "latex")
-    output <- knitr::kable(x = data, booktabs = TRUE, format.args = format_args, col.names = col_names, ...)
+    output <- knitr::kable(x = data, booktabs = TRUE, format.args = format_args, col.names = col.names, ...)
     kableExtra::kable_styling(
       kable_input = output,
       latex_options = c("striped", "hold_position"),
@@ -32,7 +32,7 @@ pretty_kable <- function (
     )
   } else {
     options(knitr.table.format = "html")
-    output <- knitr::kable(x = data, format.args = format_args, col.names = col_names, ...)
+    output <- knitr::kable(x = data, format.args = format_args, col.names = col.names, ...)
     kableExtra::kable_styling(
       kable_input = output,
       bootstrap_options = c("striped", "hover", "condensed", "responsive"),

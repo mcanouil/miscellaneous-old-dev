@@ -17,12 +17,14 @@ check_sample_sheet <- function(
   )
   if (length(list_files)>1) {
     warnings("More than one CSV file have been found, please check the 'csvpattern' parameter!")
+    list_files <- list_files[1]
+    message("File '", list_files, "' will be used.")
   }
   dataheader <- grep("^\\[DATA\\]", readLines(list_files), ignore.case = TRUE)
   if (length(dataheader) == 0) {
     dataheader <- 0
   }
-  col_names <- colnames(read.csv(file, stringsAsFactor = FALSE, skip = dataheader, nrows = 1))
+  col_names <- colnames(read.csv(file = list_files, stringsAsFactor = FALSE, skip = dataheader, nrows = 1))
   default_cols <- c(
     "Sample_ID", "Sample_Plate", "Sample_Well", 
     "Sentrix_ID", "Sentrix_Position"

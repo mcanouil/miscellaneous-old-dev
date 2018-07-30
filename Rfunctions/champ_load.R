@@ -1,5 +1,44 @@
 # Function from ChAMP package customised to allow multiple csv files in root directory
 
+check_sample_sheet <- function(
+  base, 
+  pattern = "csv$", 
+  ignore.case = TRUE, 
+  recursive = TRUE, 
+  full.names = TRUE
+) {
+  require(glue)
+  list_files <- list.files(
+    path = base, 
+    pattern = pattern, 
+    full.names = full.names, 
+    ignore.case = ignore.case, 
+    recursive = recursive
+  )
+  if (length(list_files)>1) {
+    warnings("More than one CSV file have been found, please check the 'csvpattern' parameter!")
+  }
+  dataheader <- grep("^\\[DATA\\]", readLines(list_files), ignore.case = TRUE)
+  if (length(dataheader) == 0) {
+    dataheader <- 0
+  }
+  col_names <- colnames(read.csv(file, stringsAsFactor = FALSE, skip = dataheader, nrows = 1))
+  default_cols <- c(
+    "Sample_ID", "Sample_Plate", "Sample_Well", 
+    "Sentrix_ID", "Sentrix_Position"
+  )
+  cols_missing <- default_cols[!default_cols%in%col_names]
+  if (length(cols_missing)!=0) {
+    stop(
+      paste0(
+        "Sample Sheet don't have all mandatory columns:\n    ", 
+        glue::collapse(cols_missing, last = " and ", sep = ", ")
+      )
+    )
+  }
+  return(invisible())
+}
+
 read_metharray <- function(basenames, extended = FALSE, verbose = FALSE, force = FALSE, nCores = 1) {
   basenames <- sub("_Grn\\.idat.*", "", basenames)
   basenames <- sub("_Red\\.idat.*", "", basenames)
@@ -355,6 +394,7 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
     message("\n[ Loading Data with Minfi Method ]")
     message("----------------------------------")
     message("Loading data from ", directory)
+    check_sample_sheet(base = directory, pattern = csvpattern)
     suppressWarnings(targets <- read.metharray.sheet(base = directory, pattern = csvpattern))
     rgSet <- read_metharray_exp(
       targets = targets,

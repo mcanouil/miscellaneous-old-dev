@@ -1,7 +1,7 @@
 # rm(list = ls())
 options(stringsAsFactors = FALSE)
 
-setwd("/disks/DATA/PRJCT/")
+setwd("/disks/DATATMP/PRJCT/")
 # ggsave(file = "Pictures/.png", plot = p, width = 6.3, height = 4.7, units = "in", dpi = 300)
 
 

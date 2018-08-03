@@ -28,3 +28,71 @@ set_ncores <- function(n_cores = parallel::detectCores(), hooks = NULL) {
 
   return(n_cores)
 }
+
+
+bot_ncores <- function (
+  expr, 
+  hooks = NULL
+) {
+  if (is.null(hooks)) {
+    stop('"hooks" is missing and must be provided!')
+  }
+  
+  send_message <- function(message, hooks) {
+    cmd <- paste(
+      'curl',
+      '-X POST',
+      '-H "Content-Type: application/json"',
+      '--data \'{', 
+        '"text":"', message, '"',
+      '}\'',
+      hooks,
+      '--silent'
+    )
+    res_cmd <- system(cmd, intern = TRUE)
+    if (grepl("Bad Request", res_cmd) | !grepl("{\"success\":true}", res_cmd, fixed = TRUE)) {
+      stop("Request to send a message to chat failed!")
+    }
+    return(invisible())
+  }
+  
+  random_id <- paste0('[ID:', sprintf(fmt = "%03d", sample(1:100, 1)), ']')
+  
+  sub_expr <- substitute(expr)
+  if (any(grepl("mc.cores", sub_expr))) {
+    n_cores <- as.numeric(gsub(
+      pattern = ".*mc.cores *= *([0-9]+),.*", 
+      replacement = "\\1", 
+      x = grep("mc.cores", sub_expr, value = TRUE)
+    ))
+  } else {
+    n_cores <- getOption("mc.cores", 2L)
+  }
+  
+  message_in <- paste(
+    random_id, 
+    '_', Sys.getenv("LOGNAME"), '_', 
+    '*started* using', paste0('*', n_cores, ' cores*'), 
+    paste0('(', (n_cores / parallel::detectCores()) * 100, '%)'),
+    'on', '_', Sys.info()[["nodename"]],  '_'
+  )
+  send_message(message = message_in, hooks = hooks)
+  
+  expr
+  
+  message_out <- paste(
+    random_id, 
+    '_', Sys.getenv("LOGNAME"), '_', 
+    '*stopped* using', paste0('*', n_cores, ' cores*'), 
+    paste0('(', (n_cores / parallel::detectCores()) * 100, '%)'),
+    'on', '_', Sys.info()[["nodename"]],  '_'
+  )
+  send_message(message = message_out, hooks = hooks)
+  
+  on.exit()
+  return(invisible())
+}
+
+# bot_ncores(
+#   res <- parallel::mclapply(rep(4, 25), mc.cores = 25, Sys.sleep)
+# )

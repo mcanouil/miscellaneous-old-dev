@@ -1,17 +1,22 @@
-set_ncores <- function(n_cores = parallel::detectCores(), channel = NULL, hooks = NULL, auth_token = NULL, user_id = NULL) {
+set_ncores <- function(n_cores = parallel::detectCores(), hooks = NULL) {
   if (is.null(hooks)) {
     stop('"hooks" is missing and must be provided!')
   }
-  # hooks <- 'http://chat.egid.local/api/v1/chat.postMessage'
+  message <- paste0(
+    '*', n_cores, ' cores*',
+    ' (', paste0((n_cores / parallel::detectCores()) * 100, "%"), ')',
+    ' are currently being used by _*', Sys.getenv("LOGNAME"), '*_', 
+    ' (on _', Sys.info()[["nodename"]],  '_)',
+    '!'
+  )
+
   cmd <- paste(
     'curl',
     '-X POST',
     '-H "Content-Type: application/json"',
-    # '-H "X-Auth-Token: ', auth_token, '"',
-    # '-H "X-User-Id: ', user_id, '"',
-    '--data \'{"channel": "', channel, '", "text":"', 
-    paste0(n_cores, ' cores are currently being used by ', Sys.getenv("LOGNAME"), '!'),
-    '"}\'',
+    '--data \'{', 
+      '"text":"', message, '"',
+    '}\'',
     hooks,
     '--silent'
   )

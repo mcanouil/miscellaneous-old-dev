@@ -1,4 +1,7 @@
-set_ncores <- function(n_cores = parallel::detectCores(), hooks = NULL) {
+set_ncores <- function(
+  n_cores = parallel::detectCores(), 
+  hooks = NULL
+) {
   if (is.null(hooks)) {
     stop('"hooks" is missing and must be provided!')
   }
@@ -29,10 +32,13 @@ set_ncores <- function(n_cores = parallel::detectCores(), hooks = NULL) {
   return(n_cores)
 }
 
+# set_ncores(
+#   n_cores = 42
+# )
 
 bot_ncores <- function (
   expr, 
-  hooks = NULL
+  hooks = "http://chat.egid.local/hooks/sxsHEbEwyNMWx2CPo/4G6gEd8os43L2NniYR8GDiaP86vJtZBuePEved5h35oYevce"
 ) {
   if (is.null(hooks)) {
     stop('"hooks" is missing and must be provided!')
@@ -58,17 +64,18 @@ bot_ncores <- function (
   
   random_id <- paste0('[ID:', sprintf(fmt = "%03d", sample(1:100, 1)), ']')
   
-  sub_expr <- substitute(expr)
+  sub_expr <- deparse(substitute(expr))
   if (any(grepl("mc.cores", sub_expr))) {
-    n_cores <- as.numeric(gsub(
-      pattern = ".*mc.cores *= *([0-9]+),.*", 
+    n_cores <- gsub(
+      pattern = ".*mc.cores *= *([^, ]+),.*", 
       replacement = "\\1", 
       x = grep("mc.cores", sub_expr, value = TRUE)
-    ))
+    )
+    n_cores <- eval(parse(text = n_cores))
   } else {
-    n_cores <- getOption("mc.cores", 2L)
+    n_cores <- getOption("mc.cores", 3L)
   }
-  
+
   message_in <- paste(
     random_id, 
     '_', Sys.getenv("LOGNAME"), '_', 
@@ -76,10 +83,6 @@ bot_ncores <- function (
     paste0('(', (n_cores / parallel::detectCores()) * 100, '%)'),
     'on', '_', Sys.info()[["nodename"]],  '_'
   )
-  send_message(message = message_in, hooks = hooks)
-  
-  expr
-  
   message_out <- paste(
     random_id, 
     '_', Sys.getenv("LOGNAME"), '_', 
@@ -87,10 +90,23 @@ bot_ncores <- function (
     paste0('(', (n_cores / parallel::detectCores()) * 100, '%)'),
     'on', '_', Sys.info()[["nodename"]],  '_'
   )
-  send_message(message = message_out, hooks = hooks)
+    
+  send_message(message = message_in, hooks = hooks)
   
+  if (any(grepl("<-", sub_expr))) {
+    expr
+  } else {
+    out <- expr
+  }
+  
+  send_message(message = message_out, hooks = hooks)
+
   on.exit()
-  return(invisible())
+  if (any(grepl("<-", sub_expr))) {
+    return(invisible())
+  } else {
+    return(out)
+  }
 }
 
 # bot_ncores(

@@ -62,7 +62,7 @@ bot_ncores <- function (
     return(invisible())
   }
   
-  random_id <- paste0('[ID:', sprintf(fmt = "%03d", sample(1:100, 1)), ']')
+  random_id <- paste0('[ID:', sprintf(fmt = "%04d", sample(1:1000, 1)), ']')
   
   sub_expr <- deparse(substitute(expr))
   if (any(grepl("mc.cores", sub_expr))) {

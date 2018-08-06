@@ -5,9 +5,15 @@ set_ncores <- function(
   if (is.null(hooks)) {
     stop('"hooks" is missing and must be provided!')
   }
+  n_cores_percent <- paste0(
+    '(', 
+    round((n_cores / parallel::detectCores()) * 100, digits = 2), 
+    '%)'
+  )
+  
   message <- paste0(
     '*', n_cores, ' cores*',
-    ' (', paste0((n_cores / parallel::detectCores()) * 100, "%"), ')',
+    n_cores_percent,
     ' are currently being used by _*', Sys.getenv("LOGNAME"), '*_', 
     ' (on _', Sys.info()[["nodename"]],  '_)',
     '!'
@@ -38,7 +44,7 @@ set_ncores <- function(
 
 bot_ncores <- function (
   expr, 
-  hooks = "http://chat.egid.local/hooks/sxsHEbEwyNMWx2CPo/4G6gEd8os43L2NniYR8GDiaP86vJtZBuePEved5h35oYevce"
+  hooks = NULL
 ) {
   if (is.null(hooks)) {
     stop('"hooks" is missing and must be provided!')
@@ -64,7 +70,7 @@ bot_ncores <- function (
   
   random_id <- paste0('[ID:', sprintf(fmt = "%04d", sample(1:1000, 1)), ']')
   
-  sub_expr <- deparse(substitute(expr))
+  sub_expr <- paste(deparse(substitute(expr)), collapse = "")
   if (any(grepl("mc.cores", sub_expr))) {
     n_cores <- gsub(
       pattern = ".*mc.cores *= *([^, ]+),.*", 
@@ -75,34 +81,39 @@ bot_ncores <- function (
   } else {
     n_cores <- getOption("mc.cores", 3L)
   }
+  n_cores_percent <- paste0(
+    '(', 
+    round((n_cores / parallel::detectCores()) * 100, digits = 2), 
+    '%)'
+  )
 
   message_in <- paste(
     random_id, 
     '_', Sys.getenv("LOGNAME"), '_', 
     '*started* using', paste0('*', n_cores, ' cores*'), 
-    paste0('(', (n_cores / parallel::detectCores()) * 100, '%)'),
+    n_cores_percent,
     'on', '_', Sys.info()[["nodename"]],  '_'
   )
   message_out <- paste(
     random_id, 
     '_', Sys.getenv("LOGNAME"), '_', 
     '*stopped* using', paste0('*', n_cores, ' cores*'), 
-    paste0('(', (n_cores / parallel::detectCores()) * 100, '%)'),
+    n_cores_percent,
     'on', '_', Sys.info()[["nodename"]],  '_'
   )
     
-  send_message(message = message_in, hooks = hooks)
+  # send_message(message = message_in, hooks = hooks)
   
-  if (any(grepl("<-", sub_expr))) {
+  if (any(grepl("<-[^(]*mclapply", sub_expr))) {
     expr
   } else {
     out <- expr
   }
   
-  send_message(message = message_out, hooks = hooks)
+  # send_message(message = message_out, hooks = hooks)
 
   on.exit()
-  if (any(grepl("<-", sub_expr))) {
+  if (any(grepl("<-[^(]*mclapply", sub_expr))) {
     return(invisible())
   } else {
     return(out)

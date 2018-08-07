@@ -1,6 +1,7 @@
 set_ncores <- function(
   n_cores = parallel::detectCores(), 
-  hooks = NULL
+  hooks = NULL, 
+  message = "are currently being used"
 ) {
   if (is.null(hooks)) {
     stop('"hooks" is missing and must be provided!')
@@ -11,10 +12,10 @@ set_ncores <- function(
     '%)'
   )
   
-  message <- paste0(
-    '*', n_cores, ' cores*',
+  full_message <- paste0(
+    '*', n_cores, ' cores* ',
     n_cores_percent,
-    ' are currently being used by _*', Sys.getenv("LOGNAME"), '*_', 
+    ' ', message,' by _*', Sys.getenv("LOGNAME"), '*_', 
     ' (on _', Sys.info()[["nodename"]],  '_)',
     '!'
   )
@@ -24,7 +25,7 @@ set_ncores <- function(
     '-X POST',
     '-H "Content-Type: application/json"',
     '--data \'{', 
-      '"text":"', message, '"',
+      '"text":"', full_message, '"',
     '}\'',
     hooks,
     '--silent'
@@ -89,20 +90,20 @@ bot_ncores <- function (
 
   message_in <- paste(
     random_id, 
-    '_', Sys.getenv("LOGNAME"), '_', 
+    paste0('_', Sys.getenv("LOGNAME"), '_'), 
     '*started* using', paste0('*', n_cores, ' cores*'), 
     n_cores_percent,
-    'on', '_', Sys.info()[["nodename"]],  '_'
+    'on', paste0('_', Sys.info()[["nodename"]],  '_')
   )
   message_out <- paste(
     random_id, 
-    '_', Sys.getenv("LOGNAME"), '_', 
+    paste0('_', Sys.getenv("LOGNAME"), '_'), 
     '*stopped* using', paste0('*', n_cores, ' cores*'), 
     n_cores_percent,
-    'on', '_', Sys.info()[["nodename"]],  '_'
+    'on', paste0('_', Sys.info()[["nodename"]],  '_')
   )
     
-  # send_message(message = message_in, hooks = hooks)
+  send_message(message = message_in, hooks = hooks)
   
   if (any(grepl("<-[^(]*mclapply", sub_expr))) {
     expr
@@ -110,7 +111,7 @@ bot_ncores <- function (
     out <- expr
   }
   
-  # send_message(message = message_out, hooks = hooks)
+  send_message(message = message_out, hooks = hooks)
 
   on.exit()
   if (any(grepl("<-[^(]*mclapply", sub_expr))) {

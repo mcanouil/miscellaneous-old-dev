@@ -2,8 +2,8 @@
 title: 'PRJCT'
 author: 'Mickaël Canouil, *Ph.D.*'
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
-monofont: "Source Code Pro"
-monofontoptions: "Scale=0.7"
+monofont: 'Source Code Pro'
+monofontoptions: 'Scale=0.7'
 params:
   output_code: FALSE
   n_cores: !r parallel::detectCores()
@@ -30,7 +30,7 @@ output:
     fig_height: 4.7
     number_sections: true
     df_print: kable
-    latex_engine: "pdflatex"
+    latex_engine: 'pdflatex'
 ---
 
 ```{r setup, include = FALSE}
@@ -84,9 +84,7 @@ knitr::opts_chunk$set(
 
 ### Code to resize font size of R code chunks output according to 'size' option (only LATEX)
 if (knitr:::is_latex_output()) {
-  # get_chunk <- knitr::knit_hooks$get("chunk")
   knitr::knit_hooks$set(chunk = function(x, options) {
-    # x <- get_chunk(x, options)
     if (options$size != "normalsize") {
       x <- paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize")
     }
@@ -102,7 +100,6 @@ n_cores <- params$n_cores
 ### Define theme
 theme_dark <- params$theme_dark
 if (theme_dark) {
-  ## Theme Black ON ##
   theme_set(theme_black(base_size = params$gg_fontsize))
 } else {
   theme_set(theme_light(base_size = params$gg_fontsize))

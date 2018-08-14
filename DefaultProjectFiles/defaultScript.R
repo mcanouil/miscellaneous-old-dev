@@ -28,7 +28,6 @@ n_cores <- params$n_cores
 ### Define theme
 theme_dark <- params$theme_dark
 if (theme_dark) {
-  ## Theme Black ON ##
   theme_set(theme_black(base_size = params$gg_fontsize))
 } else {
   theme_set(theme_light(base_size = params$gg_fontsize))

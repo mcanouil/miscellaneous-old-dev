@@ -53,12 +53,12 @@ library(grid)
 
 tidyverse_conflicts()
 
-source("/disks/PROJECT/Mickael/DEV/Rfunctions/format_pval.R")
-source("/disks/PROJECT/Mickael/DEV/Rfunctions/ggheatmap.R")
-source("/disks/PROJECT/Mickael/DEV/Rfunctions/ggmanhattan.R")
-source("/disks/PROJECT/Mickael/DEV/Rfunctions/ggqqplot.R")
-source("/disks/PROJECT/Mickael/DEV/Rfunctions/pretty_kable.R")
-source("/disks/PROJECT/Mickael/DEV/Rfunctions/theme_black.R")
+source("/disks/PROJECT/Rscripts/MC/format_pval.R")
+source("/disks/PROJECT/Rscripts/MC/ggheatmap.R")
+source("/disks/PROJECT/Rscripts/MC/ggmanhattan.R")
+source("/disks/PROJECT/Rscripts/MC/ggqqplot.R")
+source("/disks/PROJECT/Rscripts/MC/pretty_kable.R")
+source("/disks/PROJECT/Rscripts/MC/theme_black.R")
 
 
 

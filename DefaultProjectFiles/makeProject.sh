@@ -5,13 +5,13 @@ mkdir /disks/PROJECT/$projectName
 
 currentdir=`pwd`
 
-printf "Engineer: Mickaël Canouil  " >> /disks/PROJECT/$projectName/README.md
+echo "Engineer: Mickaël Canouil  \n" >> /disks/PROJECT/$projectName/README.md
 
 printf "Version: 1.0
 
-RestoreWorkspace: Default
-SaveWorkspace: Default
-AlwaysSaveHistory: Default
+RestoreWorkspace: No
+SaveWorkspace: No
+AlwaysSaveHistory: No
 
 EnableCodeIndexing: Yes
 UseSpacesForTab: Yes
@@ -22,11 +22,16 @@ RnwWeave: knitr
 LaTeX: pdfLaTeX
 
 AutoAppendNewline: Yes
+
+BuildType: Custom
+CustomScriptPath: Scripts/_build.sh
+
+QuitChildProcessesOnExit: Yes
 " >> /disks/PROJECT/$projectName/$projectName.Rproj
 
 for iFile in "Docs" "Report" "Scripts"
 do
-   mkdir /disks/PROJECT/$projectName/$iFile
+  mkdir /disks/PROJECT/$projectName/$iFile
 done
 
 mkdir /disks/DATATMP/$projectName/
@@ -34,7 +39,7 @@ ln -s /disks/DATATMP/$projectName/ /disks/PROJECT/$projectName/Data
 
 cat /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/defaultScript.R | sed -e "s/PRJCT/$projectName/g" > "/disks/PROJECT/$projectName/Scripts/00-${projectName}.R"
 cat /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/defaultScript.Rmd | sed -e "s/PRJCT/$projectName/g" > "/disks/PROJECT/$projectName/Scripts/00-${projectName}.Rmd"
-cat /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/defaultScript.sh | sed -e "s/PRJCT/$projectName/g" > "/disks/PROJECT/$projectName/Scripts/00-${projectName}.sh"
+cat /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/defaultScript.sh | sed -e "s/PRJCT/$projectName/g" > "/disks/PROJECT/$projectName/Scripts/_build.sh"
 
 cp /disks/PROJECT/Mickael/DEV/DefaultProjectFiles/gitignore.txt /disks/PROJECT/$projectName/.gitignore
 

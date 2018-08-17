@@ -26,7 +26,7 @@ pretty_kable <- function (
     kableExtra::kable_styling(
       kable_input = output,
       latex_options = c("striped", "hold_position"),
-      full_width = FALSE,
+      full_width = ifelse(is.missing(full_width), FALSE, full_width),
       position = "center",
       font_size = font_size
     )
@@ -36,7 +36,7 @@ pretty_kable <- function (
     kableExtra::kable_styling(
       kable_input = output,
       bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-      full_width = TRUE,
+      full_width = ifelse(is.missing(full_width), TRUE, full_width),
       position = "center",
       font_size = font_size
     )

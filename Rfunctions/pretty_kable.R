@@ -4,6 +4,7 @@ pretty_kable <- function (
     format_args = list(scientific = -1, digits = 3, big.mark = ","), 
     col.names = NA,
     pval_cols = NULL,
+    full_width,
     ...
 ) {
 	format_pval <- function (x, thresh = 10^-2, digits = 3, eps = 1e-50) {

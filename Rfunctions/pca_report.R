@@ -18,6 +18,25 @@ pca_report <- function(
   if (!is(design[, id_var], "character")) {
     design[, id_var] <- as.character(design[, id_var])
   }
+  
+  keep_technical <- sapply(
+    X = design[, technical_vars], 
+    FUN = function(icol) {
+      length(unique(icol))>1 & length(unique(icol))!=length(design[, id_var])
+    }
+  ) %>% 
+    which() %>% 
+    names()
+  
+  if (length(setdiff(technical_vars, keep_technical))!=0) {
+    variables_excluded <- setdiff(technical_vars, keep_technical)
+    message(
+      "The following variables have been excluded (null variances or confounding with samples): ", 
+        paste(variables_excluded[-length(variables_excluded)], collapse = ", "), 
+        " and ", 
+        variables_excluded[length(variables_excluded)]
+    )
+  }
 
   pca_res <- flashpca(
     X = t(as.matrix(data)[, seq(8)]),
@@ -46,61 +65,56 @@ pca_report <- function(
   print(p)
   cat("\n")
 
-  cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA  factorial planes {- .tabset}\n"))
-  for (ivar in technical_vars) {
-    cat(paste0("\n", paste(rep("#", title_level + 1), collapse = ""), " ", ivar, " {-}\n"))
-    p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(n_comp)), 2)), 1, function(icoord) {
-      tmp <- pca_dfxy[, c(ivar, icoord)]
-      tmp[, ivar] <- as.factor(tmp[, ivar])
-      colnames(tmp)[-seq_len(ncol(tmp) - 2)] <- c("X", "Y")
-      tmp[, "X.PC"] <- icoord[1]
-      tmp[, "Y.PC"] <- icoord[2]
-      return(tmp)
-    })) %>%
-      ggplot(aes_string(x = "X", y = "Y", colour = ivar)) +
-      geom_hline(aes(yintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
-      geom_vline(aes(xintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
-      geom_point(shape = 4, size = 2) +
-      stat_ellipse(type = "norm") +
-      scale_colour_viridis_d() +
-      labs(x = NULL, y = NULL) +
-      facet_grid(Y.PC ~ X.PC, scales = "free") +
-      guides(colour = ifelse(length(unique(pca_dfxy[, ivar])) <= 12, "legend", "none"))
+  if (length(keep_technical)>0) {
+    cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA  factorial planes {- .tabset}\n"))
+    for (ivar in keep_technical) {
+      cat(paste0("\n", paste(rep("#", title_level + 1), collapse = ""), " ", ivar, " {-}\n"))
+      p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(n_comp)), 2)), 1, function(icoord) {
+        tmp <- pca_dfxy[, c(ivar, icoord)]
+        tmp[, ivar] <- as.factor(tmp[, ivar])
+        colnames(tmp)[-seq_len(ncol(tmp) - 2)] <- c("X", "Y")
+        tmp[, "X.PC"] <- icoord[1]
+        tmp[, "Y.PC"] <- icoord[2]
+        return(tmp)
+      })) %>%
+        ggplot(aes_string(x = "X", y = "Y", colour = ivar)) +
+        geom_hline(aes(yintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
+        geom_vline(aes(xintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
+        geom_point(shape = 4, size = 2) +
+        stat_ellipse(type = "norm") +
+        scale_colour_viridis_d() +
+        labs(x = NULL, y = NULL) +
+        facet_grid(Y.PC ~ X.PC, scales = "free") +
+        guides(colour = ifelse(length(unique(pca_dfxy[, ivar])) <= 12, "legend", "none"))
+      print(p)
+      cat("\n")
+    }
+
+    cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA association {-}\n"))
+    p <- pca_dfxy %>%
+      (function(.data) {
+        lapply(seq_len(n_comp), function(i) {
+          form <- as.formula(paste0("PC", i, " ~ ", paste(keep_technical, collapse = " + ")))
+          lm(form, data = .data) %>% 
+            anova() %>% 
+            rownames_to_column(var = "term") %>% 
+            mutate(PC = i)
+        }) %>%
+          bind_rows()
+      }) %>%
+      filter(term != "Residuals") %>%
+      mutate(term = gsub("factor\\((.*)\\)", "\\1", term)) %>%
+      ggplot(aes(x = factor(PC), y = term, fill = `Pr(>F)`)) +
+      geom_tile(colour = "white") +
+      geom_text(aes(label = scientific(`Pr(>F)`, digits = 2)), colour = "white", size = 3) +
+      scale_fill_viridis_c(name = "P-Value", na.value = "grey85", limits = c(0, 0.1)) +
+      theme(panel.grid = element_blank()) +
+      scale_x_discrete(expand = c(0, 0)) +
+      scale_y_discrete(expand = c(0, 0)) +
+      labs(x = "PCA Components", y = NULL)
     print(p)
     cat("\n")
   }
-
-  cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA association {-}\n"))
-  technical_vars <- names(which(
-    apply(
-      X = pca_dfxy[, technical_vars], 
-      MARGIN = 2, 
-      FUN = function(icol) {length(unique(icol))>1}
-    )
-  ))
-  p <- pca_dfxy %>%
-    (function(.data) {
-      lapply(seq_len(n_comp), function(i) {
-        form <- as.formula(paste0("PC", i, " ~ ", paste(paste0("factor(", technical_vars, ")"), collapse = " + ")))
-        lm(form, data = .data) %>% 
-          anova() %>% 
-          rownames_to_column(var = "term") %>% 
-          mutate(PC = i)
-      }) %>%
-        bind_rows()
-    }) %>%
-    filter(term != "Residuals") %>%
-    mutate(term = gsub("factor\\((.*)\\)", "\\1", term)) %>%
-    ggplot(aes(x = factor(PC), y = term, fill = `Pr(>F)`)) +
-    geom_tile(colour = "white") +
-    geom_text(aes(label = scientific(`Pr(>F)`, digits = 2)), colour = "white", size = 3) +
-    scale_fill_viridis_c(name = "P-Value", na.value = "grey85", limits = c(0, 0.1)) +
-    theme(panel.grid = element_blank()) +
-    scale_x_discrete(expand = c(0, 0)) +
-    scale_y_discrete(expand = c(0, 0)) +
-    labs(x = "PCA Components", y = NULL)
-  print(p)
-  cat("\n")
 
 
   if (!is.null(outliers_component)) {

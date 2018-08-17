@@ -58,8 +58,8 @@ source("/disks/PROJECT/Rscripts/MC/ggheatmap.R")
 source("/disks/PROJECT/Rscripts/MC/ggmanhattan.R")
 source("/disks/PROJECT/Rscripts/MC/ggqqplot.R")
 source("/disks/PROJECT/Rscripts/MC/pretty_kable.R")
-source("/disks/PROJECT/Rscripts/MC/theme_black.R")
 
+source("/disks/PROJECT/Rscripts/MC/theme_black.R")
 
 
 ### Set knitr rmarkdown chunk options

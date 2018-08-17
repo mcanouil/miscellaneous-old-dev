@@ -884,7 +884,12 @@ ggheatmap <- function(
   output <- list(left_item = left_item, top_item = top_item, right_item = right_item, bottom_item = bottom_item, center_item = center_item, hm.legend = hm.legend)
 
   if (print) {
-    ggheatmap.show(data = output, grid.h.ratio = grid.h.ratio, grid.v.ratio = grid.v.ratio, legend.position = legend.position)
+    ggheatmap.show(
+      data = output, 
+      grid.h.ratio = grid.h.ratio, 
+      grid.v.ratio = grid.v.ratio, 
+      legend.position = legend.position
+    )
   }
 
   return(invisible(output))
@@ -906,7 +911,12 @@ ggheatmap <- function(
 #' }
 #' @rdname ggheatmap.show
 #' @export
-ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.ratio = rev(grid.h.ratio), legend.position = NULL) {
+ggheatmap.show <- function(
+  data, 
+  grid.h.ratio = c(0.15, 0.60, 0.25), 
+  grid.v.ratio = rev(grid.h.ratio), 
+  legend.position = NULL
+) {
   ggdraw <- function(plot = NULL, xlim = c(0, 1), ylim = c(0, 1)) {
     set_colour <- function() {
       ggplot2::theme_get()$plot.background$colour %>%
@@ -932,7 +942,7 @@ ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.rati
           text = element_text(
             family = base_family, 
             face = "plain",
-            colour = "black", 
+            colour = default_colour, 
             size = base_size, 
             lineheight = 0.9,
             hjust = 0.5, 
@@ -1048,11 +1058,11 @@ ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.rati
   print(ggdraw(), vp = viewport(layout.pos.col = 3, layout.pos.row = 2))
   print(ggdraw(), vp = viewport(layout.pos.col = 3, layout.pos.row = 3))
 
-  print(data$left_item, vp = viewport(layout.pos.col = 1, layout.pos.row = 2))
-  print(data$top_item, vp = viewport(layout.pos.col = 2, layout.pos.row = 1))
-  print(data$right_item, vp = viewport(layout.pos.col = 3, layout.pos.row = 2))
-  print(data$bottom_item, vp = viewport(layout.pos.col = 2, layout.pos.row = 3))
-  print(data$center_item, vp = viewport(layout.pos.col = 2, layout.pos.row = 2))
+  ggplot2:::print.ggplot(data$left_item, vp = viewport(layout.pos.col = 1, layout.pos.row = 2))
+  ggplot2:::print.ggplot(data$top_item, vp = viewport(layout.pos.col = 2, layout.pos.row = 1))
+  ggplot2:::print.ggplot(data$right_item, vp = viewport(layout.pos.col = 3, layout.pos.row = 2))
+  ggplot2:::print.ggplot(data$bottom_item, vp = viewport(layout.pos.col = 2, layout.pos.row = 3))
+  ggplot2:::print.ggplot(data$center_item, vp = viewport(layout.pos.col = 2, layout.pos.row = 2))
   pushViewport(viewport(layout.pos.col = legend.position[1], layout.pos.row = legend.position[2]))
   grid.draw(data$hm.legend)
   return(invisible(upViewport(0)))

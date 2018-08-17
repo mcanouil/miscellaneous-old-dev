@@ -85,7 +85,7 @@ theme_black <- function(
 
     plot.background = ggplot2::element_rect(colour = base_colours[1]),
     plot.title = ggplot2::element_text(size = rel(1.2), face = "bold", hjust = 0.5, vjust = 1, margin = margin(b = half_line * 1.2)),
-    plot.subtitle = ggplot2::element_text(size = rel(0.9), hjust = 0, vjust = 1, margin = margin(b = half_line * 0.9)),
+    plot.subtitle = ggplot2::element_text(size = rel(0.9), hjust = 0.5, vjust = 1, margin = margin(b = half_line * 0.9)),
     plot.caption = ggplot2::element_text(size = rel(0.9), hjust = 1, vjust = 1, margin = margin(t = half_line * 0.9)),
     plot.margin = margin(half_line, half_line, half_line, half_line),
     plot.tag = ggplot2::element_text(size = rel(1.2), hjust = 0.5, vjust = 0.5), 

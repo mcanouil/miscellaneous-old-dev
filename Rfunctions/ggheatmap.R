@@ -727,7 +727,7 @@ ggheatmap <- function(
       legend.position = "none"
     ) +
     labs(x = NULL, y = NULL) +
-    scale_colour_viridis(discrete = TRUE)
+    scale_colour_viridis_d()
 
   right_item <- ggplot() +
     ifelse(length(unique(label.h.colour)) == 1 | !segments.colour,
@@ -753,7 +753,7 @@ ggheatmap <- function(
       legend.position = "none"
     ) +
     labs(x = NULL, y = NULL) +
-    scale_colour_viridis(discrete = TRUE, na.value = ifelse(theme_dark, "white", "black"))
+    scale_colour_viridis_d(na.value = ifelse(theme_dark, "white", "black"))
 
 
   top_item <- ggplot() +
@@ -779,7 +779,7 @@ ggheatmap <- function(
       legend.position = "none"
     ) +
     labs(x = NULL, y = NULL) +
-    scale_colour_viridis(discrete = TRUE, na.value = ifelse(theme_dark, "white", "black"))
+    scale_colour_viridis_d(na.value = ifelse(theme_dark, "white", "black"))
 
   bottom_item <- ggplot(data = col_data$label, aes_string(x = "x", y = "y", label = "label", colour = "colour")) +
     scale_x_continuous(expand = c(0, 0), limits = c(min(col_data$labels$x) - 0.5, max(col_data$labels$x) + 0.5)) +
@@ -807,7 +807,7 @@ ggheatmap <- function(
       legend.position = "none"
     ) +
     labs(x = NULL, y = NULL) +
-    scale_colour_viridis(discrete = TRUE)
+    scale_colour_viridis_d()
 
   row_data$labels$label <- row_data$labels$lab
   col_data$labels$label <- col_data$labels$lab
@@ -822,7 +822,7 @@ ggheatmap <- function(
   center_item <- ggplot(data = M, aes_string(x = "x", y = "y")) +
     theme_void() +
     geom_tile(aes_string(fill = "value")) +
-    scale_fill_viridis(name = legend.title) +
+    scale_fill_viridis_c(name = legend.title) +
     labs(title = NULL, x = NULL, y = NULL) +
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0)) +

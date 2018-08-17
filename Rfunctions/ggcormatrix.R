@@ -71,7 +71,7 @@ ggcormatrix <- function(data, method = c("pearson", "spearman"), digits = 3, lim
       )
     ) +
     geom_tile(colour = ifelse(theme_dark, "grey20", "white")) +
-    scale_fill_viridis(
+    scale_fill_viridis_c(
       limits = limits,
       name = paste0(toupper(substr(method, 1, 1)), substr(method, 2, nchar(method)), "\nCorrelation")
     ) +

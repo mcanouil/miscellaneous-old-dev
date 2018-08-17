@@ -132,7 +132,6 @@ plot.ggplot <- print.ggplot <- function (x, newpage = is.null(vp), vp = NULL, ..
   return(invisible(x))
 }
 
-
 ggsave <- function(
   filename, 
   plot = ggplot2::last_plot(), 

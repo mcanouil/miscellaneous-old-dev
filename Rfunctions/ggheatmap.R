@@ -35,7 +35,7 @@ as.gapdata <- function(d, segments, labels, ...) {
 #' }
 #' @rdname assign_branch_positions
 #' @export
-assign_branch_positions <- function(d, verbose=FALSE, ...) {
+assign_branch_positions <- function(d, verbose = FALSE, ...) {
   left <- d[[1]]
   right <- d[[2]]
   if (is.leaf(left) && is.leaf(right)) {
@@ -103,7 +103,7 @@ assign_branch_positions <- function(d, verbose=FALSE, ...) {
 #' }
 #' @rdname assign_positions
 #' @export
-assign_positions <- function(d, runningX=1, verbose=FALSE, ...) {
+assign_positions <- function(d, runningX = 1, verbose = FALSE, ...) {
   left <- d[[1]]
   right <- d[[2]]
   if (is.leaf(left) && is.leaf(right)) {
@@ -171,7 +171,7 @@ assign_positions <- function(d, runningX=1, verbose=FALSE, ...) {
 #' }
 #' @rdname calculate_gap
 #' @export
-calculate_gap <- function(d, sum, gap_total, mode=c("quantitative", "threshold"), mapping=c("exponential", "linear"), scale = 0.2, max_height=0, threshold=2, gap_size=0, verbose=FALSE, ...) {
+calculate_gap <- function(d, sum, gap_total, mode = c("quantitative", "threshold"), mapping = c("exponential", "linear"), scale = 0.2, max_height = 0, threshold = 2, gap_size = 0, verbose = FALSE, ...) {
   a <- attributes(d) # attributes
   left <- d[[1]]
   right <- d[[2]]
@@ -249,7 +249,7 @@ calculate_gap <- function(d, sum, gap_total, mode=c("quantitative", "threshold")
 #' }
 #' @rdname count_gap
 #' @export
-count_gap <- function(d=d, count=0, threshold=threshold) {
+count_gap <- function(d = d, count = 0, threshold = threshold) {
   a <- attributes(d) # attributes
   height <- a$height
   left <- d[[1]]
@@ -291,7 +291,7 @@ count_gap <- function(d=d, count=0, threshold=threshold) {
 #' }
 #' @rdname extract_list
 #' @export
-extract_list <- function(d, type, segments_df=NULL, labels_df=NULL, ...) {
+extract_list <- function(d, type, segments_df = NULL, labels_df = NULL, ...) {
   inner <- !is.leaf(d) # check if it is subtree
   yTop <- attr(d, "height") # height of subtree
   xMid <- attr(d, "xmid")
@@ -352,7 +352,7 @@ extract_list <- function(d, type, segments_df=NULL, labels_df=NULL, ...) {
 #' }
 #' @rdname gap_data
 #' @export
-gap_data <- function(d, mode=c("quantitative", "threshold"), mapping=c("exponential", "linear"), ratio= 0.2, scale = 0.5, threshold = 0, verbose=FALSE, ...) {
+gap_data <- function(d, mode = c("quantitative", "threshold"), mapping = c("exponential", "linear"), ratio = 0.2, scale = 0.5, threshold = 0, verbose = FALSE, ...) {
   # arguments
   mode <- match.arg(mode)
   # number of nodes
@@ -532,7 +532,7 @@ get_most_right_leaf <- function(d) {
 #' }
 #' @rdname sum_distance
 #' @export
-sum_distance <- function(d, sum=0, mapping=c("exponential", "linear"), scale = 0, max_height=0, ...) {
+sum_distance <- function(d, sum = 0, mapping = c("exponential", "linear"), scale = 0, max_height = 0, ...) {
   a <- attributes(d) # attributes
   height <- a$height
   mapping <- match.arg(mapping)
@@ -591,7 +591,6 @@ get_segment_df <- function(x0, y0, x1, y1) {
 #' @param label.v.size PARAM_DESCRIPTION, Default: label.h.size
 #' @param label.h.colour PARAM_DESCRIPTION, Default: 'black'
 #' @param label.v.colour PARAM_DESCRIPTION, Default: 'black'
-#' @param theme_dark PARAM_DESCRIPTION, Default: FALSE
 #' @param segments.colour PARAM_DESCRIPTION, Default: FALSE
 #' @param print PARAM_DESCRIPTION, Default: TRUE
 #' @return OUTPUT_DESCRIPTION
@@ -618,18 +617,40 @@ ggheatmap <- function(
                       label.v.size = label.h.size,
                       label.h.colour = "black",
                       label.v.colour = "black",
-                      theme_dark = FALSE,
                       segments.colour = FALSE,
                       print = TRUE) {
+  set_colour <- function() {
+    ggplot2::theme_get()$plot.background$colour %>%
+      grDevices::col2rgb() %>%
+      range() %>%
+      sum() %>%
+      (function(.x) {
+        if ((.x * 100 * 0.5 / 255) >= 50) {
+          "black"
+        } else {
+          "white"
+        }
+      })()
+  }
+  default_colour <- set_colour()
+
+  if (label.h.colour %in% c("white", "black") & label.h.colour != default_colour) {
+    label.h.colour <- default_colour
+  }
+
+  if (label.v.colour %in% c("white", "black") & label.v.colour != default_colour) {
+    label.v.colour <- default_colour
+  }
+
   if (!is.matrix(data)) {
     data <- as.matrix(data)
-  } else {}
+  }
   if (is.null(rownames(data))) {
     rownames(data) <- seq_len(nrow(data))
-  } else {}
+  }
   if (is.null(colnames(data))) {
     colnames(data) <- seq_len(ncol(data))
-  } else {}
+  }
 
   row_hc <- hclust(dist(data), "ward.D")
   col_hc <- hclust(dist(t(data)), "ward.D")
@@ -639,12 +660,12 @@ ggheatmap <- function(
 
   if (length(label.h.colour) == 1) {
     label.h.colour <- rep(label.h.colour, length(row_hc$order))
-  } else {}
+  }
   label.h.colour <- as.character(label.h.colour[rev(row_hc$order)])
 
   if (length(label.v.colour) == 1) {
     label.v.colour <- rep(label.v.colour, length(col_hc$order))
-  } else {}
+  }
   label.v.colour <- as.character(label.v.colour[rev(col_hc$order)])
 
   row_data <- gap_data(
@@ -672,7 +693,7 @@ ggheatmap <- function(
     # row_tmpdta[row_tmpdta[, "colour"]%in%"default", "colour"] <- NA
     row_tmpdta[, "colour"] <- row_tmpdta[, "group"]
     row_data$segments <- row_tmpdta
-  } else {}
+  }
 
   col_data <- gap_data(
     d = d_col,
@@ -699,13 +720,13 @@ ggheatmap <- function(
     # col_tmpdta[col_tmpdta[, "colour"]%in%"default", "colour"] <- NA
     col_tmpdta[, "colour"] <- col_tmpdta[, "group"]
     col_data$segments <- col_tmpdta
-  } else {}
+  }
 
   left_item <- ggplot(data = row_data$label, aes_string(x = "y", y = "x", label = "label", colour = "colour")) +
     scale_y_continuous(expand = c(0, 0), limits = c(min(row_data$labels$x) - 0.5, max(row_data$labels$x) + 0.5)) +
     scale_x_continuous(expand = c(0, 0), limits = c(-1, 0)) +
     ifelse(length(unique(label.h.colour)) == 1,
-      list(geom_text(hjust = 1, size = label.h.size, colour = ifelse(theme_dark, "white", "black"))),
+      list(geom_text(hjust = 1, size = label.h.size, colour = default_colour)),
       list(geom_text(hjust = 1, size = label.h.size))
     ) +
     theme(
@@ -731,7 +752,7 @@ ggheatmap <- function(
 
   right_item <- ggplot() +
     ifelse(length(unique(label.h.colour)) == 1 | !segments.colour,
-      list(geom_segment(data = row_data$segments, aes_string(x = "x", y = "y", xend = "xend", yend = "yend"), colour = ifelse(theme_dark, "white", "black"))),
+      list(geom_segment(data = row_data$segments, aes_string(x = "x", y = "y", xend = "xend", yend = "yend"), colour = default_colour)),
       list(geom_segment(data = row_data$segments, aes_string(x = "x", y = "y", xend = "xend", yend = "yend", colour = "colour")))
     ) +
     scale_x_continuous(expand = c(0, 0), limits = c(min(row_data$labels$x) - 0.5, max(row_data$labels$x) + 0.5)) +
@@ -753,12 +774,12 @@ ggheatmap <- function(
       legend.position = "none"
     ) +
     labs(x = NULL, y = NULL) +
-    scale_colour_viridis_d(na.value = ifelse(theme_dark, "white", "black"))
+    scale_colour_viridis_d(na.value = default_colour)
 
 
   top_item <- ggplot() +
     ifelse(length(unique(label.v.colour)) == 1 | !segments.colour,
-      list(geom_segment(data = col_data$segments, aes_string(x = "x", y = "y", xend = "xend", yend = "yend"), colour = ifelse(theme_dark, "white", "black"))),
+      list(geom_segment(data = col_data$segments, aes_string(x = "x", y = "y", xend = "xend", yend = "yend"), colour = default_colour)),
       list(geom_segment(data = col_data$segments, aes_string(x = "x", y = "y", xend = "xend", yend = "yend", colour = "colour")))
     ) +
     scale_x_continuous(expand = c(0, 0), limits = c(min(col_data$labels$x) - 0.5, max(col_data$labels$x) + 0.5)) +
@@ -779,13 +800,13 @@ ggheatmap <- function(
       legend.position = "none"
     ) +
     labs(x = NULL, y = NULL) +
-    scale_colour_viridis_d(na.value = ifelse(theme_dark, "white", "black"))
+    scale_colour_viridis_d(na.value = default_colour)
 
   bottom_item <- ggplot(data = col_data$label, aes_string(x = "x", y = "y", label = "label", colour = "colour")) +
     scale_x_continuous(expand = c(0, 0), limits = c(min(col_data$labels$x) - 0.5, max(col_data$labels$x) + 0.5)) +
     scale_y_continuous(expand = c(0, 0), limits = c(-1, 0)) +
     ifelse(length(unique(label.v.colour)) == 1,
-      list(geom_text(angle = 90, hjust = 1, size = label.v.size, colour = ifelse(theme_dark, "white", "black"))),
+      list(geom_text(angle = 90, hjust = 1, size = label.v.size, colour = default_colour)),
       list(geom_text(angle = 90, hjust = 1, size = label.v.size))
     ) +
     theme(
@@ -835,8 +856,8 @@ ggheatmap <- function(
   hm.leg <- center_item +
     theme(
       legend.position = c(0.50, 0.50),
-      legend.text = element_text(colour = ifelse(theme_dark, "white", "black")),
-      legend.title = element_text(colour = ifelse(theme_dark, "white", "black"))
+      legend.text = element_text(colour = default_colour),
+      legend.title = element_text(colour = default_colour)
     ) +
     guides(fill = guide_colourbar(direction = "horizontal", title.position = "top", title.hjust = 0.5))
   hm.leg <- ggplot_gtable(ggplot_build(hm.leg))
@@ -863,8 +884,8 @@ ggheatmap <- function(
   output <- list(left_item = left_item, top_item = top_item, right_item = right_item, bottom_item = bottom_item, center_item = center_item, hm.legend = hm.legend)
 
   if (print) {
-    ggheatmap.show(data = output, grid.h.ratio = grid.h.ratio, grid.v.ratio = grid.v.ratio, legend.position = legend.position, theme_dark = theme_dark)
-  } else {}
+    ggheatmap.show(data = output, grid.h.ratio = grid.h.ratio, grid.v.ratio = grid.v.ratio, legend.position = legend.position)
+  }
 
   return(invisible(output))
 }
@@ -875,7 +896,6 @@ ggheatmap <- function(
 #' @param grid.h.ratio PARAM_DESCRIPTION, Default: c(0.15, 0.6, 0.25)
 #' @param grid.v.ratio PARAM_DESCRIPTION, Default: rev(grid.h.ratio)
 #' @param legend.position PARAM_DESCRIPTION, Default: NULL
-#' @param theme_dark PARAM_DESCRIPTION, Default: FALSE
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -886,72 +906,120 @@ ggheatmap <- function(
 #' }
 #' @rdname ggheatmap.show
 #' @export
-ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.ratio = rev(grid.h.ratio), legend.position = NULL, theme_dark = FALSE) {
-  ggdraw <- function (plot = NULL, xlim = c(0, 1), ylim = c(0, 1), theme_dark = FALSE) {
+ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.ratio = rev(grid.h.ratio), legend.position = NULL) {
+  ggdraw <- function(plot = NULL, xlim = c(0, 1), ylim = c(0, 1)) {
+    set_colour <- function() {
+      ggplot2::theme_get()$plot.background$colour %>%
+        grDevices::col2rgb() %>%
+        range() %>%
+        sum() %>%
+        (function(.x) {
+          if ((.x * 100 * 0.5 / 255) >= 50) {
+            "black"
+          } else {
+            "white"
+          }
+        })()
+    }
+    default_colour <- set_colour()
+    base_colour <- ggplot2::theme_get()$plot.background$colour
+    
     theme_nothing <- function(base_size = 14, base_family = "") {
       theme_void(base_size = base_size, base_family = base_family) %+replace%
         theme(
-          line = element_blank(), rect = element_blank(),
+          line = element_blank(), 
+          rect = element_blank(),
           text = element_text(
-            family = base_family, face = "plain",
-            colour = "black", size = base_size, lineheight = 0.9,
-            hjust = 0.5, vjust = 0.5, angle = 0, margin = margin(),
+            family = base_family, 
+            face = "plain",
+            colour = "black", 
+            size = base_size, 
+            lineheight = 0.9,
+            hjust = 0.5, 
+            vjust = 0.5, 
+            angle = 0, 
+            margin = margin(),
             debug = FALSE
-          ), axis.line = element_blank(),
-          axis.line.x = NULL, axis.line.y = NULL, axis.text = element_blank(),
-          axis.text.x = element_blank(), axis.text.x.top = element_blank(),
-          axis.text.y = element_blank(), axis.text.y.right = element_blank(),
-          axis.ticks = element_blank(), axis.ticks.length = unit(
-            0,
-            "pt"
-          ), axis.title.x = element_blank(), axis.title.x.top = element_blank(),
-          axis.title.y = element_blank(), axis.title.y.right = element_blank(),
-          legend.background = element_blank(), legend.spacing = unit(
-            0.4,
-            "cm"
-          ), legend.spacing.x = NULL, legend.spacing.y = NULL,
+          ), 
+          axis.line = element_blank(),
+          axis.line.x = NULL, 
+          axis.line.y = NULL, 
+          axis.text = element_blank(),
+          axis.text.x = element_blank(), 
+          axis.text.x.top = element_blank(),
+          axis.text.y = element_blank(), 
+          axis.text.y.right = element_blank(),
+          axis.ticks = element_blank(), 
+          axis.ticks.length = unit(0, "pt"), 
+          axis.title.x = element_blank(), 
+          axis.title.x.top = element_blank(),
+          axis.title.y = element_blank(), 
+          axis.title.y.right = element_blank(),
+          legend.background = element_blank(), 
+          legend.spacing = unit(0.4, "cm"), 
+          legend.spacing.x = NULL, 
+          legend.spacing.y = NULL,
           legend.margin = margin(0.2, 0.2, 0.2, 0.2, "cm"),
-          legend.key = element_blank(), legend.key.size = unit(
-            1.2,
-            "lines"
-          ), legend.key.height = NULL, legend.key.width = NULL,
-          legend.text = element_text(size = rel(0.8)), legend.text.align = NULL,
-          legend.title = element_text(hjust = 0), legend.title.align = NULL,
-          legend.position = "none", legend.direction = NULL,
-          legend.justification = "center", legend.box = NULL,
-          legend.box.margin = margin(0, 0, 0, 0, "cm"), legend.box.background = element_blank(),
-          legend.box.spacing = unit(0.4, "cm"), panel.background = element_blank(),
-          panel.border = element_blank(), panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(), panel.spacing = unit(
-            0,
-            "pt"
-          ), panel.spacing.x = NULL, panel.spacing.y = NULL,
-          panel.ontop = FALSE, strip.background = element_blank(),
-          strip.text = element_blank(), strip.text.x = element_blank(),
-          strip.text.y = element_blank(), strip.placement = "inside",
-          strip.placement.x = NULL, strip.placement.y = NULL,
-          strip.switch.pad.grid = unit(0, "cm"), strip.switch.pad.wrap = unit(
-            0,
-            "cm"
-          ), plot.background = element_blank(), plot.title = element_blank(),
-          plot.subtitle = element_blank(), plot.caption = element_blank(),
-          plot.margin = margin(0, 0, 0, 0), complete = TRUE
+          legend.key = element_blank(), 
+          legend.key.size = unit(1.2, "lines"), 
+          legend.key.height = NULL, 
+          legend.key.width = NULL,
+          legend.text = element_text(size = rel(0.8)), 
+          legend.text.align = NULL,
+          legend.title = element_text(hjust = 0), 
+          legend.title.align = NULL,
+          legend.position = "none", 
+          legend.direction = NULL,
+          legend.justification = "center", 
+          legend.box = NULL,
+          legend.box.margin = margin(0, 0, 0, 0, "cm"), 
+          legend.box.background = element_blank(),
+          legend.box.spacing = unit(0.4, "cm"), 
+          panel.background = element_blank(),
+          panel.border = element_blank(), 
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), 
+          panel.spacing = unit(0, "pt"), 
+          panel.spacing.x = NULL, 
+          panel.spacing.y = NULL,
+          panel.ontop = FALSE, 
+          strip.background = element_blank(),
+          strip.text = element_blank(), 
+          strip.text.x = element_blank(),
+          strip.text.y = element_blank(), 
+          strip.placement = "inside",
+          strip.placement.x = NULL, 
+          strip.placement.y = NULL,
+          strip.switch.pad.grid = unit(0, "cm"), 
+          strip.switch.pad.wrap = unit(0, "cm"), 
+          plot.background = element_blank(), 
+          plot.title = element_blank(),
+          plot.subtitle = element_blank(), 
+          plot.caption = element_blank(),
+          plot.margin = margin(0, 0, 0, 0), 
+          complete = TRUE
         )
     }
-    d <- data.frame(x = 0:1, y = 0:1)
-    p <- ggplot(d, aes_string(x = "x", y = "y")) + 
-      scale_x_continuous(limits = xlim, expand = c(0, 0)) + 
-      scale_y_continuous(limits = ylim, expand = c(0, 0)) + 
-      theme_nothing() + 
-      theme(plot.background = element_rect(colour = ifelse(theme_dark, "grey20", "white"), fill =  ifelse(theme_dark, "grey20", "white"))) +
+    
+    p <- ggplot(data = data.frame(x = 0:1, y = 0:1), aes_string(x = "x", y = "y")) +
+      scale_x_continuous(limits = xlim, expand = c(0, 0)) +
+      scale_y_continuous(limits = ylim, expand = c(0, 0)) +
+      theme_nothing() +
+      theme(
+        plot.background = element_rect(colour = base_colour, fill = base_colour)
+      ) +
       labs(x = NULL, y = NULL)
     if (!is.null(plot)) {
       p <- p + draw_plot(plot)
     }
     p
   }
+  
   if (is.null(legend.position)) {
-    legend.position <- c(which.max(c(grid.h.ratio[1], 0, grid.h.ratio[3])), which.max(c(grid.v.ratio[1], 0, grid.v.ratio[3])))
+    legend.position <- c(
+      which.max(c(grid.h.ratio[1], 0, grid.h.ratio[3])), 
+      which.max(c(grid.v.ratio[1], 0, grid.v.ratio[3]))
+    )
   }
   top.height <- grid.v.ratio[1]
   center.height <- grid.v.ratio[2]
@@ -970,15 +1038,15 @@ ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.rati
     heights = unit(c(top.height, center.height, bottom.height), "null")
   )
   pushViewport(viewport(layout = grid_layout))
-  print(ggdraw(theme_dark = theme_dark), vp = viewport(layout.pos.col = 1, layout.pos.row = 1))
-  print(ggdraw(theme_dark = theme_dark), vp = viewport(layout.pos.col = 1, layout.pos.row = 2))
-  print(ggdraw(theme_dark = theme_dark), vp = viewport(layout.pos.col = 1, layout.pos.row = 3))
-  print(ggdraw(theme_dark = theme_dark), vp = viewport(layout.pos.col = 2, layout.pos.row = 1))
-  print(ggdraw(theme_dark = theme_dark), vp = viewport(layout.pos.col = 2, layout.pos.row = 2))
-  print(ggdraw(theme_dark = theme_dark), vp = viewport(layout.pos.col = 2, layout.pos.row = 3))
-  print(ggdraw(theme_dark = theme_dark), vp = viewport(layout.pos.col = 3, layout.pos.row = 1))
-  print(ggdraw(theme_dark = theme_dark), vp = viewport(layout.pos.col = 3, layout.pos.row = 2))
-  print(ggdraw(theme_dark = theme_dark), vp = viewport(layout.pos.col = 3, layout.pos.row = 3))
+  print(ggdraw(), vp = viewport(layout.pos.col = 1, layout.pos.row = 1))
+  print(ggdraw(), vp = viewport(layout.pos.col = 1, layout.pos.row = 2))
+  print(ggdraw(), vp = viewport(layout.pos.col = 1, layout.pos.row = 3))
+  print(ggdraw(), vp = viewport(layout.pos.col = 2, layout.pos.row = 1))
+  print(ggdraw(), vp = viewport(layout.pos.col = 2, layout.pos.row = 2))
+  print(ggdraw(), vp = viewport(layout.pos.col = 2, layout.pos.row = 3))
+  print(ggdraw(), vp = viewport(layout.pos.col = 3, layout.pos.row = 1))
+  print(ggdraw(), vp = viewport(layout.pos.col = 3, layout.pos.row = 2))
+  print(ggdraw(), vp = viewport(layout.pos.col = 3, layout.pos.row = 3))
 
   print(data$left_item, vp = viewport(layout.pos.col = 1, layout.pos.row = 2))
   print(data$top_item, vp = viewport(layout.pos.col = 2, layout.pos.row = 1))
@@ -996,7 +1064,6 @@ ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.rati
 #' @param size PARAM_DESCRIPTION, Default: 24
 #' @param barwidth PARAM_DESCRIPTION, Default: 10
 #' @param barheight PARAM_DESCRIPTION, Default: 3
-#' @param theme_dark PARAM_DESCRIPTION, Default: FALSE
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -1007,12 +1074,26 @@ ggheatmap.show <- function(data, grid.h.ratio = c(0.15, 0.60, 0.25), grid.v.rati
 #' }
 #' @rdname edit.hm.legend
 #' @export
-edit.hm.legend <- function(ggheatmap, size = 24, barwidth = 10, barheight = 3, theme_dark = FALSE) {
+edit.hm.legend <- function(ggheatmap, size = 24, barwidth = 10, barheight = 3) {
+  set_colour <- function() {
+    ggplot2::theme_get()$plot.background$colour %>%
+      grDevices::col2rgb() %>%
+      range() %>%
+      sum() %>%
+      (function(.x) {
+        if ((.x * 100 * 0.5 / 255) >= 50) {
+          "black"
+        } else {
+          "white"
+        }
+      })()
+  }
+  default_colour <- set_colour()
   hm.leg <- ggheatmap$center_item +
     theme(
       legend.position = c(0.50, 0.50),
-      legend.text = element_text(colour = ifelse(theme_dark, "white", "black")),
-      legend.title = element_text(colour = ifelse(theme_dark, "white", "black"))
+      legend.text = element_text(colour = default_colour),
+      legend.title = element_text(colour = default_colour)
     ) +
     guides(fill = guide_colourbar(
       title = "Spearman Correlation",
@@ -1021,8 +1102,8 @@ edit.hm.legend <- function(ggheatmap, size = 24, barwidth = 10, barheight = 3, t
       barwidth = barwidth,
       barheight = barheight,
       direction = "horizontal",
-      title.theme = element_text(size = rel(size), angle = 0, colour = ifelse(theme_dark, "white", "black")),
-      label.theme = element_text(size = rel(size * 2 / 3), angle = 0, colour = ifelse(theme_dark, "white", "black"))
+      title.theme = element_text(size = rel(size), angle = 0, colour = default_colour),
+      label.theme = element_text(size = rel(size * 2 / 3), angle = 0, colour = default_colour)
     ))
   hm.leg <- ggplot_gtable(ggplot_build(hm.leg))
   hm.legend <- hm.leg$grobs[[which(sapply(hm.leg$grobs, function(x) x$name) == "guide-box")]]

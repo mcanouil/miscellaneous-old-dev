@@ -137,7 +137,21 @@ ggqqplot <- function (data, col_names = colnames(data), point_size = 1) {
   if (is.null(col_names)) {
     colnames(data) <- col_names
   }
-
+  
+  set_colour <- function() {
+    ggplot2::theme_get()$plot.background$colour %>% 
+      grDevices::col2rgb() %>% 
+      range() %>% 
+      sum() %>% 
+      (function(.x){
+        if ((.x* 100 * 0.5/255)>=50) {
+          "black"
+        } else {
+          "white"
+        }
+      })()
+  }
+  
   data %>% 
     as.data.frame() %>% 
     tidyr::gather(key = "group", value = "obspval") %>% 
@@ -155,7 +169,7 @@ ggqqplot <- function (data, col_names = colnames(data), point_size = 1) {
       labels = factor(labels, levels = unique(labels))
     ) %>% 
     ggplot() +
-      geom_abline(intercept = 0, slope = 1) +
+      geom_abline(intercept = 0, slope = 1, colour = set_colour()) +
       geom_point(aes_string(x = "exppval", y = "obspval", colour = "labels", shape = "labels"), size = point_size) +
       scale_x_continuous(trans = pval_trans()) +
       scale_y_continuous(trans = pval_trans()) +

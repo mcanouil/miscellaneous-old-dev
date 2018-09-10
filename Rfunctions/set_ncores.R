@@ -46,8 +46,8 @@ set_ncores <- function(
 bot_ncores <- function (
   expr, 
   hooks = NULL,
-  message_in = NULL,
-  message_out = NULL,
+  note_in = NULL,
+  note_out = NULL,
   id = NULL
 ) {
   if (is.null(hooks)) {
@@ -95,29 +95,29 @@ bot_ncores <- function (
     '%)'
   )
   
-  message_in_def <- paste(
+  message_in <- paste(
     random_id, 
     paste0('_', Sys.getenv("LOGNAME"), '_'), 
     '*started* using', paste0('*', n_cores, ' cores*'), 
     n_cores_percent,
     'on', paste0('_', Sys.info()[["nodename"]],  '_')
   )
-  if (!is.null(message_in)) {
-    message_in_def <- paste(message_in_def, '\n\t', message_in)
+  if (!is.null(note_in)) {
+    message_in <- paste(message_in, '\\nNote: ', note_in)
   }
   
-  message_out_def <- paste(
+  message_out <- paste(
     random_id, 
     paste0('_', Sys.getenv("LOGNAME"), '_'), 
     '*stopped* using', paste0('*', n_cores, ' cores*'), 
     n_cores_percent,
     'on', paste0('_', Sys.info()[["nodename"]],  '_')
   )
-  if (!is.null(message_out)) {
-    message_out_def <- paste(message_out_def, '\n\t', message_out)
+  if (!is.null(note_out)) {
+    message_out <- paste(message_out, '\\nNote: ', note_out)
   }
     
-  send_message(message = message_in_def, hooks = hooks)
+  send_message(message = message_in, hooks = hooks)
   
   if (any(grepl("<-[^(]*mclapply", sub_expr))) {
     expr
@@ -125,7 +125,7 @@ bot_ncores <- function (
     out <- expr
   }
   
-  send_message(message = message_out_def, hooks = hooks)
+  send_message(message = message_out, hooks = hooks)
 
   on.exit()
   if (any(grepl("<-[^(]*mclapply", sub_expr))) {

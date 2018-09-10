@@ -106,7 +106,7 @@ bot_ncores <- function (
     message_in_def <- paste(message_in_def, '\n\t', message_in)
   }
   
-  message_out <- paste(
+  message_out_def <- paste(
     random_id, 
     paste0('_', Sys.getenv("LOGNAME"), '_'), 
     '*stopped* using', paste0('*', n_cores, ' cores*'), 

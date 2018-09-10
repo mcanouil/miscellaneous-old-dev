@@ -45,7 +45,10 @@ set_ncores <- function(
 
 bot_ncores <- function (
   expr, 
-  hooks = NULL
+  hooks = NULL,
+  message_in = NULL,
+  message_out = NULL,
+  id = NULL
 ) {
   if (is.null(hooks)) {
     stop('"hooks" is missing and must be provided!')
@@ -69,7 +72,11 @@ bot_ncores <- function (
     return(invisible())
   }
   
-  random_id <- paste0('[ID:', sprintf(fmt = "%04d", sample(1:1000, 1)), ']')
+  if (is.null(id)) {
+    random_id <- paste0('[ID:', sprintf(fmt = "%04d", sample(1:1000, 1)), ']')
+  } else {
+    random_id <- paste0('[', id, ']')
+  }
   
   sub_expr <- paste(deparse(substitute(expr)), collapse = "")
   if (any(grepl("mc.cores", sub_expr))) {
@@ -87,14 +94,18 @@ bot_ncores <- function (
     round((n_cores / parallel::detectCores()) * 100, digits = 2), 
     '%)'
   )
-
-  message_in <- paste(
+  
+  message_in_def <- paste(
     random_id, 
     paste0('_', Sys.getenv("LOGNAME"), '_'), 
     '*started* using', paste0('*', n_cores, ' cores*'), 
     n_cores_percent,
     'on', paste0('_', Sys.info()[["nodename"]],  '_')
   )
+  if (!is.null(message_in)) {
+    message_in_def <- paste(message_in_def, '\n\t', message_in)
+  }
+  
   message_out <- paste(
     random_id, 
     paste0('_', Sys.getenv("LOGNAME"), '_'), 
@@ -102,8 +113,11 @@ bot_ncores <- function (
     n_cores_percent,
     'on', paste0('_', Sys.info()[["nodename"]],  '_')
   )
+  if (!is.null(message_out)) {
+    message_out_def <- paste(message_out_def, '\n\t', message_out)
+  }
     
-  send_message(message = message_in, hooks = hooks)
+  send_message(message = message_in_def, hooks = hooks)
   
   if (any(grepl("<-[^(]*mclapply", sub_expr))) {
     expr
@@ -111,7 +125,7 @@ bot_ncores <- function (
     out <- expr
   }
   
-  send_message(message = message_out, hooks = hooks)
+  send_message(message = message_out_def, hooks = hooks)
 
   on.exit()
   if (any(grepl("<-[^(]*mclapply", sub_expr))) {

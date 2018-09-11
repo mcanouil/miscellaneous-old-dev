@@ -4,9 +4,11 @@ pca_report <- function(
   id_var = "Sample_ID",
   technical_vars,
   n_comp = 5,
+  fig_n_comp = n_comp,
   outliers_component = NULL,
   outliers_threshold = 3,
-  title_level = 2
+  title_level = 2,
+  theme_dark = FALSE
 ) {
   require(flashpcaR)
   require(scales)
@@ -49,7 +51,7 @@ pca_report <- function(
     as.data.frame() %>%
     `colnames<-`(paste0("PC", seq_len(ncol(.)))) %>%
     mutate(Sample_ID = as.character(colnames(data))) %>% 
-    left_join(x = design, y = ., by = "Sample_ID")
+    left_join(x = design, y = ., by = id_var)
 
 
   cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA inertia contribution {-}\n"))
@@ -66,10 +68,10 @@ pca_report <- function(
   cat("\n")
 
   if (length(keep_technical)>0) {
-    cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA  factorial planes {- .tabset}\n"))
+    cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA factorial planes {- .tabset}\n"))
     for (ivar in keep_technical) {
       cat(paste0("\n", paste(rep("#", title_level + 1), collapse = ""), " ", ivar, " {-}\n"))
-      p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(n_comp)), 2)), 1, function(icoord) {
+      p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(fig_n_comp)), 2)), 1, function(icoord) {
         tmp <- pca_dfxy[, c(ivar, icoord)]
         tmp[, ivar] <- as.factor(tmp[, ivar])
         colnames(tmp)[-seq_len(ncol(tmp) - 2)] <- c("X", "Y")
@@ -93,7 +95,7 @@ pca_report <- function(
     cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA association {-}\n"))
     p <- pca_dfxy %>%
       (function(.data) {
-        lapply(seq_len(n_comp), function(i) {
+        lapply(seq_len(fig_n_comp), function(i) {
           form <- as.formula(paste0("PC", i, " ~ ", paste(keep_technical, collapse = " + ")))
           lm(form, data = .data) %>% 
             anova() %>% 
@@ -125,7 +127,7 @@ pca_report <- function(
       rowSums() %>%
       sqrt() %>%
       data_frame(EuclideanDistance = .) %>%
-      rownames_to_column(var = "SampleID") %>%
+      rownames_to_column(var = id_var) %>%
       mutate(
         BadSamplesLogical = 
           EuclideanDistance <= 
@@ -134,7 +136,7 @@ pca_report <- function(
             (median(EuclideanDistance) + outliers_threshold * IQR(EuclideanDistance)),
         BadSamples = factor(ifelse(BadSamplesLogical, "BAD", "GOOD"), levels = c("BAD", "GOOD"))
       ) %>%
-      column_to_rownames(var = "SampleID")
+      column_to_rownames(var = id_var)
   
     pca_dfxy <- merge(
       x = pca_dfxy,

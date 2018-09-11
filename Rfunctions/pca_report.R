@@ -39,7 +39,7 @@ pca_report <- function(
   }
 
   pca_res <- flashpca(
-    X = t(as.matrix(data)[, seq(8)]),
+    X = t(as.matrix(data)),
     stand = "sd",
     ndim = n_comp
   )

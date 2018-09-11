@@ -71,7 +71,7 @@ echo '/*
 
 !/Scripts/
 !README.md
-' > test /disks/PROJECT/$projectName/.gitignore
+' > ~/disks/PROJECT/$projectName/.gitignore
 
 cd /disks/PROJECT/$projectName/
 git init

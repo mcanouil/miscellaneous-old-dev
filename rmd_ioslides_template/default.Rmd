@@ -1,0 +1,102 @@
+---
+title: ''
+author: 'Mickaël CANOUIL, *Ph.D.*'
+date: ''
+monofont: 'Source Code Pro'
+monofontoptions: 'Scale=0.7'
+params:
+  eval: TRUE
+output:
+  ioslides_presentation:
+    css: 'template/shiny-slides.css'
+    logo: 'template/logo_UMR.png'
+    smaller: false
+    self_contained: true
+    mathjax: default
+    fig_width: 5.94
+    fig_height: 3.30
+---
+
+
+```{r setup, include = FALSE}
+options(stringsAsFactors = FALSE)
+# Sys.setlocale("LC_TIME", "english_united kingdom.1252")
+
+output_directory <- ""
+
+### Load packages and functions
+library(tidyverse)
+library(broom)
+library(scales)
+library(parallel)
+library(grid)
+library(knitr)
+library(rmarkdown)
+library(kableExtra)
+
+devtools::source_url('https://github.com/mcanouil/DEV/raw/master/Rfunctions/theme_black.R')
+
+options("width" = 80)
+### Set knitr rmarkdown chunk options
+opts_chunk$set(
+  include = TRUE,
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  eval = params$eval,
+  tidy = FALSE,
+  crop = TRUE,
+  autodep = FALSE,
+  dpi = 120,
+  fig.path = "./images/",
+  cache = FALSE,
+  cache.path = NULL,
+  width = 80,
+  comment = "#>",
+  results = "asis"
+)
+
+### Define theme
+theme_set(theme_black(base_size = 11))
+
+# options(tibble.print_max = 3, tibble.print_min = 3)
+
+
+```
+
+# Title | Subtitle {.flexbox .vcenter}
+
+
+## Title 1 | Title 2
+
+
+
+
+
+# <img src="http://mickael.canouil.fr/img/IDPhotoBWlight.png" height = "150px"></img>__*Me?*__ {.flexbox .vcenter}
+
+<div class="auto-fadein">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/js/uikit.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/js/uikit-icons.min.js"></script>
+<div class="columns-2">
+
+<span class="uk-icon-button" uk-icon="icon: receiver; ratio: 1"></span>
+    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="" target="_blank">+33 (0) 374 00 81 29</a> 
+    
+<span class="uk-icon-button" uk-icon="icon: mail; ratio: 1"></span>
+    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="mailto:mickael.canouil@cnrs.fr" target="_blank">mickael.canouil@cnrs.fr</a> 
+
+<span class="uk-icon-button" uk-icon="icon: home; ratio: 1"></span>
+    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="http://mickael.canouil.fr" target="_blank">mickael.canouil.fr</a> 
+
+<span class="uk-icon-button" uk-icon="icon: linkedin; ratio: 1"></span>
+    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="https://www.linkedin.com/in/mickael-canouil" target="_blank">mickael-canouil</a> 
+
+<span class="uk-icon-button" uk-icon="icon: github; ratio: 1"></span>
+    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="https://github.com/mcanouil" target="_blank">mcanouil</a> 
+
+<span class="uk-icon-button" uk-icon="icon: twitter; ratio: 1"></span>
+    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="https://twitter.com/Coeos_" target="_blank">@Coeos_</a> 
+
+</div>
+</div>

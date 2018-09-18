@@ -22,7 +22,7 @@ pca_report <- function(
   }
   
   keep_technical <- sapply(
-    X = design[, technical_vars], 
+    X = design[, technical_vars, drop = FALSE], 
     FUN = function(icol) {
       length(unique(icol))>1 & length(unique(icol))!=length(design[, id_var])
     }

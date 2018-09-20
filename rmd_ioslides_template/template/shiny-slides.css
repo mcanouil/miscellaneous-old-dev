@@ -51,6 +51,8 @@ aside.gdbar {
 .title-slide hgroup {
   text-align: center;
   bottom: 100px;
+  margin-top: 10%;
+  margin-bottom: 10%;
 }
 
 .title-slide hgroup h1 {
@@ -65,13 +67,13 @@ aside.gdbar {
   border-radius: 10px 10px 10px 10px;
 }
 
+
 .auto-fadein h2 {
   text-align: center;
 }
 .auto-fadein h3 {
   text-align: center;
 }
-
 
 .segue hgroup {
   position: relative; 

@@ -150,7 +150,10 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
     labs(y = y_pval, x = x_chr)
   if (y_trans) {
     p <- p +
-      scale_y_continuous(trans = pval_trans())
+      scale_y_continuous(trans = pval_trans(), expand = expand_scale(mult = c(0, 0.10)))
+  } else {
+    p <- p +
+      scale_y_continuous(expand = expand_scale(mult = c(0, 0.10)))
   }
   return(p)
 }

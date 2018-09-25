@@ -12,19 +12,19 @@
     }
   } else {
     message(paste0('Loading "', rds_path, '" ...'))
-    if (any(grepl("<-", sub_expr))) {
-      readRDS(file = rds_path)
-    } else {
+    # if (any(grepl("<-", sub_expr))) {
+    #   readRDS(file = rds_path)
+    # } else {
       out <- readRDS(file = rds_path)
-    }
+    # }
   }
   
   on.exit()
-  if (any(grepl("<-", sub_expr))) {
-    return(invisible())
-  } else {
-    return(out)
-  }
+  # if (any(grepl("<-", sub_expr))) {
+  #   return(invisible())
+  # } else {
+    return(invisible(out))
+  # }
 }
 
 # run_or_load(rds_path = "./test.rds", expr = {x <- 1+1})

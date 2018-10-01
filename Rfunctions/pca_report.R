@@ -18,7 +18,7 @@ pca_report <- function(
     design <- as.data.frame(design)
   }
   if (!is(design[, id_var], "character")) {
-    design[, id_var] <- as.character(design[, id_var])
+    design[[id_var]] <- as.character(design[[id_var]])
   }
   
   keep_technical <- sapply(
@@ -51,7 +51,8 @@ pca_report <- function(
     as.data.frame() %>%
     `colnames<-`(paste0("PC", seq_len(ncol(.)))) %>%
     mutate(Sample_ID = as.character(colnames(data))) %>% 
-    left_join(x = design, y = ., by = id_var)
+    left_join(x = design, y = ., by = id_var) %>% 
+    as.data.frame()
 
 
   cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA inertia contribution {-}\n"))

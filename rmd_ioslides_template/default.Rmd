@@ -4,6 +4,7 @@ author: 'Mickaël CANOUIL, *Ph.D.*'
 date: ''
 monofont: 'Source Code Pro'
 monofontoptions: 'Scale=0.7'
+csl: template/csl/apa.csl
 params:
   eval: TRUE
 output:
@@ -15,6 +16,8 @@ output:
     mathjax: default
     fig_width: 5.94
     fig_height: 3.30
+    transition: 0.5
+    incremental: false
 ---
 
 

@@ -4,6 +4,7 @@ author: 'Mickaël CANOUIL, *Ph.D.*'
 date: ''
 monofont: 'Source Code Pro'
 monofontoptions: 'Scale=0.7'
+csl: template/csl/apa.csl
 params:
   eval: TRUE
 output:

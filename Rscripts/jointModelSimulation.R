@@ -97,7 +97,7 @@ simulateJM <- compiler::cmpfun(function (n, times, thetas, gamma, maf, Epsilon_t
     Xrandom <- model.matrix.default(reformulate(c("Time", "SNP")[1]), data = dta)
     Z <- model.matrix.default(reformulate(c("Time", "SNP")[2]), data = dta)
 
-    thetasi <- matrix(rep(mvrnorm(n, rep(0, ncol(Z)), Epsilon_thetas), each = length(times)), ncol = ncol(Z))
+    thetasi <- matrix(rep(MASS::mvrnorm(n, rep(0, ncol(Z)), Epsilon_thetas), each = length(times)), ncol = ncol(Z))
     dta[, "Ytrue"] <- Xfixed %*% c(thetas, gamma) + rowSums(Xrandom * thetasi)
     dta[, "Y"] <- rnorm(nrow(dta), mean = dta[, "Ytrue"], sd = sigma)
     if (!(beta==0 & all(alpha==0) & nu==1 & lambda==0)) {

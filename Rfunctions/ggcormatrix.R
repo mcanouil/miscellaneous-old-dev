@@ -22,6 +22,8 @@
 #' @importFrom Hmisc rcorr
 #' @importFrom reshape2 melt
 ggcormatrix <- function(data, method = c("pearson", "spearman"), digits = 3, limits = c(-1, 1), size = 4, theme_dark = FALSE) {
+  require(Hmisc)
+  require(reshape2)
   format_pval <- function (x, thresh = 10^-2, digits = 3, eps = 1e-50) {
     ifelse(
       x>=thresh, 
@@ -62,37 +64,37 @@ ggcormatrix <- function(data, method = c("pearson", "spearman"), digits = 3, lim
     melted_cormat[, "label"] <- paste0("r==", melted_cormat[, "value"] * 100, '~"%"')
   }
 
-  ggheatmap <- ggplot(
+  ggheatmap <- ggplot2::ggplot(
       data = melted_cormat, 
-      aes(
+      mapping = ggplot2::aes(
         x = Var2, 
         y = Var1, 
         fill = value
       )
     ) +
-    geom_tile(colour = ifelse(theme_dark, "grey20", "white")) +
-    scale_fill_viridis_c(
+    ggplot2::geom_tile(colour = ifelse(theme_dark, "grey20", "white")) +
+    ggplot2::scale_fill_viridis_c(
       limits = limits,
       name = paste0(toupper(substr(method, 1, 1)), substr(method, 2, nchar(method)), "\nCorrelation")
     ) +
-    coord_fixed() +
-    labs(x = NULL, y = NULL) +
-    geom_text(
-      aes(Var2, Var1, label = label), 
+    ggplot2::coord_fixed() +
+    ggplot2::labs(x = NULL, y = NULL) +
+    ggplot2::geom_text(
+      mapping = ggplot2::aes(Var2, Var1, label = label), 
       colour = ifelse(theme_dark, "white", "white"), 
       size = size, 
       parse = TRUE,
       vjust = -0.25
     ) +
-    geom_text(
-      aes(Var2, Var1, label = value.p.format), 
+    ggplot2::geom_text(
+      mapping = ggplot2::aes(Var2, Var1, label = value.p.format), 
       colour = ifelse(theme_dark, "white", "white"), 
       size = size, 
       parse = TRUE,
       vjust = 1.25
     ) +
-    theme(
-      plot.background = element_rect(
+    ggplot2::theme(
+      plot.background = ggplot2::element_rect(
         colour = ifelse(theme_dark, "grey20", "white"), 
         fill = ifelse(theme_dark, "grey20", "white")
       )

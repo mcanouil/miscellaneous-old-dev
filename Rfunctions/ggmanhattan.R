@@ -22,7 +22,6 @@
 ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e7, ...) {
   require(tidyverse)
   require(scales)
-  require(viridis)
   args_values <- list(...)
   all_args <- names(args_values)
   old_args <- intersect(
@@ -33,7 +32,7 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
     all_args, 
     c("data", "x_chr", "x_pos", "y_pval", "y_trans", "x_space", "chr", "position", "y", "sep", "ytrans")
   ) %>% 
-    map(.x = ., .f = ~message(paste0("Argument '", .x, "' is deprecated!")))
+    purrr::map(.x = ., .f = ~message(paste0("Argument '", .x, "' is deprecated!")))
   if (length(old_args)!=0) {
     for (iarg in old_args) {
       message(paste0(
@@ -78,7 +77,7 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
         }
       }
     }
-    trans_new(
+    scales::trans_new(
       name = "pval",
       transform = function(x) {
         -log(x, 10)
@@ -90,7 +89,7 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
       domain = c(1e-300, 1),
       format = function(x) {
         parse(
-          text = scientific_format()(x) %>%
+          text = scales::scientific_format()(x) %>%
             gsub("1e+00", "1", ., fixed = TRUE) %>%
             gsub("e", " %*% 10^", .)
         )
@@ -99,12 +98,12 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
   }
 
   data <- data %>% 
-    rename(
+    dplyr::rename(
       x_chr = !!x_chr,
       x_pos = !!x_pos,
       y_pval = !!y_pval
     ) %>% 
-    mutate(
+    dplyr::mutate(
       x_chr = x_chr %>% 
         toupper() %>% 
         gsub("CHR", "", .) %>% 
@@ -112,48 +111,48 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
       x_pos = as.integer(x_pos),
       y_pval = as.numeric(y_pval)
     ) %>% 
-    filter(!is.na(x_chr) & !is.na(x_pos)) %>% 
-    arrange(x_chr, x_pos) %>% 
-    group_by(x_chr) %>% 
-    mutate(x_pos = x_pos - min(x_pos) + 1) %>% 
-    ungroup()
+    dplyr::filter(!is.na(x_chr) & !is.na(x_pos)) %>% 
+    dplyr::arrange(x_chr, x_pos) %>% 
+    dplyr::group_by(x_chr) %>% 
+    dplyr::mutate(x_pos = x_pos - min(x_pos) + 1) %>% 
+    dplyr::ungroup()
 
-  data <- full_join(
+  data <- dplyr::full_join(
     x = data,
     y = data %>% 
-      group_by(x_chr) %>% 
-      summarise(x_pos = max(x_pos)) %>% 
-      mutate(x_start = c(0, cumsum(x_pos[-length(x_pos)]+x_space))) %>% 
-      select(x_chr, x_start),
+      dplyr::group_by(x_chr) %>% 
+      dplyr::summarise(x_pos = max(x_pos)) %>% 
+      dplyr::mutate(x_start = c(0, cumsum(x_pos[-length(x_pos)]+x_space))) %>% 
+      dplyr::select(x_chr, x_start),
     by = "x_chr"
   ) %>% 
-    mutate(
+    dplyr::mutate(
       x_pos = x_pos + x_start
     )
 
   x_breaks <- data %>% 
-    group_by(x_chr) %>% 
-    summarise(x_med = median(x_pos)) %>% 
-    select(x_chr, x_med)
+    dplyr::group_by(x_chr) %>% 
+    dplyr::summarise(x_med = median(x_pos)) %>% 
+    dplyr::select(x_chr, x_med)
 
-  p <- ggplot(data = data, aes(x = x_pos, y = y_pval, colour = x_chr)) +
-    geom_point(size = 1.5, shape = 21, na.rm = TRUE, show.legend = FALSE) +
-    scale_colour_manual(
-      values = rep(viridis_pal(begin = 1/4, end = 3/4)(2), 12)
+  p <- ggplot2::ggplot(data = data, mapping = ggplot2::aes(x = x_pos, y = y_pval, colour = x_chr)) +
+    ggplot2::geom_point(size = 1.5, shape = 21, na.rm = TRUE, show.legend = FALSE) +
+    ggplot2::scale_colour_manual(
+      values = rep(scales::viridis_pal(begin = 1/4, end = 3/4)(2), 12)
     ) +
-    scale_x_continuous(
+    ggplot2::scale_x_continuous(
       breaks = x_breaks[["x_med"]],
       labels = x_breaks[["x_chr"]],
       limits = range(data[["x_pos"]]),
       expand = c(0.01, 0)
     ) +
-    labs(y = y_pval, x = x_chr)
+    ggplot2::labs(y = y_pval, x = x_chr)
   if (y_trans) {
     p <- p +
-      scale_y_continuous(trans = pval_trans(), expand = expand_scale(mult = c(0, 0.10)), limits = c(1, NA))
+      ggplot2::scale_y_continuous(trans = pval_trans(), expand = ggplot2::expand_scale(mult = c(0, 0.10)), limits = c(1, NA))
   } else {
     p <- p +
-      scale_y_continuous(expand = expand_scale(mult = c(0, 0.10)))
+      ggplot2::scale_y_continuous(expand = ggplot2::expand_scale(mult = c(0, 0.10)))
   }
   return(p)
 }

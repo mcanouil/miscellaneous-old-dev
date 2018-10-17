@@ -61,23 +61,23 @@ ggqqplot_old <- function (pvalue, lambdaNames = NULL, pt.size = 1) {
     )
   )
   
-  p <- ggplot(data = res) +
-    geom_abline(intercept = 0, slope = 1) +
-    geom_point(
-      aes_string(x = "logexppval", y = "logobspval", colour = "labnames", shape = "labnames"), 
+  p <- ggplot2::ggplot(data = res) +
+    ggplot2::geom_abline(intercept = 0, slope = 1) +
+    ggplot2::geom_point(
+      ggplot2::aes_string(x = "logexppval", y = "logobspval", colour = "labnames", shape = "labnames"), 
       size = pt.size
     ) +
-    scale_colour_viridis_d() +
-    scale_shape_discrete(solid = FALSE) +
-    labs(
+    ggplot2::scale_colour_viridis_d() +
+    ggplot2::scale_shape_discrete(solid = FALSE) +
+    ggplot2::labs(
       x = bquote(Expected -log[10](P[value])), 
       y = bquote(Observed - log[10](P[value])), 
       title = "Q-Q plot",
       colour = NULL,
       shape = NULL
     ) + 
-    xlim(axisLim) + 
-    ylim(axisLim)
+    ggplot2::xlim(axisLim) + 
+    ggplot2::ylim(axisLim)
   return(p)
 }
 
@@ -176,14 +176,14 @@ ggqqplot <- function (data, col_names = colnames(data), point_size = 1) {
       labels = paste0("lambda[", group, "]==", round(gc, digits = 3)),
       labels = factor(labels, levels = unique(labels))
     ) %>% 
-    ggplot() +
-      geom_abline(intercept = 0, slope = 1, colour = set_colour()) +
-      geom_point(aes_string(x = "exppval", y = "obspval", colour = "labels", shape = "labels"), size = point_size) +
-      scale_x_continuous(trans = pval_trans()) +
-      scale_y_continuous(trans = pval_trans()) +
-      scale_colour_viridis_d(labels = parse_format()) +
-      scale_shape_discrete(solid = FALSE, labels = parse_format()) +
-      labs(
+    ggplot2::ggplot() +
+      ggplot2::geom_abline(intercept = 0, slope = 1, colour = set_colour()) +
+      ggplot2::geom_point(ggplot2::aes_string(x = "exppval", y = "obspval", colour = "labels", shape = "labels"), size = point_size) +
+      ggplot2::scale_x_continuous(trans = pval_trans()) +
+      ggplot2::scale_y_continuous(trans = pval_trans()) +
+      ggplot2::scale_colour_viridis_d(labels = parse_format()) +
+      ggplot2::scale_shape_discrete(solid = FALSE, labels = parse_format()) +
+      ggplot2::labs(
         x = "Expected P-value", 
         y = "Observed P-value", 
         title = "Q-Q plot",

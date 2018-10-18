@@ -2,7 +2,7 @@
 # Name - S4generator.R
 # Desc - Build a S4 class object with several methods
 # Author - Mickael Canouil
-# Source code - https://github.com/mcanouil/DEV/S4generator.R
+# Source code - https://github.com/mcanouil/DEV/S4_generator.R
 #---------------------------------------------------------------------------------
 
 

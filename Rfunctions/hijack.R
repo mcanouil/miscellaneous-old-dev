@@ -18,5 +18,5 @@ hijack <- function(FUN, ...) {
   invisible(lapply(seq_along(args), function(i) {
     formals(.FUN)[[names(args)[i]]] <<- args[[i]]
   }))
-  .FUN
+  return(.FUN)
 }

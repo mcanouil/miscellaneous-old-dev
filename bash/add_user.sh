@@ -11,6 +11,7 @@ ID=$3
 && addgroup $USER info \
 && addgroup $USER root \
 && adduser $USER sudo \
+&& usermod -g info $USER \
 && mkdir -p /media/User/$USER/.rstudio/monitored/user-settings \
 && [ -f /media/User/$USER/.rstudio/monitored/user-settings/user-settings ] || echo 'alwaysSaveHistory="0" 
 cleanTexi2DviOutput="1" 
@@ -42,21 +43,21 @@ useInternet2="1"' > /media/User/$USER/.rstudio/monitored/user-settings/user-sett
 && echo 'R_MAX_NUM_DLLS=300' > /media/User/$USER/.Renviron \
 && [ -f /media/User/$USER/.bashrc ] || echo '
 #### set locales
-export LANG="en_US.UTF-8"
-export LANGUAGE="en_US.UTF-8"
-export LC_CTYPE="en_US.UTF-8"
-export LC_NUMERIC="en_US.UTF-8"
-export LC_TIME="en_US.UTF-8"
-export LC_COLLATE="en_US.UTF-8"
-export LC_MONETARY="en_US.UTF-8"
-export LC_MESSAGES="en_US.UTF-8"
-export LC_PAPER="en_US.UTF-8"
-export LC_NAME="en_US.UTF-8"
-export LC_ADDRESS="en_US.UTF-8"
-export LC_TELEPHONE="en_US.UTF-8"
-export LC_MEASUREMENT="en_US.UTF-8"
-export LC_IDENTIFICATION="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
+export LANG="en_GB.UTF-8"
+export LANGUAGE="en_GB.UTF-8"
+export LC_CTYPE="en_GB.UTF-8"
+export LC_NUMERIC="en_GB.UTF-8"
+export LC_TIME="en_GB.UTF-8"
+export LC_COLLATE="en_GB.UTF-8"
+export LC_MONETARY="en_GB.UTF-8"
+export LC_MESSAGES="en_GB.UTF-8"
+export LC_PAPER="en_GB.UTF-8"
+export LC_NAME="en_GB.UTF-8"
+export LC_ADDRESS="en_GB.UTF-8"
+export LC_TELEPHONE="en_GB.UTF-8"
+export LC_MEASUREMENT="en_GB.UTF-8"
+export LC_IDENTIFICATION="en_GB.UTF-8"
+export LC_ALL="en_GB.UTF-8"
 
 #### Set ssh agent with key for every VM at startup
 env=~/.ssh/agent_$(hostname).env
@@ -95,25 +96,10 @@ fi
 
 unset env
 
-alias reniceJobs="/disks/DATA/Scripts/reniceJobs.pl"
+
 alias killJobs="/disks/DATA/Scripts/killJobs.pl"
-alias textUser="/disks/DATA/Scripts/textUser.pl"
-alias gcta="/disks/DATA/Softwares/gcta/gcta_latest/gcta64"
-alias gtool="/disks/DATA/Softwares/Gtool/gtool_latest/gtool"
-alias impute2="/disks/DATA/Softwares/Impute2/impute2_latest/impute2"
-alias plink="/disks/DATA/Softwares/plink/plink_latest/plink"
-alias shapeit="/disks/DATA/Softwares/ShapeIt/shapeit_latest/shapeit"
-alias snptest="/disks/DATA/Softwares/Snptest/snptest_latest/snptest"
-alias fastqtl="/disks/DATA/Softwares/FastQTL/FastQTL_latest/bin/fastQTL"
-alias bcftools="/disks/DATA/Softwares/bcftools/bcftools_latest/bcftools/bcftools"
-alias bgzip="/disks/DATA/Softwares/htslib/htslib_latest/bgzip"
-alias tabix="/disks/DATA/Softwares/htslib/htslib_latest/tabix"
-alias epacts="/disks/DATA/Softwares/EPACTS/EPACTS_latest/bin/epacts"
-alias qctool="/disks/DATA/Softwares/qctool/qctool_latest/qctool"
-alias vcftools="/disks/DATA/Softwares/vcftools/vcftools_latest/bin/vcftools"
-alias makeProject="/disks/PROJECT/Mickael/DEV/DefaultProjectFiles/makeProject.sh"
 alias R="R --no-save --no-restore-data"
-alias fex="/disks/DATA/Softwares/FEX/fexsend"
+
 
 alias gaa="git add --all"
 alias gam="git commit -am"

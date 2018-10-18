@@ -1,12 +1,14 @@
 pretty_kable <- function (
-    data, 
-    font_size = 12, 
-    format_args = list(scientific = -1, digits = 3, big.mark = ","), 
-    col.names = NA,
-    pval_cols = NULL,
-    full_width,
-    ...
+  data, 
+  font_size = 12, 
+  format_args = list(scientific = -1, digits = 3, big.mark = ","), 
+  col.names = NA,
+  pval_cols = NULL,
+  full_width,
+  ...
 ) {
+  require(Hmisc)
+  require(knitr)
 	format_pval <- function (x, thresh = 10^-2, digits = 3, eps = 1e-50) {
 		ifelse(
 			x>=thresh, 
@@ -42,9 +44,4 @@ pretty_kable <- function (
       font_size = font_size
     )
   }
-}
-
-mykable <- function(...) {
-  warning("'mykable()' is deprecated, please use 'pretty_kable()' instead!")
-  pretty_kable(...)
 }

@@ -1,4 +1,5 @@
 pval_trans <- function() {
+  require(scales)
   neglog10_breaks <- function(n = 5) {
     function(x) {
       rng <- -log(range(x, na.rm = TRUE), base = 10)
@@ -12,7 +13,7 @@ pval_trans <- function() {
       }
     }
   }
-  trans_new(
+  scales::trans_new(
     name = "pval",
     transform = function(x) {
       -log(x, 10)
@@ -24,7 +25,7 @@ pval_trans <- function() {
     domain = c(1e-300, 1),
     format = function(x) {
       parse(
-        text = scientific_format()(x) %>%
+        text = scales::scientific_format()(x) %>%
           gsub("1e+00", "1", ., fixed = TRUE) %>%
           gsub("e", " %*% 10^", .)
       )

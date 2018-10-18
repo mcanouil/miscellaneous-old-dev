@@ -13,7 +13,7 @@
 #' @rdname sem
 #' @export 
 sem <- function (x, na.rm = TRUE) {
-    sqrt(
-        (mean(x^2, na.rm = na.rm)-mean(x, na.rm = na.rm)^2) / sum(!is.na(x))
-    )
+  sqrt(
+    (mean(x^2, na.rm = na.rm)-mean(x, na.rm = na.rm)^2) / sum(!is.na(x))
+  )
 }

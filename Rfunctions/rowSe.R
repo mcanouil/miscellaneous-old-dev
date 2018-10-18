@@ -13,11 +13,11 @@
 #' @rdname rowSe
 #' @export 
 rowSe <- function (x, na.rm = TRUE) {
-    if (na.rm) {
-        n <- rowSums(!is.na(x))
-    } else {
-        n <- nrow(x)
-    }
-    rowVar <- rowMeans(x*x, na.rm = na.rm) - (rowMeans(x, na.rm = na.rm))^2
-    return(sqrt(rowVar/n))
+  if (na.rm) {
+    n <- rowSums(!is.na(x))
+  } else {
+    n <- nrow(x)
+  }
+  rowVar <- rowMeans(x*x, na.rm = na.rm) - (rowMeans(x, na.rm = na.rm))^2
+  return(sqrt(rowVar/n))
 }

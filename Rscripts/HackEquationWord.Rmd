@@ -1,34 +1,33 @@
 ---
 output:
-    html_document:
-        keep_md: true
+  html_document:
+    keep_md: true
 ---
 # The code
 ```{r cache = TRUE, include = TRUE} 
 is_docx_output <- function (fmt = knitr:::pandoc_to()) {
-    if (length(fmt) == 0) {
-        return(FALSE)
-    } else {
-        return(fmt == "docx")
-
-    }
+  if (length(fmt) == 0) {
+    return(FALSE)
+  } else {
+    return(fmt == "docx")
+  }
 }
 
 numberEq.docx <- function (eq, lab, envir = docx.eqcounter) {
-    assign(x = "counter", value = get(x = "counter", envir = envir)+1, envir = envir)
-    assign(x = gsub("eq:", "", lab), value = get(x = "counter", envir = envir), envir = envir)
-    lab <- get("counter", envir = envir)
-    return(paste0('$$', eq, '\\;\\;\\;\\;(', lab, ')', '$$'))
+  assign(x = "counter", value = get(x = "counter", envir = envir)+1, envir = envir)
+  assign(x = gsub("eq:", "", lab), value = get(x = "counter", envir = envir), envir = envir)
+  lab <- get("counter", envir = envir)
+  return(paste0('$$', eq, '\\;\\;\\;\\;(', lab, ')', '$$'))
 }
 
 labEq.docx <- function (lab, envir = docx.eqcounter) {
-    return(paste0('(', get(x = gsub("eq:", "", lab), envir = envir), ')'))
+  return(paste0('(', get(x = gsub("eq:", "", lab), envir = envir), ')'))
 }
 
 # if (is_docx_output()) {
-    docx.eqcounter <- new.env()
-    docx.eqcounter$counter <- 0
-# } else {}
+  docx.eqcounter <- new.env()
+  docx.eqcounter$counter <- 0
+# }
 ```
 
 # Start writing math expressions

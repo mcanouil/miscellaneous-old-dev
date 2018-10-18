@@ -26,7 +26,7 @@ simulateJM <- compiler::cmpfun(function(n, times, thetas, gamma, maf, Epsilon_th
     # RNGstate <- structure(seed, kind = as.list(RNGkind()))
     # on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
     on.exit(rm(".Random.seed", envir = .GlobalEnv))
-  } else {}
+  }
 
   dta <- data.frame(ID = rep(seq_len(n), each = length(times)))
   dta[, "Time"] <- rep(times, times = n)
@@ -63,7 +63,7 @@ simulateJM <- compiler::cmpfun(function(n, times, thetas, gamma, maf, Epsilon_th
     dta[dta[, "Time"] < dta[, "DiscreteEventTime"], "Yobs"] <- dta[dta[, "Time"] < dta[, "DiscreteEventTime"], "Y"]
 
     # 1-prop.table(table(subset(dta, Time==0)[, "Event"]))["0"]
-  } else {}
+  }
   return(dta)
 })
 

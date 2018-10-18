@@ -7,9 +7,9 @@ monofontoptions: 'Scale=0.7'
 params:
   output_code: FALSE
   n_cores: !r parallel::detectCores()
-  theme_dark: FALSE
   dpi: 120
-  gg_fontsize: 9
+  gg_fontsize: 12
+  theme_dark: TRUE
 output:
   bookdown::html_document2:
     theme: simplex
@@ -37,11 +37,11 @@ output:
 options(stringsAsFactors = FALSE)
 
 script_name <- ""
-main_directory <- gsub("Scripts", "", getwd())
-working_directory <- gsub("/PROJECT/", "/DATATMP/", main_directory)
+project_directory <- gsub("Scripts", "", getwd())
+working_directory <- gsub("/PROJECT/", "/DATATMP/", project_directory)
 output_directory <- paste0(working_directory, "/", script_name)
 
-dir.create(paste0(output_directory, "/KnitrFiles/"), recursive = TRUE, showWarnings = FALSE)
+dir.create(paste0(output_directory, "/KnitrFiles/"), recursive = TRUE, showWarnings = FALSE, mode = '0777')
 
 
 ### Load packages and functions
@@ -54,12 +54,7 @@ library(grid)
 tidyverse_conflicts()
 
 source("/disks/PROJECT/Rscripts/MC/format_pval.R")
-source("/disks/PROJECT/Rscripts/MC/ggheatmap.R")
-source("/disks/PROJECT/Rscripts/MC/ggmanhattan.R")
-source("/disks/PROJECT/Rscripts/MC/ggqqplot.R")
 source("/disks/PROJECT/Rscripts/MC/pretty_kable.R")
-
-source("/disks/PROJECT/Rscripts/MC/theme_black.R")
 
 
 ### Set knitr rmarkdown chunk options
@@ -74,7 +69,7 @@ knitr::opts_chunk$set(
   crop = TRUE,
   autodep = TRUE,
   fig.align = 'center',
-  fig.pos = '!H',
+  fig.pos = '!h',
   dpi = params$dpi,
   fig.path = paste0(output_directory, "/KnitrFiles/"),
   cache = FALSE,
@@ -98,8 +93,8 @@ n_cores <- params$n_cores
 
 
 ### Define theme
-theme_dark <- params$theme_dark
-if (theme_dark) {
+if (params$theme_dark) {
+  source("/disks/PROJECT/Rscripts/MC/theme_black.R")
   theme_set(theme_black(base_size = params$gg_fontsize))
 } else {
   theme_set(theme_light(base_size = params$gg_fontsize))

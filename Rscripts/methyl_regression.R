@@ -1,4 +1,4 @@
-methylRegression <- function (
+methyl_regression <- function (
   betamatrix, phenotype, gcase = "G1", gcontrol = "G3", concov = "OFF", padj = "bonferroni", nCPU = 70
 ) {
   grouplev <- phenotype[colnames(betamatrix), "Sample_Group"]

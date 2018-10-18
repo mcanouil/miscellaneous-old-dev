@@ -40,7 +40,7 @@ pca_report <- function(
     )
   }
 
-  pca_res <- flashpca(
+  pca_res <- flashpcaR::flashpca(
     X = t(as.matrix(data)),
     stand = "sd",
     ndim = n_comp
@@ -50,21 +50,21 @@ pca_report <- function(
     `[[`("projection") %>%
     as.data.frame() %>%
     `colnames<-`(paste0("PC", seq_len(ncol(.)))) %>%
-    mutate(Sample_ID = as.character(colnames(data))) %>% 
-    left_join(x = design, y = ., by = id_var) %>% 
+    dplyr::mutate(Sample_ID = as.character(colnames(data))) %>% 
+    dplyr::left_join(x = design, y = ., by = id_var) %>% 
     as.data.frame()
 
 
   cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA inertia contribution {-}\n"))
-  p <- data_frame(
+  p <- dplyr::data_frame(
     y = (pca_res$values / sum(pca_res$values)), 
     x = sprintf("PC%02d", seq_along(pca_res$values))
   ) %>%
-    mutate(cumsum = cumsum(y)) %>%
-    ggplot(aes(x = x, y = y)) +
-    geom_bar(stat = "identity", width = 1, colour = "white", fill = "#3B528BFF") +
-    scale_y_continuous(labels = percent) +
-    labs(y = "Inertia", x = "PCA Components")
+    dplyr::mutate(cumsum = cumsum(y)) %>%
+    ggplot2::ggplot(ggplot2::aes(x = x, y = y)) +
+    ggplot2::geom_bar(stat = "identity", width = 1, colour = "white", fill = "#3B528BFF") +
+    ggplot2::scale_y_continuous(labels = scales::percent) +
+    ggplot2::labs(y = "Inertia", x = "PCA Components")
   print(p)
   cat("\n")
 
@@ -80,15 +80,15 @@ pca_report <- function(
         tmp[, "Y.PC"] <- icoord[2]
         return(tmp)
       })) %>%
-        ggplot(aes_string(x = "X", y = "Y", colour = ivar)) +
-        geom_hline(aes(yintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
-        geom_vline(aes(xintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
-        geom_point(shape = 4, size = 2) +
-        stat_ellipse(type = "norm") +
-        scale_colour_viridis_d() +
-        labs(x = NULL, y = NULL) +
-        facet_grid(Y.PC ~ X.PC, scales = "free") +
-        guides(colour = ifelse(length(unique(pca_dfxy[, ivar])) <= 12, "legend", "none"))
+        ggplot2::ggplot(ggplot2::aes_string(x = "X", y = "Y", colour = ivar)) +
+        ggplot2::geom_hline(ggplot2::aes(yintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
+        ggplot2::geom_vline(ggplot2::aes(xintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
+        ggplot2::geom_point(shape = 4, size = 2) +
+        ggplot2::stat_ellipse(type = "norm") +
+        ggplot2::scale_colour_viridis_d() +
+        ggplot2::labs(x = NULL, y = NULL) +
+        ggplot2::facet_grid(Y.PC ~ X.PC, scales = "free") +
+        ggplot2::guides(colour = ifelse(length(unique(pca_dfxy[, ivar])) <= 12, "legend", "none"))
       print(p)
       cat("\n")
     }
@@ -100,21 +100,21 @@ pca_report <- function(
           form <- as.formula(paste0("PC", i, " ~ ", paste(keep_technical, collapse = " + ")))
           lm(form, data = .data) %>% 
             anova() %>% 
-            rownames_to_column(var = "term") %>% 
-            mutate(PC = i)
+            tibble::rownames_to_column(var = "term") %>% 
+            dplyr::mutate(PC = i)
         }) %>%
-          bind_rows()
+          dplyr::bind_rows()
       }) %>%
-      filter(term != "Residuals") %>%
-      mutate(term = gsub("factor\\((.*)\\)", "\\1", term)) %>%
-      ggplot(aes(x = factor(PC), y = term, fill = `Pr(>F)`)) +
-      geom_tile(colour = "white") +
-      geom_text(aes(label = scientific(`Pr(>F)`, digits = 2)), colour = "white", size = 3) +
-      scale_fill_viridis_c(name = "P-Value", na.value = "grey85", limits = c(0, 0.1)) +
-      theme(panel.grid = element_blank()) +
-      scale_x_discrete(expand = c(0, 0)) +
-      scale_y_discrete(expand = c(0, 0)) +
-      labs(x = "PCA Components", y = NULL)
+      dplyr::filter(term != "Residuals") %>%
+      dplyr::mutate(term = gsub("factor\\((.*)\\)", "\\1", term)) %>%
+      ggplot2::ggplot(ggplot2::aes(x = factor(PC), y = term, fill = `Pr(>F)`)) +
+      ggplot2::geom_tile(colour = "white") +
+      ggplot2::geom_text(ggplot2::aes(label = scales::scientific(`Pr(>F)`, digits = 2)), colour = "white", size = 3) +
+      ggplot2::scale_fill_viridis_c(name = "P-Value", na.value = "grey85", limits = c(0, 0.1)) +
+      ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+      ggplot2::scale_x_discrete(expand = c(0, 0)) +
+      ggplot2::scale_y_discrete(expand = c(0, 0)) +
+      ggplot2::labs(x = "PCA Components", y = NULL)
     print(p)
     cat("\n")
   }
@@ -127,9 +127,9 @@ pca_report <- function(
       `^`(2) %>%
       rowSums() %>%
       sqrt() %>%
-      data_frame(EuclideanDistance = .) %>%
-      rownames_to_column(var = id_var) %>%
-      mutate(
+      dplyr::data_frame(EuclideanDistance = .) %>%
+      tibble::rownames_to_column(var = id_var) %>%
+      dplyr::mutate(
         BadSamplesLogical = 
           EuclideanDistance <= 
             (median(EuclideanDistance) - outliers_threshold * IQR(EuclideanDistance)) |
@@ -137,14 +137,14 @@ pca_report <- function(
             (median(EuclideanDistance) + outliers_threshold * IQR(EuclideanDistance)),
         BadSamples = factor(ifelse(BadSamplesLogical, "BAD", "GOOD"), levels = c("BAD", "GOOD"))
       ) %>%
-      column_to_rownames(var = id_var)
+      tibble::column_to_rownames(var = id_var)
   
     pca_dfxy <- merge(
       x = pca_dfxy,
       y = pca_outliers,
       by = "row.names"
     ) %>%
-      column_to_rownames(var = "Row.names")
+      tibble::column_to_rownames(var = "Row.names")
     
     ivar <- "BadSamples"
     
@@ -156,20 +156,20 @@ pca_report <- function(
       tmp[, "Y.PC"] <- icoord[2]
       return(tmp)
     })) %>%
-      ggplot(aes_string(x = "X", y = "Y", colour = ivar)) +
-      geom_hline(aes(yintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
-      geom_vline(aes(xintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
-      geom_point(shape = 4, size = 2) +
-      stat_ellipse(type = "norm") +
+      ggplot2::ggplot(ggplot2::aes_string(x = "X", y = "Y", colour = ivar)) +
+      ggplot2::geom_hline(ggplot2::aes(yintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = 0), colour = ifelse(theme_dark, "white", "black")) +
+      ggplot2::geom_point(shape = 4, size = 2) +
+      ggplot2::stat_ellipse(type = "norm") +
       scale_colour_viridis(discrete = TRUE) +
-      labs(x = NULL, y = NULL) +
-      facet_grid(Y.PC ~ X.PC, scales = "free")
+      ggplot2::labs(x = NULL, y = NULL) +
+      ggplot2::facet_grid(Y.PC ~ X.PC, scales = "free")
     print(p)
     cat("\n")
     
     pca.dfxy %>%
-      select(-starts_with("PC")) %>%
-      filter(BadSamples == "BAD") %>%
+      dplyr::select(-dplyr::starts_with("PC")) %>%
+      dplyr::filter(BadSamples == "BAD") %>%
       return()
   }
   return(invisible())

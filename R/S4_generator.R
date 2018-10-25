@@ -22,7 +22,7 @@ set_class_S4 <- function(name, field, type, file = paste0(name, "-Class.R"), app
   length_field <- length(field)
   code <- c(
     "### Class definition ###\n",
-    "set.class(\n  Class = \"", name, "\", \n  representation = representation(\n",
+    "setClass(\n  Class = \"", name, "\", \n  representation = representation(\n",
     paste0(paste0(sapply(seq(length_field), function(i) {
       paste0("    ", field[i], " = \"", type[i], "\"")
     }), collapse = ", \n"), "\n"),

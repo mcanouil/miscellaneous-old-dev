@@ -666,7 +666,7 @@ ggheatmap <- function(
   if (length(label.v.colour) == 1) {
     label.v.colour <- rep(label.v.colour, length(col_hc$order))
   }
-  label.v.colour <- as.character(label.v.colour[rev(col_hc$order)])
+  label.v.colour <- as.character(label.v.colour[col_hc$order])
 
   row_data <- gap_data(
     d = d_row,

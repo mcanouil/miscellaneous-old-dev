@@ -132,7 +132,7 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
 
   x_breaks <- data %>% 
     dplyr::group_by(x_chr) %>% 
-    dplyr::summarise(x_med = median(x_pos)) %>% 
+    dplyr::summarise(x_med = min(x_pos)+diff(range(x_pos))/2) %>% 
     dplyr::select(x_chr, x_med)
 
   p <- ggplot2::ggplot(data = data, mapping = ggplot2::aes(x = x_pos, y = y_pval, colour = x_chr)) +

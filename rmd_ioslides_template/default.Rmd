@@ -9,7 +9,7 @@ params:
   eval: TRUE
 output:
   ioslides_presentation:
-    css: 'template/shiny-slides.css'
+    css: 'template/dark.css'
     logo: 'template/logo_UMR.png'
     smaller: false
     self_contained: true
@@ -37,7 +37,7 @@ library(knitr)
 library(rmarkdown)
 library(kableExtra)
 
-devtools::source_url('https://github.com/mcanouil/DEV/raw/master/Rfunctions/theme_black.R')
+devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/theme_black.R')
 
 options("width" = 80)
 ### Set knitr rmarkdown chunk options
@@ -63,8 +63,6 @@ opts_chunk$set(
 theme_set(theme_black(base_size = 11))
 
 # options(tibble.print_max = 3, tibble.print_min = 3)
-
-
 ```
 
 # Title | Subtitle {.flexbox .vcenter}

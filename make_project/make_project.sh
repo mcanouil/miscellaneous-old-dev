@@ -2,9 +2,9 @@
 
 project_name=$1
 
-mkdir -p -m 777 /disks/PROJECT/$project_name
+mkdir -p -m 777 ~/$project_name
 
-echo "Engineer: Mickaël Canouil" >> /disks/PROJECT/$project_name/README.md
+echo "Engineer: Mickaël Canouil" >> ~/$project_name/README.md
 
 printf "Version: 1.0
 
@@ -26,24 +26,21 @@ BuildType: Custom
 CustomScriptPath: Scripts/_build.sh
 
 QuitChildProcessesOnExit: Yes
-" > /disks/PROJECT/$project_name/$project_name.Rproj
+" > ~/$project_name/$project_name.Rproj
 
-for ifile in "Docs" "Report" "Scripts"
+for ifile in "Docs" "Report" "Scripts" "Data"
 do
-  mkdir /disks/PROJECT/$project_name/$ifile
+  mkdir -p -m 777 ~/$project_name/$ifile
 done
 
-mkdir -p -m 777 /disks/DATATMP/$project_name
-ln -s /disks/DATATMP/$project_name /disks/PROJECT/$project_name/Data
+cat ~/DEV/make_project/default_script.R \
+  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/00-main.R
 
-cat /disks/PROJECT/BIOSTAT_TEAM/make_project/default_script.R \
-  | sed -e "s/PRJCT/$project_name/g" > /disks/PROJECT/$project_name/Scripts/00-main.R
+cat ~/DEV/make_project/default_script.Rmd \
+  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/00-main.Rmd
 
-cat /disks/PROJECT/BIOSTAT_TEAM/make_project/default_script.Rmd \
-  | sed -e "s/PRJCT/$project_name/g" > /disks/PROJECT/$project_name/Scripts/00-main.Rmd
-
-cat /disks/PROJECT/BIOSTAT_TEAM/make_project/default_script.sh \
-  | sed -e "s/PRJCT/$project_name/g" > /disks/PROJECT/$project_name/Scripts/_build.sh
+cat ~/DEV/make_project/default_script.sh \
+  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/_build.sh
 
 echo '/*
 
@@ -70,14 +67,16 @@ echo '/*
 **.pdf
 
 !/Scripts/
+!/Docs/*
+!/Report/*
 !README.md
-' > /disks/PROJECT/$project_name/.gitignore
+' > ~/$project_name/.gitignore
 
-git -C /disks/PROJECT/$project_name/ init
-git -C /disks/PROJECT/$project_name/ remote add origin git@gitlab.egid.local:BioStat/$project_name.git
-git -C /disks/PROJECT/$project_name/ add --all
-git -C /disks/PROJECT/$project_name/ commit -am 'create project'
-chmod 777 -R /disks/PROJECT/$project_name/.git
+git -C ~/$project_name/ init
+git -C ~/$project_name/ remote add origin git@github.com:mcanouil/$project_name.git
+git -C ~/$project_name/ add --all
+git -C ~/$project_name/ commit -am 'create project'
+# chmod 777 -R ~/$project_name/.git
 # git push -u origin master
 
-# /disks/PROJECT/BIOSTAT_TEAM/make_project/make_project.sh ""
+# ~/DEV/make_project/make_project.sh ""

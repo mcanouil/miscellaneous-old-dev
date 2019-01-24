@@ -1,27 +1,25 @@
-# rm(list = ls())
 options(stringsAsFactors = FALSE)
 
-script_name <- ""
-project_directory <- getwd()
-working_directory <- gsub("/PROJECT/", "/DATATMP/", project_directory)
-output_directory <- paste0(working_directory, "/", script_name)
+script_name <- ''
+project_directory <- '~/PRJCT'
+working_directory <- paste0(project_directory, '/Data')
+output_directory <- paste0(working_directory, script_name, sep = '/')
 
-# setwd(working_directory)
 
 params <- list(
   n_cores = parallel::detectCores(),
+  theme_dark = TRUE,
   gg_fontsize = 12
 )
 
 
 ### Load packages
 library(parallel)
+library(grid)
 library(tidyverse)
 library(scales)
-library(grid)
-library(broom)
 
-tidyverse_conflicts()
+devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/theme_black.R')
 
 
 ### Define n_cores
@@ -29,8 +27,11 @@ n_cores <- params$n_cores
 
 
 ### Define theme
-devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/theme_black.R') 
-theme_set(theme_black(base_size = params$gg_fontsize))
+if (params$theme_dark) {
+  theme_set(theme_black(base_size = params$gg_fontsize))
+} else {
+  theme_set(theme_light(base_size = params$gg_fontsize))
+}
 
 
 ###

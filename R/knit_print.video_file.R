@@ -1,3 +1,4 @@
+require(rlang)
 knit_print.video_file <- function(x, options, ...) {
   if (grepl('\\.(mp4)|(webm)|(ogg)$', x, ignore.case = TRUE)) {
     knitr::knit_print(
@@ -32,6 +33,6 @@ as_html_video <- function(x, width = NULL, autoplay = TRUE) {
   ))
 }
 
-get_chunk_autoplay <- function (options) {
+get_chunk_autoplay <- function(options) {
   options$autoplay %||% TRUE
 }

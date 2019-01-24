@@ -1,8 +1,8 @@
 #!/bin/sh
 
 R --slave --silent <<RSCRIPT
-project_directory <- '/disks/PROJECT/PRJCT'
-report_directory <- '/disks/PROJECT/Report/PRJCT'
+project_directory <- '~/PRJCT'
+report_directory <- paste0(project_directory, '/Report')
 
 dir.create(path = report_directory, recursive = TRUE, showWarnings = FALSE, mode = '0777')
 
@@ -15,6 +15,5 @@ rmarkdown::render(
 )
 RSCRIPT
 
-git -C /disks/PROJECT/Report/PRJCT/ add 00-main.html
-git -C /disks/PROJECT/Report/PRJCT/ commit -a 00-main.html -m 'Update report PRJCT'
-
+git -C ~/PRJCT/Report add 00-main.html
+git -C ~/PRJCT/Report commit -a 00-main.html -m 'Update report PRJCT'

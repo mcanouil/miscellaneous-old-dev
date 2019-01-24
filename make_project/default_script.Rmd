@@ -1,7 +1,7 @@
 ---
 title: 'PRJCT'
 author: 'Mickaël Canouil, *Ph.D.*'
-date: '`r format(Sys.time(), "%B %d, %Y (%Hh%M)")`'
+date: '`r format(Sys.time(), '%B %d, %Y (%Hh%M)')`'
 monofont: 'Source Code Pro'
 monofontoptions: 'Scale=0.7'
 params:
@@ -23,69 +23,47 @@ output:
     self_contained: true
     mathjax: default
     df_print: kable
-  pdf_document:
-    toc: true
-    toc_depth: 2
-    fig_width: 6.3
-    fig_height: 4.7
-    number_sections: true
-    df_print: kable
-    latex_engine: 'pdflatex'
 ---
 
 ```{r setup, include = FALSE}
 options(stringsAsFactors = FALSE)
 
-script_name <- ""
-project_directory <- gsub("Scripts", "", getwd())
-working_directory <- gsub("/PROJECT/", "/DATATMP/", project_directory)
-output_directory <- paste0(working_directory, "/", script_name)
+script_name <- ''
+project_directory <- '~/PRJCT'
+working_directory <- paste0(project_directory, '/Data')
+output_directory <- paste0(working_directory, script_name, sep = '/')
 
-dir.create(paste0(output_directory, "/KnitrFiles/"), recursive = TRUE, showWarnings = FALSE, mode = '0777')
+dir.create(paste0(output_directory, '/KnitrFiles/'), recursive = TRUE, showWarnings = FALSE, mode = '0777')
 
 
-### Load packages and functions
-library(tidyverse)
-library(broom)
-library(scales)
+### Load packages
 library(parallel)
 library(grid)
+library(tidyverse)
+library(scales)
 
-tidyverse_conflicts()
-
-source("/disks/PROJECT/Rscripts/MC/format_pval.R")
-source("/disks/PROJECT/Rscripts/MC/pretty_kable.R")
+devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/theme_black.R')
+devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/pretty_kable.R')
 
 
 ### Set knitr rmarkdown chunk options
 knitr::opts_chunk$set(
-  results = "asis",
-  size = 'small',
+  results = 'asis',
+  dpi = params$dpi,
   include = TRUE,
   echo = params$output_code,
   warning = params$output_code,
   message = params$output_code,
+  size = 'small',
   tidy = FALSE,
   crop = TRUE,
   autodep = TRUE,
   fig.align = 'center',
-  fig.pos = '!h',
-  dpi = params$dpi,
-  fig.path = paste0(output_directory, "/KnitrFiles/"),
+  fig.pos = '!H',
   cache = FALSE,
-  cache.path = paste0(output_directory, "/KnitrFiles/")
+  cache.path = paste0(output_directory, '/KnitrFiles/'),
+  fig.path = paste0(output_directory, '/KnitrFiles/')
 )
-
-
-### Code to resize font size of R code chunks output according to 'size' option (only LATEX)
-if (knitr:::is_latex_output()) {
-  knitr::knit_hooks$set(chunk = function(x, options) {
-    if (options$size != "normalsize") {
-      x <- paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize")
-    }
-    return(x)
-  })
-}
 
 
 ### Define n_cores
@@ -94,7 +72,6 @@ n_cores <- params$n_cores
 
 ### Define theme
 if (params$theme_dark) {
-  source("/disks/PROJECT/Rscripts/MC/theme_black.R")
   theme_set(theme_black(base_size = params$gg_fontsize))
 } else {
   theme_set(theme_light(base_size = params$gg_fontsize))

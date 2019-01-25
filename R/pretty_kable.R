@@ -9,6 +9,7 @@ pretty_kable <- function (
 ) {
   require(Hmisc)
   require(knitr)
+  require(kableExtra)
 	format_pval <- function (x, thresh = 10^-2, digits = 3, eps = 1e-50) {
 		ifelse(
 			x>=thresh, 
@@ -23,7 +24,7 @@ pretty_kable <- function (
     )
   }
   colnames(data) <- Hmisc::capitalize(colnames(data))
-  if (knitr:::is_latex_output()) {
+  out <- if (knitr:::is_latex_output()) {
     options(knitr.table.format = "latex")
     output <- knitr::kable(x = data, booktabs = TRUE, format.args = format_args, col.names = col.names, ...)
     kableExtra::kable_styling(
@@ -44,4 +45,6 @@ pretty_kable <- function (
       font_size = font_size
     )
   }
+  print(out)
+  return(invisible(out))
 }

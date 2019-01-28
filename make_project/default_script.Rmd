@@ -1,7 +1,7 @@
 ---
 title: 'PRJCT'
 author: 'Mickaël Canouil, *Ph.D.*'
-date: '`r format(Sys.time(), '%B %d, %Y (%Hh%M)')`'
+date: '`r format(Sys.time(), "%B %d, %Y (%Hh%M)")`'
 monofont: 'Source Code Pro'
 monofontoptions: 'Scale=0.7'
 params:

@@ -167,7 +167,7 @@ plot.ggplot <- print.ggplot <- function(x, newpage = is.null(vp), vp = NULL, ...
   if (newpage) {
     grid::grid.newpage()
   }
-  grid:::grid.rect(gp = grid::gpar(fill = base_colour, col = base_colour))
+  grid::grid.rect(gp = grid::gpar(fill = base_colour, col = base_colour))
   grDevices::recordGraphics(
     requireNamespace("ggplot2", quietly = TRUE),
     list(),

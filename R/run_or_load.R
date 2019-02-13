@@ -1,4 +1,4 @@
- run_or_load <- function(rds_path, expr) {
+ run_or_load <- function(expr, rds_path = tempfile(pattern = 'cache_rol', fileext = '.rds')) {
   sub_expr <- paste(deparse(substitute(expr)), collapse = "")
 
   if (!file.exists(rds_path)) {
@@ -27,5 +27,5 @@
   # }
 }
 
-# run_or_load(rds_path = "./test.rds", expr = {x <- 1+1})
-# x <- run_or_load(rds_path = "./test.rds", expr = {1+1})
+# run_or_load(expr = {x <- 1+1})
+# x <- run_or_load( expr = {1+1})

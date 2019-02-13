@@ -1,3 +1,14 @@
+#-------------------------------------------------------------------------------
+# Name - MiST: Mixed effects Score Test for continuous outcomes
+# Desc - Test for association between a set of SNPS/genes and continuous 
+#        or binary outcomes by including variant characteristic information 
+#        and using (weighted) score statistics.
+# Version - 1.1.0
+# Author - Mickaël Canouil, Ph.D.
+# From - https://cran.r-project.org/package=MiST
+# References - https://doi.org/10.1002/gepi.21717
+#-------------------------------------------------------------------------------
+
 mist <- function(y, X, G, Z, method = "liu", model = c("guess", "continuous", "binary")) {
   check_y <- c("continuous", "binary")[(length(unique(y))==2)+1]
   if (any(grepl("guess", model))) {

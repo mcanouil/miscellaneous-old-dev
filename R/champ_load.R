@@ -1,5 +1,12 @@
 # Function from ChAMP package customised to allow multiple csv files in root directory
 
+# library(limma)
+# library(minfi)
+# library(glue)
+# library(ChAMP)
+# library(illuminaio)
+# library(SummarizedExperiment)
+
 check_sample_sheet <- function(
   base, 
   pattern = "csv$", 
@@ -7,7 +14,6 @@ check_sample_sheet <- function(
   recursive = TRUE, 
   full.names = TRUE
 ) {
-  require(glue)
   list_files <- list.files(
     path = base, 
     pattern = pattern, 
@@ -24,11 +30,13 @@ check_sample_sheet <- function(
   if (length(dataheader) == 0) {
     dataheader <- 0
   }
-  col_names <- colnames(read.csv(file = list_files, stringsAsFactor = FALSE, skip = dataheader, nrows = 1))
+  col_names <- colnames(utils::read.csv(file = list_files, stringsAsFactor = FALSE, skip = dataheader, nrows = 1))
   default_cols <- c(
-    "Sample_ID", "Sample_Plate", "Sample_Well", 
+    "Sample_ID", 
+    # "Sample_Plate", "Sample_Well", 
     "Sentrix_ID", "Sentrix_Position"
   )
+  
   cols_missing <- default_cols[!default_cols%in%col_names]
   if (length(cols_missing)!=0) {
     stop(
@@ -78,13 +86,13 @@ read_metharray <- function(basenames, extended = FALSE, verbose = FALSE, force =
     )
   }
   stime <- system.time({
-    G.idats <- mclapply(G.files, mc.cores = nCores, mc.preschedule = FALSE, function(xx) {
+    G.idats <- parallel::mclapply(G.files, mc.cores = nCores, mc.preschedule = FALSE, function(xx) {
       if (verbose) {
         message("[read.metharray] Reading", basename(xx))
       }
       illuminaio::readIDAT(xx)
     })
-    R.idats <- mclapply(R.files, mc.cores = nCores, mc.preschedule = FALSE, function(xx) {
+    R.idats <- parallel::mclapply(R.files, mc.cores = nCores, mc.preschedule = FALSE, function(xx) {
       if (verbose) {
         message("[read.metharray] Reading", basename(xx))
       }
@@ -106,7 +114,7 @@ read_metharray <- function(basenames, extended = FALSE, verbose = FALSE, force =
   ptime1 <- proc.time()
   allNProbes <- sapply(G.idats, function(xx) nrow(xx$Quants))
   arrayTypes <- cbind(
-    do.call(rbind, mclapply(allNProbes, mc.cores = nCores, mc.preschedule = FALSE, minfi:::.guessArrayTypes)),
+    do.call("rbind", parallel::mclapply(allNProbes, mc.cores = nCores, mc.preschedule = FALSE, minfi:::.guessArrayTypes)),
     size = allNProbes
   )
   sameLength <- (length(unique(arrayTypes[, "size"])) == 1)
@@ -120,28 +128,28 @@ read_metharray <- function(basenames, extended = FALSE, verbose = FALSE, force =
   if (!sameLength && sameArray && !force) {
     stop("[read.metharray] Trying to parse IDAT files with different array size but seemingly all of the same type.\n  You can force this by 'force=TRUE', see the man page ?read.metharray")
   }
-  commonAddresses <- as.character(Reduce("intersect", mclapply(
+  commonAddresses <- as.character(Reduce("intersect", parallel::mclapply(
     G.idats, mc.cores = nCores, mc.preschedule = FALSE,
     function(xx) rownames(xx$Quants)
   )))
-  GreenMean <- do.call(cbind, mclapply(G.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
+  GreenMean <- do.call("cbind", parallel::mclapply(G.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
       commonAddresses,
       "Mean"
     ]))
-  RedMean <- do.call(cbind, mclapply(R.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
+  RedMean <- do.call("cbind", parallel::mclapply(R.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
       commonAddresses,
       "Mean"
     ]))
   if (extended) {
-    GreenSD <- do.call(cbind, mclapply(G.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
+    GreenSD <- do.call("cbind", parallel::mclapply(G.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
         commonAddresses,
         "SD"
       ]))
-    RedSD <- do.call(cbind, mclapply(R.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
+    RedSD <- do.call("cbind", parallel::mclapply(R.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
         commonAddresses,
         "SD"
       ]))
-    NBeads <- do.call(cbind, mclapply(G.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
+    NBeads <- do.call("cbind", parallel::mclapply(G.idats, mc.cores = nCores, mc.preschedule = FALSE, function(xx) xx$Quants[
         commonAddresses,
         "NBeads"
       ]))
@@ -159,18 +167,15 @@ read_metharray <- function(basenames, extended = FALSE, verbose = FALSE, force =
   }
   ptime1 <- proc.time()
   if (extended) {
-    out <- RGChannelSetExtended(
+    out <- minfi::RGChannelSetExtended(
       Red = RedMean, Green = GreenMean,
       RedSD = RedSD, GreenSD = GreenSD, NBeads = NBeads
     )
   } else {
-    out <- RGChannelSet(Red = RedMean, Green = GreenMean)
+    out <- minfi::RGChannelSet(Red = RedMean, Green = GreenMean)
   }
   rownames(out) <- commonAddresses
-  out@annotation <- c(array = arrayTypes[1, 1], annotation = arrayTypes[
-    1,
-    2
-  ])
+  out@annotation <- c(array = arrayTypes[1, 1], annotation = arrayTypes[1, 2])
   ptime2 <- proc.time()
   stime <- (ptime2 - ptime1)[3]
   if (verbose) {
@@ -197,7 +202,7 @@ read_metharray_exp <- function(base = NULL, targets = NULL, extended = FALSE, re
     pD <- targets
     pD$filenames <- files
     rownames(pD) <- colnames(rgSet)
-    colData(rgSet) <- as(pD, "DataFrame")
+    SummarizedExperiment::colData(rgSet) <- as(pD, "DataFrame")
     return(rgSet)
   }
   Grn.files <- list.files(
@@ -249,43 +254,44 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
     message("[<<<< ChAMP.LOAD START >>>>>]")
     message("-----------------------------")
   }
-  mybeadcount <- function(x) {
-    nb <- getNBeads(x)
-    typeIadd <- getProbeInfo(x, type = "I")
-    typeImatchA <- match(typeIadd$AddressA, rownames(nb))
-    typeImatchB <- match(typeIadd$AddressB, rownames(nb))
-    typeIIadd <- getProbeInfo(x, type = "II")
-    typeIImatch <- match(typeIIadd$Address, rownames(nb))
-    nbcg <- nb
-    locusNames <- getManifestInfo(x, "locusNames")
-    bc_temp <- matrix(
-      NA_real_, ncol = ncol(x), nrow = length(locusNames),
-      dimnames = list(locusNames, sampleNames(x))
-    )
-    TypeII.Name <- getProbeInfo(x, type = "II")$Name
-    bc_temp[TypeII.Name, ] <- nbcg[getProbeInfo(x, type = "II")$AddressA, ]
-    TypeI <- getProbeInfo(x, type = "I")
-    bcB <- bc_temp
-    bcA <- bc_temp
-    bcB[TypeI$Name, ] <- nbcg[TypeI$AddressB, ]
-    bcA[TypeI$Name, ] <- nbcg[TypeI$AddressA, ]
-    bcB3 <- which(bcB < 3)
-    bcA3 <- which(bcA < 3)
-    bcA2 <- bcA
-    bcB2 <- bcB
-    bcA2[bcA3] <- NA
-    bcA2[bcB3] <- NA
-    bc <- data.frame(bcA2)
-    bc
-  }
+  
   if (method == "minfi") {
+    mybeadcount <- function(x) {
+      nb <- minfi::getNBeads(x)
+      typeIadd <- minfi::getProbeInfo(x, type = "I")
+      typeImatchA <- match(typeIadd$AddressA, rownames(nb))
+      typeImatchB <- match(typeIadd$AddressB, rownames(nb))
+      typeIIadd <- minfi::getProbeInfo(x, type = "II")
+      typeIImatch <- match(typeIIadd$Address, rownames(nb))
+      nbcg <- nb
+      locusNames <-  minfi::getManifestInfo(x, "locusNames")
+      bc_temp <- matrix(
+        NA_real_, ncol = ncol(x), nrow = length(locusNames),
+        dimnames = list(locusNames, minfi::sampleNames(x))
+      )
+      TypeII.Name <-  minfi::getProbeInfo(x, type = "II")$Name
+      bc_temp[TypeII.Name, ] <- nbcg[ minfi::getProbeInfo(x, type = "II")$AddressA, ]
+      TypeI <- minfi::getProbeInfo(x, type = "I")
+      bcB <- bc_temp
+      bcA <- bc_temp
+      bcB[TypeI$Name, ] <- nbcg[TypeI$AddressB, ]
+      bcA[TypeI$Name, ] <- nbcg[TypeI$AddressA, ]
+      bcB3 <- which(bcB < 3)
+      bcA3 <- which(bcA < 3)
+      bcA2 <- bcA
+      bcB2 <- bcB
+      bcA2[bcA3] <- NA
+      bcA2[bcB3] <- NA
+      bc <- data.frame(bcA2)
+      bc
+    }
     if (verbose) {
       message("\n[ Loading Data with Minfi Method ]")
       message("----------------------------------")
       message("Loading data from ", directory)
     }
     check_sample_sheet(base = directory, pattern = csvpattern)
-    suppressWarnings(targets <- read.metharray.sheet(base = directory, pattern = csvpattern, verbose = verbose))
+    suppressWarnings(targets <- minfi::read.metharray.sheet(base = directory, pattern = csvpattern, verbose = verbose))
     rgSet <- read_metharray_exp(
       targets = targets,
       extended = TRUE,
@@ -293,26 +299,23 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
       nCores = nCores
     )
     if (arraytype == "EPIC") {
-      rgSet@annotation <- c(
-        array = "IlluminaHumanMethylationEPIC",
-        annotation = "ilm10b3.hg19"
-      )
+      rgSet@annotation <- c(array = "IlluminaHumanMethylationEPIC", annotation = "ilm10b4.hg19")
     }
-    sampleNames(rgSet) <- rgSet[[1]]
-    pd <- pData(rgSet)
-    mset <- preprocessRaw(rgSet)
-    detP <- detectionP(rgSet)
+    minfi::sampleNames(rgSet) <- rgSet[[1]]
+    pd <- minfi::pData(rgSet)
+    mset <- minfi::preprocessRaw(rgSet)
+    detP <- minfi::detectionP(rgSet)
     if (verbose) {
       message("<< Read DataSet Success. >>\n")
     }
     if (methValue == "B") {
-      tmp <- getBeta(mset, "Illumina")
+      tmp <- minfi::getBeta(mset, "Illumina")
     } else {
-      tmp <- getM(mset)
+      tmp <- minfi::getM(mset)
     }
     tmp[detP >= detPcut] <- NA
     if (verbose) {
-      message("The fraction of failed positions per sample\n \n            (You may need to delete samples with high proportion of failed probes\n): ")
+      message("The fraction of failed positions per sample\n(You may need to delete samples with high proportion of failed probes\n): ")
     }
     numfail <- matrix(colMeans(is.na(tmp)))
     rownames(numfail) <- colnames(detP)
@@ -337,8 +340,7 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
     pd <- pd[RemainSample, ]
     tmp <- tmp[, RemainSample]
     if (filterDetP) {
-      mset.f <- mset[rowSums(is.na(tmp)) <= ProbeCutoff *
-        ncol(detP), ]
+      mset.f <- mset[rowSums(is.na(tmp)) <= ProbeCutoff * ncol(detP), ]
       if (verbose) {
         if (ProbeCutoff == 0) {
           message(
@@ -356,8 +358,7 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
         }
       }
       mset <- mset.f
-      tmp <- tmp[rowSums(is.na(tmp)) <= ProbeCutoff *
-        ncol(detP), ]
+      tmp <- tmp[rowSums(is.na(tmp)) <= ProbeCutoff * ncol(detP), ]
       message("<< Filter DetP Done. >>\n")
     }
     if (verbose) {
@@ -378,7 +379,7 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
       zz <- file("ImputeMessage.Rout", open = "wt")
       sink(zz)
       sink(zz, type = "message")
-      tmp <- impute.knn(tmp, k = 5)$data
+      tmp <- impute::impute.knn(tmp, k = 5)$data
       sink(type = "message")
       sink()
       if (verbose) {
@@ -388,8 +389,8 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
     if (filterBeads) {
       bc <- mybeadcount(rgSet)
       bc2 <- bc[rowSums(is.na(bc)) < beadCutoff * (ncol(bc)), ]
-      mset.f2 <- mset[featureNames(mset) %in% row.names(bc2), ]
-      tmp <- tmp[rownames(tmp) %in% row.names(bc2), ]
+      mset.f2 <- mset[minfi::featureNames(mset) %in% rownames(bc2), ]
+      tmp <- tmp[rownames(tmp) %in% rownames(bc2), ]
       if (verbose) {
         message(
           "Filtering probes with a beadcount <3 in at least ",
@@ -403,7 +404,7 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
       }
     }
     if (filterNoCG) {
-      mset.f2 <- dropMethylationLoci(mset, dropCH = T)
+      mset.f2 <- minfi::dropMethylationLoci(mset, dropCH = T)
       tmp <- tmp[rownames(tmp) %in% featureNames(mset.f2), ]
       if (verbose) {
         message(
@@ -422,7 +423,7 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
           if (verbose) {
             message("Using general 450K SNP list for filtering.")
           }
-          data(hm450.manifest.hg38)
+          data(hm450.manifest.hg38, package = "ChAMPdata")
           maskname <- rownames(hm450.manifest.hg38)[which(hm450.manifest.hg38$MASK.general == TRUE)]
         } else if (!population %in% c(
           "AFR", "EAS", "EUR",
@@ -435,13 +436,13 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
           if (verbose) {
             message("Using general 450K SNP list for filtering.")
           }
-          data(hm450.manifest.hg38)
+          data(hm450.manifest.hg38, package = "ChAMPdata")
           maskname <- rownames(hm450.manifest.hg38)[which(hm450.manifest.hg38$MASK.general == TRUE)]
         } else {
           if (verbose) {
             message("Using ", population, " specific 450K SNP list for filtering.")
           }
-          data(hm450.manifest.pop.hg38)
+          data(hm450.manifest.pop.hg38, package = "ChAMPdata")
           maskname <- rownames(hm450.manifest.pop.hg38)[which(hm450.manifest.pop.hg38[, paste("MASK.general", population, sep = ".")] == TRUE)]
         }
       } else {
@@ -449,7 +450,7 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
           if (verbose) {
             message("Using general EPIC SNP list for filtering.")
           }
-          data(EPIC.manifest.hg38)
+          data(EPIC.manifest.hg38, package = "ChAMPdata")
           maskname <- rownames(EPIC.manifest.hg38)[which(EPIC.manifest.hg38$MASK.general == TRUE)]
         } else if (!population %in% c(
           "AFR", "EAS", "EUR",
@@ -462,17 +463,17 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
           if (verbose) {
             message("Using general EPIC SNP list for filtering.")
           }
-          data(EPIC.manifest.hg38)
+          data(EPIC.manifest.hg38, package = "ChAMPdata")
           maskname <- rownames(EPIC.manifest.hg38)[which(EPIC.manifest.hg38$MASK.general == TRUE)]
         } else {
           if (verbose) {
             message("Using ", population, " specific EPIC SNP list for filtering.")
           }
-          data(EPIC.manifest.pop.hg38)
+          data(EPIC.manifest.pop.hg38, package = "ChAMPdata")
           maskname <- rownames(EPIC.manifest.pop.hg38)[which(EPIC.manifest.pop.hg38[, paste("MASK.general", population, sep = ".")] == TRUE)]
         }
       }
-      mset.f2 <- mset[!featureNames(mset) %in% maskname, ]
+      mset.f2 <- mset[!minfi::featureNames(mset) %in% maskname, ]
       tmp <- tmp[!rownames(tmp) %in% maskname, ]
       if (verbose) {
         message(
@@ -486,8 +487,8 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
       }
     }
     if (filterMultiHit) {
-      data(multi.hit)
-      mset.f2 <- mset[!featureNames(mset) %in% multi.hit$TargetID, ]
+      data(multi.hit, package = "ChAMPdata")
+      mset.f2 <- mset[!minfi::featureNames(mset) %in% multi.hit$TargetID, ]
       tmp <- tmp[!rownames(tmp) %in% multi.hit$TargetID, ]
       if (verbose) {
         message(
@@ -502,13 +503,13 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
     }
     if (filterXY) {
       if (arraytype == "EPIC") {
-        data(probe.features.epic)
+        data(probe.features.epic, package = "ChAMPdata")
       } else {
-        data(probe.features)
+        data(probe.features, package = "ChAMPdata")
       }
       autosomes <- probe.features[!probe.features$CHR %in% c("X", "Y"), ]
-      mset.f2 <- mset[featureNames(mset) %in% row.names(autosomes), ]
-      tmp <- tmp[rownames(tmp) %in% row.names(autosomes), ]
+      mset.f2 <- mset[minfi::featureNames(mset) %in% rownames(autosomes), ]
+      tmp <- tmp[rownames(tmp) %in% rownames(autosomes), ]
       if (verbose) {
         message(
           "Filtering probes on the X or Y chromosome has removed ",
@@ -530,7 +531,7 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
     }
     beta.raw <- tmp
     intensity <- minfi::getMeth(mset) + minfi::getUnmeth(mset)
-    detP <- detP[which(row.names(detP) %in% row.names(beta.raw)), ]
+    detP <- detP[which(rownames(detP) %in% rownames(beta.raw)), ]
     if (min(beta.raw, na.rm = TRUE) <= 0) {
       beta.raw[beta.raw <= 0] <- min(beta.raw[beta.raw > 0])
     }
@@ -564,9 +565,9 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
       message("----------------------------------")
       message("Note that ChAMP method will NOT return rgSet or mset, they object defined by minfi. Which means, if you use ChAMP method to load data, you can not use SWAN or FunctionNormliazation method in champ.norm() (you can use BMIQ or PBC still). But All other function should not be influenced.\n")
     }
-    myImport <- champ.import(directory, arraytype = arraytype)
+    myImport <- ChAMP::champ.import(directory, arraytype = arraytype)
     if (methValue == "B") {
-      myLoad <- champ.filter(
+      myLoad <- ChAMP::champ.filter(
         beta = myImport$beta, M = NULL,
         pd = myImport$pd, intensity = myImport$intensity,
         Meth = NULL, UnMeth = NULL, detP = myImport$detP,
@@ -579,7 +580,7 @@ champ_load <- function(directory = getwd(), method = "ChAMP", methValue = "B",
         filterXY = filterXY, arraytype = arraytype
       )
     } else {
-      myLoad <- champ.filter(
+      myLoad <- ChAMP::champ.filter(
         beta = NULL, M = myImport$M,
         pd = myImport$pd, intensity = myImport$intensity,
         Meth = NULL, UnMeth = NULL, detP = myImport$detP,
@@ -627,15 +628,15 @@ champ_DMP <- function(
     tmpbeta <- beta[, which(pheno %in% tmp_compare)]
     if (is.null(covariate)) {
       df <- data.frame(pheno = p)
-      design <- model.matrix(~0 + pheno, data = df)
+      design <- stats::model.matrix(~0 + pheno, data = df)
     } else {
       tmp_covariate <- covariate[which(pheno %in% tmp_compare), ]
       df <- data.frame(pheno = p, tmp_covariate)
-      form <- as.formula(paste(c("~0+pheno", colnames(tmp_covariate)), collapse = "+"))
-      design <- model.matrix(form, data = df)
+      form <- stats::as.formula(paste(c("~0+pheno", colnames(tmp_covariate)), collapse = "+"))
+      design <- stats::model.matrix(form, data = df)
     }
     
-    contrast.matrix <- makeContrasts(
+    contrast.matrix <- limma::makeContrasts(
       contrasts = paste(colnames(design)[2:1], collapse = "-"), 
       levels = colnames(design)
     )
@@ -643,10 +644,10 @@ champ_DMP <- function(
     print(contrast.matrix)
     fit <- lmFit(tmpbeta, design)
     fit2 <- contrasts.fit(fit, contrast.matrix)
-    tryCatch(fit3 <- eBayes(fit2), warning = function(w) {
+    tryCatch(fit3 <- limma::eBayes(fit2), warning = function(w) {
       stop("limma failed, No sample variance.\n")
     })
-    DMP <- topTable(
+    DMP <- limma::topTable(
       fit3, 
       coef = 1, 
       number = nrow(tmpbeta), 
@@ -760,9 +761,9 @@ champ_DMP <- function(
   }
   message("\n[ Section 3:  Match Annotation Start ]\n")
   if (arraytype == "EPIC") {
-    data(probe.features.epic)
+    data(probe.features.epic, package = "ChAMPdata")
   } else {
-    data(probe.features)
+    data(probe.features, package = "ChAMPdata")
   }
   for (i in names(DMPs)) {
     com.idx <- intersect(rownames(DMPs[[i]]), rownames(probe.features))

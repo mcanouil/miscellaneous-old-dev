@@ -56,7 +56,7 @@ pca_report <- function(
 
 
   cat(paste0("\n", paste(rep("#", title_level), collapse = ""), " PCA inertia contribution {-}\n"))
-  p <- dplyr::data_frame(
+  p <- tibble::tibble(
     y = (pca_res$values / sum(pca_res$values)), 
     x = sprintf("PC%02d", seq_along(pca_res$values))
   ) %>%
@@ -127,7 +127,7 @@ pca_report <- function(
       `^`(2) %>%
       rowSums() %>%
       sqrt() %>%
-      dplyr::data_frame(EuclideanDistance = .) %>%
+      tibble::tibble(EuclideanDistance = .) %>%
       tibble::rownames_to_column(var = id_var) %>%
       dplyr::mutate(
         BadSamplesLogical = 
@@ -148,7 +148,7 @@ pca_report <- function(
     
     ivar <- "BadSamples"
     
-    p <- do.call("rbind", apply(t(combn(paste0("PC", seq_len(n_comp)), 2)), 1, function(icoord) {
+    p <- dplyr::bind_rows(apply(t(combn(paste0("PC", seq_len(n_comp)), 2)), 1, function(icoord) {
       tmp <- pca_dfxy[, c(ivar, icoord)]
       tmp[, ivar] <- as.factor(tmp[, ivar])
       colnames(tmp)[-seq_len(ncol(tmp) - 2)] <- c("X", "Y")

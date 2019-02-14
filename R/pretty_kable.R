@@ -5,6 +5,7 @@ pretty_kable <- function (
   col.names = NA,
   pval_cols = NULL,
   full_width,
+  echo = TRUE,
   ...
 ) {
   require(Hmisc)
@@ -45,6 +46,8 @@ pretty_kable <- function (
       font_size = font_size
     )
   }
-  print(out)
-  return(invisible(out))
+  
+  if (echo) print(out)
+  
+  invisible(out)
 }

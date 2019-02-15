@@ -1,5 +1,12 @@
-convert_hba1c <- function(x, unitFrom = "%") {
-  if (unitFrom== "%") {
+#' convert_hba1c
+#'
+#' @param x [numeric]
+#' @param from_unit [character]
+#'
+#' @return numeric
+#' @export
+convert_hba1c <- function(x, from_unit = "%") {
+  if (from_unit== "%") {
     ref_table <- structure(list(
       V1 = c(
         10L, 12L, 14L, 16L, 18L, 20L, 22L, 24L,

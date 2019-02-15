@@ -29,16 +29,9 @@ ggcormatrix <- function(
   size = 4, 
   theme_dark = FALSE
 ) {
-  require(Hmisc)
-  require(reshape2)
-  format_pval <- function(x, thresh = 10^-2, digits = 3, eps = 1e-50) {
-    ifelse(
-      x>=thresh, 
-      Hmisc::format.pval(x, digits = digits, eps = eps, nsmall = digits), 
-      base::format.pval(x, digits = digits, eps = eps, scientific = TRUE, nsmall = digits)
-    )
-  }
-  
+  # require(Hmisc)
+  # require(reshape2)
+
   res <- Hmisc::rcorr(as.matrix(data), type = method)
   cormat <- signif(res$r, digits = digits)
   dd <- as.dist((1 - cormat) / 2)
@@ -60,7 +53,7 @@ ggcormatrix <- function(
     all.x = TRUE, 
     suffixes = c("", ".p")
   )
-  melted_cormat[, "value.p.format"] <- format_pval(
+  melted_cormat[, "value.p.format"] <- ggcoeos::format_pval(
     x = melted_cormat[, "value.p"], 
     digits = digits
   )

@@ -5,12 +5,15 @@ pval_trans <- function() {
       rng <- -log(range(x, na.rm = TRUE), base = 10)
       min <- 0
       max <- floor(rng[1])
+
       if (max == min) {
-        return(10^-min)
+        out <- 10^-min
       } else {
         by <- floor((max - min) / n) + 1
-        return(10^-seq(min, max, by = by))
+        out <- 10^-seq(min, max, by = by)
       }
+    
+      out
     }
   }
   scales::trans_new(

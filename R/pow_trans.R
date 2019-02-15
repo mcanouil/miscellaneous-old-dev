@@ -12,15 +12,12 @@ pow_trans <- function(power, n = 5) {
   scales::trans_new(
     name = "pow", 
     transform = function(x, y = power) {
-        ifelse(x<=0, 0, x ^ y)
+      ifelse(x<=0, 0, x ^ y)
     }, 
     inverse = function(x, y = power) {
-        ifelse(x<=0, 0, x ^ (1 / y))
+      ifelse(x<=0, 0, x ^ (1 / y))
     }, 
     breaks = negpow_breaks(n = n), 
-    domain = c(0, Inf)#,
-    # format = function(x) {
-    #     parse(text = gsub("e", " %*% 10^", scientific(x)))
-    # }
+    domain = c(0, Inf)
   )
 }

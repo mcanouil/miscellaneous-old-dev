@@ -18,6 +18,6 @@ send_message <- function(
   if (grepl("Bad Request", res_cmd) | !grepl("{\"success\":true}", res_cmd, fixed = TRUE)) {
     stop("Request to send a message to chat failed!")
   }
-  return(invisible())
+  invisible()
 }
 

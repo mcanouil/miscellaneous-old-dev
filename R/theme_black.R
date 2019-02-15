@@ -85,19 +85,17 @@ theme_black <- function(
 }
 
 dark_mode <- function(.theme) {
-  hijack <- function(FUN, ...) {
-    .FUN <- FUN
+  hijack <- function(fun, ...) {
+    .fun <- fun
     args <- list(...)
     invisible(lapply(seq_along(args), function(i) {
-      formals(.FUN)[[names(args)[i]]] <<- args[[i]]
+      formals(.fun)[[names(args)[i]]] <<- args[[i]]
     }))
-    return(.FUN)
+    .fun
   }
 
   compute_brightness <- function(colour) {
-    (
-      (sum(range(grDevices::col2rgb(colour)))) * 100 * 0.5
-    ) / 255
+    ((sum(range(grDevices::col2rgb(colour)))) * 100 * 0.5) / 255
   }
 
   stopifnot(is.theme(.theme))
@@ -105,7 +103,11 @@ dark_mode <- function(.theme) {
   geoms <- list()
   namespaces <- loadedNamespaces()
   for (namespace in namespaces) {
-    geoms_in_namespace <- mget(geom_names, envir = asNamespace(namespace), ifnotfound = list(NULL))
+    geoms_in_namespace <- mget(
+      x = geom_names, 
+      envir = asNamespace(namespace), 
+      ifnotfound = list(NULL)
+    )
     for (geom_name in geom_names) {
       if (is.ggproto(geoms_in_namespace[[geom_name]])) {
         geoms[[geom_name]] <- geoms_in_namespace[[geom_name]]
@@ -150,7 +152,7 @@ dark_mode <- function(.theme) {
     }
   }
 
-  return(invisible(.theme))
+  invisible(.theme)
 }
 
 plot.ggplot <- print.ggplot <- function(x, newpage = is.null(vp), vp = NULL, ...) {
@@ -187,7 +189,8 @@ plot.ggplot <- print.ggplot <- function(x, newpage = is.null(vp), vp = NULL, ...
     grid::grid.draw(gtable)
     grid::upViewport()
   }
-  return(invisible(x))
+  
+  invisible(x)
 }
 
 ggsave <- function(
@@ -227,5 +230,5 @@ ggsave <- function(
   )
 }
 theme_set <- function (new) {
-  return(ggplot2::theme_set(dark_mode(.theme = new)))
+  ggplot2::theme_set(dark_mode(.theme = new))
 }

@@ -7,8 +7,14 @@ sqrtabs_trans <- function() {
       max <- ceiling(rng[2])
       min <- floor(rng[1])
       by <- floor((max - min)/n)
-      return(g(seq(min, max, by = by)))
+      g(seq(min, max, by = by))
     }
   }
-  scales::trans_new(name = "sqrtabs", transform = f, inverse = g, breaks = h(), domain = c(-Inf, Inf))
+  scales::trans_new(
+    name = "sqrtabs", 
+    transform = f, 
+    inverse = g, 
+    breaks = h(), 
+    domain = c(-Inf, Inf)
+  )
 }

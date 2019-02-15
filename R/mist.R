@@ -28,7 +28,7 @@ mist <- function(y, X, G, Z, method = "liu", model = c("guess", "continuous", "b
       message('[MiST] Logistic regression is ongoing ...')
       suppressMessages(mist_logit(y = y, X = X, G = G, Z = Z, method = method))
     },
-    stop('[MiST] Only "guess", "continuous" and "binary" are allowed for "model"!')
+    stop('[MiST] "model" must be one of "guess", "continuous" or "binary".')
   )
 }
 
@@ -40,7 +40,8 @@ mist_print <- function(x) {
     "SubClusters" = ifelse(cluster_name=="", "None", cluster_name), 
     x$out_rare
   )
-  return(list(estimate = stat_rare, statistic = as.data.frame(x$out_MiST)))
+  
+  list(estimate = stat_rare, statistic = as.data.frame(x$out_MiST))
 }
 
 
@@ -54,11 +55,17 @@ mist_logit <- function(y, X, G, Z, method = "liu") {
   Z <- as.matrix(Z)
   GZ <- G %*% Z
   M <- cbind(X, GZ)
-  fit.0 <- stats::glm(formula = y ~ X - 1, family = stats::binomial(link = logit))
+  fit.0 <- stats::glm(
+    formula = y ~ X - 1, 
+    family = stats::binomial(link = logit)
+  )
   mu.0 <- fit.0$fitted.value
   d.0 <- mu.0 * (1 - mu.0)
   res.0 <- y - mu.0
-  fit.0a <- stats::glm(formula = y ~ -1 + X + GZ, family = stats::binomial(link = logit))
+  fit.0a <- stats::glm(
+    formula = y ~ -1 + X + GZ, 
+    family = stats::binomial(link = logit)
+  )
   mu.0a <- fit.0a$fitted.value
   d.0a <- mu.0a * (1 - mu.0a)
   res.0a <- y - mu.0a
@@ -111,8 +118,7 @@ mist_logit <- function(y, X, G, Z, method = "liu") {
   )
   rownames(out_rare) <- get_GZ
 
-  out <- list(out_MiST = out_MiST, out_rare = out_rare)
-  return(out)
+  list(out_MiST = out_MiST, out_rare = out_rare)
 }
 
 
@@ -180,6 +186,5 @@ mist_linear <- function(y, X, G, Z, method = "liu") {
   )
   rownames(out_rare) <- get_GZ
 
-  out <- list(out_MiST = out_MiST, out_rare = out_rare)
-  return(out)
+  list(out_MiST = out_MiST, out_rare = out_rare)
 }

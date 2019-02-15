@@ -1,7 +1,6 @@
-convertHbA1c <- function (x, unitFrom = "%") {
-  require(broom)
+convert_hba1c <- function(x, unitFrom = "%") {
   if (unitFrom== "%") {
-    HBA1Cconvert <- structure(list(
+    ref_table <- structure(list(
       V1 = c(
         10L, 12L, 14L, 16L, 18L, 20L, 22L, 24L,
         26L, 28L, 30L, 32L, 34L, 36L, 38L, 40L, 42L, 44L, 46L, 48L, 50L,
@@ -26,8 +25,14 @@ convertHbA1c <- function (x, unitFrom = "%") {
         20.8, 21, 21.2
       )
     ), .Names = c("V1", "V2"), class = "data.frame", row.names = c(NA, -100L))
-    return(sapply(x, function (y) {round(sum(broom::tidy(lm(V1~V2, data =  HBA1Cconvert))[, "estimate"] *c(1, y)))}))
+    sapply(x, function(y) {
+      round(
+        sum(
+          broom::tidy(lm(V1~V2, data =  ref_table))[, "estimate"] * c(1, y)
+        )
+      )
+    })
   } else {
-    return(x)
+    x
   }
 }

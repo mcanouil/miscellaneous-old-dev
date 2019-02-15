@@ -142,7 +142,7 @@ dark_mode <- function(.theme) {
     for (viridis_name in viridis_names) {
       if (is.function(viridis_in_namespace[[viridis_name]])) {
         vscales[[viridis_name]] <- hijack(
-          FUN =  viridis_in_namespace[[viridis_name]], 
+          fun =  viridis_in_namespace[[viridis_name]], 
           begin = scale_parameters[["begin"]],
           end = scale_parameters[["end"]],
           direction = scale_parameters[["direction"]]

@@ -1,7 +1,7 @@
-require(grid)
-require(grDevices)
-require(ggplot2)
-require(scales)
+# require(grid)
+# require(grDevices)
+# require(ggplot2)
+# require(scales)
 
 theme_black <- function(
   base_size = 11, 

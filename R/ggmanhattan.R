@@ -1,60 +1,18 @@
-# @examples
-# ggmanhattan()
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param data PARAM_DESCRIPTION
-#' @param x_chr PARAM_DESCRIPTION
-#' @param x_pos PARAM_DESCRIPTION
-#' @param y_pval PARAM_DESCRIPTION
-#' @param y_trans PARAM_DESCRIPTION, Default: TRUE
-#' @param x_space PARAM_DESCRIPTION, Default: 5e7
-#' @param ... PARAM_DESCRIPTION
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @rdname ggmanhattan
+#' ggmanhattan
+#'
+#' @param data [data.frame]
+#' @param x_chr [character]
+#' @param x_pos [character]
+#' @param y_pval [character]
+#' @param y_trans [logical]
+#' @param x_space [numeric]
+#' @param ... [misc]
+#'
+#' @return ggplot2
 #' @export
+#' 
+#' @noRd
 ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e7, ...) {
-  require(tidyverse)
-  require(scales)
-
-  pval_trans <- function() {
-    require(scales)
-    neglog10_breaks <- function(n = 5) {
-      function(x) {
-        rng <- -log(range(x, na.rm = TRUE), base = 10)
-        min <- 0
-        max <- floor(rng[1])
-  
-        if (max == min) {
-          out <- 10^-min
-        } else {
-          by <- floor((max - min) / n) + 1
-          out <- 10^-seq(min, max, by = by)
-        }
-      
-        out
-      }
-    }
-    scales::trans_new(
-      name = "pval",
-      transform = function(x) {
-        -log(x, 10)
-      },
-      inverse = function(x) {
-        10^-x
-      },
-      breaks = neglog10_breaks(),
-      domain = c(1e-300, 1),
-      format = function(x) {
-        parse(
-          text = scales::scientific_format()(x) %>%
-            gsub("1e+00", "1", ., fixed = TRUE) %>%
-            gsub("e", " %*% 10^", .)
-        )
-      }
-    )
-  }
-
   data <- data %>% 
     dplyr::rename(x_chr = !!x_chr, x_pos = !!x_pos, y_pval = !!y_pval) %>% 
     dplyr::mutate(
@@ -105,7 +63,7 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
   if (y_trans) {
     p <- p +
       ggplot2::scale_y_continuous(
-        trans = pval_trans(), 
+        trans = ggcoeos::pval_trans(), 
         expand = ggplot2::expand_scale(mult = c(0, 0.10)), 
         limits = c(1, NA)
       )

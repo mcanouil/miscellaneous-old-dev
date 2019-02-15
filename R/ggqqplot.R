@@ -1,53 +1,14 @@
-# @examples
-# ggqqplot()
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param pvalue PARAM_DESCRIPTION
-#' @param col_names PARAM_DESCRIPTION, Default: NULL
-#' @param point_size PARAM_DESCRIPTION, Default: 1
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @rdname ggqqplot
+#' ggqqplot
+#'
+#' @param data [data.frame]
+#' @param col_names [character]
+#' @param point_size [numeric]
+#'
+#' @return ggplot2
 #' @export
+#'
+#' @noRd
 ggqqplot <- function (data, col_names = colnames(data), point_size = 1) {
-  pval_trans <- function() {
-    require(scales)
-    neglog10_breaks <- function(n = 5) {
-      function(x) {
-        rng <- -log(range(x, na.rm = TRUE), base = 10)
-        min <- 0
-        max <- floor(rng[1])
-  
-        if (max == min) {
-          out <- 10^-min
-        } else {
-          by <- floor((max - min) / n) + 1
-          out <- 10^-seq(min, max, by = by)
-        }
-      
-        out
-      }
-    }
-    scales::trans_new(
-      name = "pval",
-      transform = function(x) {
-        -log(x, 10)
-      },
-      inverse = function(x) {
-        10^-x
-      },
-      breaks = neglog10_breaks(),
-      domain = c(1e-300, 1),
-      format = function(x) {
-        parse(
-          text = scales::scientific_format()(x) %>%
-            gsub("1e+00", "1", ., fixed = TRUE) %>%
-            gsub("e", " %*% 10^", .)
-        )
-      }
-    )
-  }
-  
   if (is.null(ncol(data))) {
     data <- data.frame(X1 = data)
   }
@@ -93,10 +54,10 @@ ggqqplot <- function (data, col_names = colnames(data), point_size = 1) {
         ), 
         size = point_size
       ) +
-      ggplot2::scale_x_continuous(trans = pval_trans()) +
-      ggplot2::scale_y_continuous(trans = pval_trans()) +
-      ggplot2::scale_colour_viridis_d(labels = parse_format()) +
-      ggplot2::scale_shape_discrete(solid = FALSE, labels = parse_format()) +
+      ggplot2::scale_x_continuous(trans = ggcoeos::pval_trans()) +
+      ggplot2::scale_y_continuous(trans = ggcoeos::pval_trans()) +
+      ggplot2::scale_colour_viridis_d(labels = scales::parse_format()) +
+      ggplot2::scale_shape_discrete(solid = FALSE, labels = scales::parse_format()) +
       ggplot2::labs(
         x = "Expected P-value", 
         y = "Observed P-value", 

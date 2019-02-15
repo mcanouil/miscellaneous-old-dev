@@ -1,12 +1,11 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param bmi PARAM_DESCRIPTION
-#' @param age PARAM_DESCRIPTION
-#' @param gender PARAM_DESCRIPTION
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @rdname scale_bmi
-#' @export 
+#' scale_bmi
+#'
+#' @param bmi [numeric]
+#' @param age [numeric]
+#' @param gender [numeric/character]
+#'
+#' @return numeric
+#' @export
 scale_bmi <- function(bmi, age, gender) {
   ref_z <- structure(
     list(

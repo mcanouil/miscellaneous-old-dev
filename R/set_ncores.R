@@ -36,7 +36,7 @@ set_ncores <- function(
     stop("Request to send a message to chat failed!")
   }
 
-  return(n_cores)
+  n_cores
 }
 
 # set_ncores(

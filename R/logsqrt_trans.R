@@ -8,11 +8,17 @@ logsqrt_trans <- function () {
       max <- ceiling(rng[2])
       min <- floor(rng[1])
       if (max == min) {
-          return(g(min)+1)
+        return(g(min)+1)
       }
       by <- floor((max - min)/n) + 1
-      return(g(seq(min, max, by = by))+1)
+      g(seq(min, max, by = by))+1
     }
   }
-  scales::trans_new(name = "logsqrt", transform = f, inverse = g, breaks = neglogsqrt_breaks(), domain = c(0, Inf))
+  scales::trans_new(
+    name = "logsqrt", 
+    transform = f, 
+    inverse = g, 
+    breaks = neglogsqrt_breaks(), 
+    domain = c(0, Inf)
+  )
 }

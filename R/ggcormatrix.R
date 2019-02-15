@@ -21,10 +21,17 @@
 #' @export
 #' @importFrom Hmisc rcorr
 #' @importFrom reshape2 melt
-ggcormatrix <- function(data, method = c("pearson", "spearman"), digits = 3, limits = c(-1, 1), size = 4, theme_dark = FALSE) {
+ggcormatrix <- function(
+  data, 
+  method = c("pearson", "spearman"), 
+  digits = 3, 
+  limits = c(-1, 1), 
+  size = 4, 
+  theme_dark = FALSE
+) {
   require(Hmisc)
   require(reshape2)
-  format_pval <- function (x, thresh = 10^-2, digits = 3, eps = 1e-50) {
+  format_pval <- function(x, thresh = 10^-2, digits = 3, eps = 1e-50) {
     ifelse(
       x>=thresh, 
       Hmisc::format.pval(x, digits = digits, eps = eps, nsmall = digits), 
@@ -46,8 +53,17 @@ ggcormatrix <- function(data, method = c("pearson", "spearman"), digits = 3, lim
   melted_P <- reshape2::melt(res$P)
   melted_P <- na.omit(melted_P)
 
-  melted_cormat <- merge(melted_cormat, melted_P, by = c("Var1", "Var2"), all.x = TRUE, suffixes = c("", ".p"))
-  melted_cormat[, "value.p.format"] <- format_pval(melted_cormat[, "value.p"], digits = digits)
+  melted_cormat <- merge(
+    x = melted_cormat, 
+    y = melted_P, 
+    by = c("Var1", "Var2"), 
+    all.x = TRUE, 
+    suffixes = c("", ".p")
+  )
+  melted_cormat[, "value.p.format"] <- format_pval(
+    x = melted_cormat[, "value.p"], 
+    digits = digits
+  )
   melted_cormat[, "value.p.format"] <- ifelse(
     !is.na(melted_cormat[, "value.p.format"]), 
     ifelse(
@@ -56,15 +72,23 @@ ggcormatrix <- function(data, method = c("pearson", "spearman"), digits = 3, lim
       paste0("p==", melted_cormat[, "value.p.format"])
     ), 
     ""
-  ) %>% 
-    gsub("e", " %*% 10^", .)
+  ) 
+  melted_cormat[, "value.p.format"] <- gsub(
+    pattern = "e", 
+    replacement = " %*% 10^", 
+    x = melted_cormat[, "value.p.format"]
+  )
   if (method == "spearman") {
-    melted_cormat[, "label"] <- paste0("rho==", melted_cormat[, "value"] * 100, '~"%"')
+    melted_cormat[, "label"] <- paste0(
+      "rho==", melted_cormat[, "value"] * 100, '~"%"'
+    )
   } else {
-    melted_cormat[, "label"] <- paste0("r==", melted_cormat[, "value"] * 100, '~"%"')
+    melted_cormat[, "label"] <- paste0(
+      "r==", melted_cormat[, "value"] * 100, '~"%"'
+    )
   }
 
-  ggheatmap <- ggplot2::ggplot(
+  ggplot2::ggplot(
       data = melted_cormat, 
       mapping = ggplot2::aes(
         x = Var2, 
@@ -75,7 +99,11 @@ ggcormatrix <- function(data, method = c("pearson", "spearman"), digits = 3, lim
     ggplot2::geom_tile(colour = ifelse(theme_dark, "grey20", "white")) +
     ggplot2::scale_fill_viridis_c(
       limits = limits,
-      name = paste0(toupper(substr(method, 1, 1)), substr(method, 2, nchar(method)), "\nCorrelation")
+      name = paste0(
+        toupper(substr(method, 1, 1)), 
+        substr(method, 2, nchar(method)), "\n",
+        "Correlation"
+      )
     ) +
     ggplot2::coord_fixed() +
     ggplot2::labs(x = NULL, y = NULL) +
@@ -99,7 +127,5 @@ ggcormatrix <- function(data, method = c("pearson", "spearman"), digits = 3, lim
         fill = ifelse(theme_dark, "grey20", "white")
       )
     )
-
-  return(ggheatmap)
 }
 

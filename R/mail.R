@@ -7,12 +7,6 @@
 #' @param attachment PARAM_DESCRIPTION
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
-#' @examples 
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
 #' @rdname mail
 #' @export 
 mail <- function (from, subject, to, body, attachment) {
@@ -46,5 +40,6 @@ mail <- function (from, subject, to, body, attachment) {
   } else {
     eMailFrom <- paste("-r", from)
   }
-  return(system(paste(eMailBody, 'mail', eMailFrom, eMailSubject, eMailJoint, to)))
+  
+  system(paste(eMailBody, 'mail', eMailFrom, eMailSubject, eMailJoint, to))
 }

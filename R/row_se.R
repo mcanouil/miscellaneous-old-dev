@@ -6,18 +6,14 @@
 #' @details DETAILS
 #' @examples 
 #' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname colSe
+#' @rdname row_se
 #' @export 
-colSe <- function (x, na.rm = TRUE) {
+row_se <- function (x, na.rm = TRUE) {
   if (na.rm) {
-    n <- colSums(!is.na(x))
+    n <- rowSums(!is.na(x))
   } else {
     n <- nrow(x)
   }
-  colVar <- colMeans(x*x, na.rm = na.rm) - (colMeans(x, na.rm = na.rm))^2
-  return(sqrt(colVar/n))
+  rowVar <- rowMeans(x * x, na.rm = na.rm) - (rowMeans(x, na.rm = na.rm))^2
+  sqrt(rowVar / n)
 }

@@ -8,7 +8,7 @@
 #' \dontrun{
 #' @rdname row_se
 #' @export 
-row_se <- function (x, na.rm = TRUE) {
+row_se <- function(x, na.rm = TRUE) {
   if (na.rm) {
     n <- rowSums(!is.na(x))
   } else {

@@ -76,7 +76,7 @@ git -C ~/$project_name/ init
 git -C ~/$project_name/ remote add origin git@github.com:mcanouil/$project_name.git
 git -C ~/$project_name/ add --all
 git -C ~/$project_name/ commit -am 'create project'
-# chmod 777 -R ~/$project_name/.git
+git -C /disks/PROJECT/$project_name/ config --local core.sharedRepository 0774
 # git push -u origin master
 
 # ~/DEV/make_project/make_project.sh ""

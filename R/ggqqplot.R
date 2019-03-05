@@ -30,7 +30,7 @@ ggqqplot <- function (data, col_names = colnames(data), point_size = 1) {
   data %>% 
     as.data.frame() %>% 
     tidyr::gather(key = "group", value = "obspval") %>% 
-    gdplyr::roup_by(group) %>% 
+    dplyr::group_by(group) %>% 
     dplyr::arrange(obspval) %>% 
     dplyr::mutate(
       exppval = (seq_len(n()) - 0.5)/length(seq_len(n())),

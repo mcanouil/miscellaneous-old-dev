@@ -27,6 +27,34 @@ ggqqplot <- function (data, col_names = colnames(data), point_size = 1) {
       })()
   }
   
+  pval_trans <- function() {
+    neglog10_breaks <- function(n = 5) {
+      function(x) {
+        rng <- -log(range(x, na.rm = TRUE), base = 10)
+        min <- 0
+        max <- floor(rng[1])
+        if (max == min) {
+          10^-min
+        } else {
+          by <- floor((max - min) / n) + 1
+          10^-seq(min, max, by = by)
+        }
+      }
+    }
+    scales::trans_new(
+      name = "pval",
+      transform = function(x) {-log(x, 10)},
+      inverse = function(x) {10^-x},
+      breaks = neglog10_breaks(),
+      format = function(x) {
+        parse(
+          text = gsub("e", " %*% 10^", gsub("1e+00", "1", scales::scientific_format()(x), fixed = TRUE))
+        )
+      },
+      domain = c(0, 1)
+    )
+  }
+  
   data %>% 
     as.data.frame() %>% 
     tidyr::gather(key = "group", value = "obspval") %>% 
@@ -54,8 +82,8 @@ ggqqplot <- function (data, col_names = colnames(data), point_size = 1) {
         ), 
         size = point_size
       ) +
-      ggplot2::scale_x_continuous(trans = ggcoeos::pval_trans()) +
-      ggplot2::scale_y_continuous(trans = ggcoeos::pval_trans()) +
+      ggplot2::scale_x_continuous(trans = pval_trans()) +
+      ggplot2::scale_y_continuous(trans = pval_trans()) +
       ggplot2::scale_colour_viridis_d(labels = scales::parse_format()) +
       ggplot2::scale_shape_discrete(solid = FALSE, labels = scales::parse_format()) +
       ggplot2::labs(

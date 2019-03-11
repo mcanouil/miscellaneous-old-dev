@@ -13,6 +13,34 @@
 #' 
 #' @noRd
 ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e7, ...) {
+  pval_trans <- function() {
+    neglog10_breaks <- function(n = 5) {
+      function(x) {
+        rng <- -log(range(x, na.rm = TRUE), base = 10)
+        min <- 0
+        max <- floor(rng[1])
+        if (max == min) {
+          10^-min
+        } else {
+          by <- floor((max - min) / n) + 1
+          10^-seq(min, max, by = by)
+        }
+      }
+    }
+    scales::trans_new(
+      name = "pval",
+      transform = function(x) {-log(x, 10)},
+      inverse = function(x) {10^-x},
+      breaks = neglog10_breaks(),
+      format = function(x) {
+        parse(
+          text = gsub("e", " %*% 10^", gsub("1e+00", "1", scales::scientific_format()(x), fixed = TRUE))
+        )
+      },
+      domain = c(0, 1)
+    )
+  }
+  
   data <- data %>% 
     dplyr::rename(x_chr = !!x_chr, x_pos = !!x_pos, y_pval = !!y_pval) %>% 
     dplyr::mutate(
@@ -63,7 +91,7 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
   if (y_trans) {
     p <- p +
       ggplot2::scale_y_continuous(
-        trans = ggcoeos::pval_trans(), 
+        trans = pval_trans(), 
         expand = ggplot2::expand_scale(mult = c(0, 0.10)), 
         limits = c(1, NA)
       )

@@ -2,7 +2,7 @@
 
 project_name=$1
 
-mkdir -p -m 777 ~/$project_name
+mkdir -p -m 755 /disks/PROJECT/$project_name/{Data,Docs,Report,Scripts}
 
 echo "Engineer: Mickaël Canouil" >> ~/$project_name/README.md
 
@@ -27,11 +27,6 @@ CustomScriptPath: Scripts/_build.sh
 
 QuitChildProcessesOnExit: Yes
 " > ~/$project_name/$project_name.Rproj
-
-for ifile in "Docs" "Report" "Scripts" "Data"
-do
-  mkdir -p -m 777 ~/$project_name/$ifile
-done
 
 cat ~/DEV/make_project/default_script.R \
   | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/00-main.R
@@ -76,7 +71,7 @@ git -C ~/$project_name/ init
 git -C ~/$project_name/ remote add origin git@github.com:mcanouil/$project_name.git
 git -C ~/$project_name/ add --all
 git -C ~/$project_name/ commit -am 'create project'
-git -C /disks/PROJECT/$project_name/ config --local core.sharedRepository 0774
+git -C /disks/PROJECT/$project_name/ config --local core.sharedRepository 0755
 # git push -u origin master
 
 # ~/DEV/make_project/make_project.sh ""

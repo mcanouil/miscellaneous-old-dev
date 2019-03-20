@@ -21,8 +21,8 @@ render_nacho <- function(nacho_object, colour_name = "CartridgeID", legend = FAL
     nacho_object$nacho[[colour_name]] <- as.character(nacho_object$nacho[[colour_name]])
   }
   
-  cat("# NanoString Quality-Control using NACHO\n\n")
-  
+  cat("# NanoString Quality-Control (NACHO)\n\n")
+  knitr::include_graphics(path = system.file("logo", "nacho_hex.png", package = "NACHO"))
   
   cat("\n\n")
   cat("## RCC Summary\n\n")
@@ -484,4 +484,3 @@ render_nacho <- function(nacho_object, colour_name = "CartridgeID", legend = FAL
   
   invisible()
 }
-

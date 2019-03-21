@@ -1,7 +1,10 @@
 ---
 title: 'PRJCT'
-author: 'Mickaël Canouil, *Ph.D.*'
-date: '`r format(Sys.time(), "%B %d, %Y (%Hh%M)")`'
+author: 
+- name: "Mickaël Canouil, Ph.D."
+  affiliation: "Université de Lille, CNRS UMR 8199 - EGID, Institut Pasteur de Lille, Lille, France."
+  email: "mickael.canouil@cnrs.fr"
+date: '`r format(Sys.time(), "%B %d, %Y")`'
 monofont: 'Source Code Pro'
 monofontoptions: 'Scale=0.7'
 params:

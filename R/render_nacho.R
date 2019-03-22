@@ -21,11 +21,11 @@ render_nacho <- function(nacho_object, colour_name = "CartridgeID", legend = FAL
     nacho_object$nacho[[colour_name]] <- as.character(nacho_object$nacho[[colour_name]])
   }
   
-  cat("# NanoString Quality-Control (NACHO)\n\n")
-  knitr::include_graphics(path = system.file("logo", "nacho_hex.png", package = "NACHO"))
+  cat("# NanoString Quality-Control (NACHO) {.tabset}\n\n")
+  cat(paste0("<center>![](", system.file("help", "figures", "nacho_hex.png", package = "NACHO"), "){width=150px}</center>"))
   
   cat("\n\n")
-  cat("## RCC Summary\n\n")
+  cat("## RCC Summary {-}\n\n")
   cat('  - Samples:', length(unique(nacho_object$nacho[[nacho_object$access]])), "\n")
   genes <- table(nacho_object$nacho[["CodeClass"]]) / 
     length(unique(nacho_object$nacho[[nacho_object$access]]))
@@ -33,7 +33,7 @@ render_nacho <- function(nacho_object, colour_name = "CartridgeID", legend = FAL
   
   
   cat("\n\n")
-  cat("## Settings\n\n")
+  cat("## Settings {-}\n\n")
   cat('  - Predict housekeeping genes:', nacho_object$housekeeping_predict, "\n")
   cat('  - Normalise using housekeeping genes:', nacho_object$housekeeping_norm, "\n")
   cat(
@@ -69,7 +69,7 @@ render_nacho <- function(nacho_object, colour_name = "CartridgeID", legend = FAL
   
   
   cat("\n\n")
-  cat("## QC Metrics {.tabset .tabset-fade .tabset-pills}\n\n")
+  cat("## QC Metrics {- .tabset}\n\n")
   labels <- c(
     "MC" = "Average Counts",
     "MedC" = "Median Counts",
@@ -124,7 +124,7 @@ render_nacho <- function(nacho_object, colour_name = "CartridgeID", legend = FAL
   
   
   cat("\n\n")
-  cat("## Control Genes {.tabset .tabset-fade .tabset-pills}\n\n")
+  cat("## Control Genes {- .tabset}\n\n")
   for (icodeclass in c("Positive", "Negative", "Housekeeping")) {
     cat("\n\n")
     cat("###", icodeclass, "{-}\n\n")
@@ -210,7 +210,7 @@ render_nacho <- function(nacho_object, colour_name = "CartridgeID", legend = FAL
   
   
   cat("\n\n")
-  cat("## QC Visuals {.tabset .tabset-fade .tabset-pills}\n\n")
+  cat("## QC Visuals {- .tabset}\n\n")
   
   cat("\n\n")
   cat("### Average Count vs. Binding Density {-}\n\n")
@@ -366,7 +366,7 @@ render_nacho <- function(nacho_object, colour_name = "CartridgeID", legend = FAL
   
   
   cat("\n\n")
-  cat("## Normalisation Factors {.tabset .tabset-fade .tabset-pills}\n\n")
+  cat("## Normalisation Factors {- .tabset}\n\n")
   
   cat("\n\n")
   cat("### Positive Factor vs. Background Threshold {-}\n\n")

@@ -5,6 +5,8 @@ project_directory <- '~/PRJCT'
 working_directory <- paste0(project_directory, '/Data')
 output_directory <- paste0(working_directory, script_name, sep = '/')
 
+dir.create(output_directory, recursive = TRUE, showWarnings = FALSE, mode = '0777')
+
 
 params <- list(
   n_cores = parallel::detectCores(),

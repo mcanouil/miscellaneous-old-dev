@@ -80,3 +80,12 @@ if (params$theme_dark) {
   theme_set(theme_light(base_size = params$gg_fontsize))
 }
 ```
+
+# Summary
+
+
+# R session information
+
+```{r session_info, results = "markup"}
+sessioninfo::session_info()
+```

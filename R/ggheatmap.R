@@ -592,6 +592,7 @@ get_segment_df <- function(x0, y0, x1, y1) {
 #' @param label.h.colour PARAM_DESCRIPTION, Default: 'black'
 #' @param label.v.colour PARAM_DESCRIPTION, Default: 'black'
 #' @param segments.colour PARAM_DESCRIPTION, Default: FALSE
+#' @param trans.colour PARAM_DESCRIPTION, Default: NULL
 #' @param print PARAM_DESCRIPTION, Default: TRUE
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
@@ -607,18 +608,20 @@ get_segment_df <- function(x0, y0, x1, y1) {
 #' @export
 #' @importFrom reshape2 melt
 ggheatmap <- function(
-                      data,
-                      gap.ratio = 0.05,
-                      grid.h.ratio = c(0.15, 0.60, 0.25),
-                      grid.v.ratio = rev(grid.h.ratio),
-                      legend.title = NULL,
-                      legend.position = c(which.max(c(grid.h.ratio[1], 0, grid.h.ratio[3])), which.max(c(grid.v.ratio[1], 0, grid.v.ratio[3]))),
-                      label.h.size = 3,
-                      label.v.size = label.h.size,
-                      label.h.colour = "black",
-                      label.v.colour = "black",
-                      segments.colour = FALSE,
-                      print = TRUE) {
+  data,
+  gap.ratio = 0.05,
+  grid.h.ratio = c(0.15, 0.60, 0.25),
+  grid.v.ratio = rev(grid.h.ratio),
+  legend.title = NULL,
+  legend.position = c(which.max(c(grid.h.ratio[1], 0, grid.h.ratio[3])), which.max(c(grid.v.ratio[1], 0, grid.v.ratio[3]))),
+  label.h.size = 3,
+  label.v.size = label.h.size,
+  label.h.colour = "black",
+  label.v.colour = "black",
+  segments.colour = FALSE,
+  trans.colour = NULL,
+  print = TRUE
+) {
   set_colour <- function() {
     ggplot2::theme_get()$plot.background$colour %>%
       grDevices::col2rgb() %>%
@@ -852,6 +855,15 @@ ggheatmap <- function(
       axis.ticks.length = unit(0, "pt"),
       legend.position = "none"
     )
+  
+  if (is.null(trans.colour)) {
+    center_item <- center_item + 
+      scale_fill_viridis_c(name = legend.title)
+  } else {
+    center_item <- center_item + 
+      scale_fill_viridis_c(name = legend.title, trans = trans.colour)
+  }
+
 
   hm.leg <- center_item +
     theme(

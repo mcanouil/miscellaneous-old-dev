@@ -21,8 +21,6 @@
 #'     Default is \code{"EPIC"}.
 #' @param annotation_version [character] Version of the annotation package that should be used.
 #'     Default is \code{"ilm10b4.hg19"} for the \code{"EPIC"} array
-#' @param extended [logical] Should a \code{RGChannelSet} or a \code{RGChannelSetExtended} 
-#'     be returned. 
 #' @param n_cores [integer] The number of cores to use, 
 #'     i.e., at most how many child processes will be run simultaneously.
 #'
@@ -41,9 +39,11 @@ read_idats <- function(
   filter_xy = TRUE, 
   array_name = c("EPIC", "450k"), 
   annotation_version = c("ilm10b4.hg19", "ilmn12.hg19"),
-  extended = FALSE,
   n_cores = 1
 ) {
+  array_name <- array_name[1]
+  annotation_version <- annotation_version[1]
+  
   stopifnot(suppressPackageStartupMessages(
     require("minfi") & 
       switch(
@@ -52,8 +52,6 @@ read_idats <- function(
         "EPIC" = require("IlluminaHumanMethylationEPICmanifest")
       )
   ))
-  array_name <- array_name[1]
-  annotation_version <- annotation_version[1]
   
   message(
     "=================================", "\n",
@@ -61,7 +59,7 @@ read_idats <- function(
     "================================="
   )
   sample_sheet <- read_sample_sheet(directory= directory, csv_file = csv_file)
-  rgSet <- read_metharray_exp(sample_sheet = sample_sheet, extended = extended, n_cores = n_cores)
+  rgSet <- read_metharray_exp(sample_sheet = sample_sheet, n_cores = n_cores)
   
   rgSet@annotation <- switch(
     EXPR = array_name,
@@ -303,7 +301,7 @@ read_sample_sheet <- function(
 #' @inheritParams read_idats 
 #'
 #' @keywords internal
-read_metharray <- function(basenames, extended = FALSE, n_cores = 1) {
+read_metharray <- function(basenames, n_cores = 1) {
   basenames <- unique(sub("_[GR][re][nd]\\.idat.*", "", basenames))
 
   p <- dplyr::progress_estimated(length(basenames)*2+6)
@@ -361,38 +359,36 @@ read_metharray <- function(basenames, extended = FALSE, n_cores = 1) {
   
   p$pause(0.1)$tick()$print()
 
-  if (extended) {
-    GreenSD <- do.call("cbind", parallel::mclapply(
-      X = G_idats, mc.cores = n_cores, mc.preschedule = FALSE, 
-      y = common_addresses,
-      FUN = function(x, y) {
-        x$Quants[common_addresses, "SD"]
-      }
-    ))
-    RedSD <- do.call("cbind", parallel::mclapply(
-      X = R_idats, mc.cores = n_cores, mc.preschedule = FALSE, 
-      y = common_addresses,
-      FUN = function(x, y) {
-        x$Quants[common_addresses, "SD"]
-      }
-    ))
-    NBeads <- do.call("cbind", parallel::mclapply(
-      X = G_idats, mc.cores = n_cores, mc.preschedule = FALSE, 
-      y = common_addresses,
-      FUN = function(x, y) {
-        x$Quants[common_addresses, "NBeads"]
-      }
-    ))
-    out <- minfi::RGChannelSetExtended(
-      Red = RedMean, 
-      Green = GreenMean,
-      RedSD = RedSD, 
-      GreenSD = GreenSD, 
-      NBeads = NBeads
-    )
-  } else {
-    out <- minfi::RGChannelSet(Red = RedMean, Green = GreenMean)
-  }
+
+  GreenSD <- do.call("cbind", parallel::mclapply(
+    X = G_idats, mc.cores = n_cores, mc.preschedule = FALSE, 
+    y = common_addresses,
+    FUN = function(x, y) {
+      x$Quants[common_addresses, "SD"]
+    }
+  ))
+  RedSD <- do.call("cbind", parallel::mclapply(
+    X = R_idats, mc.cores = n_cores, mc.preschedule = FALSE, 
+    y = common_addresses,
+    FUN = function(x, y) {
+      x$Quants[common_addresses, "SD"]
+    }
+  ))
+  NBeads <- do.call("cbind", parallel::mclapply(
+    X = G_idats, mc.cores = n_cores, mc.preschedule = FALSE, 
+    y = common_addresses,
+    FUN = function(x, y) {
+      x$Quants[common_addresses, "NBeads"]
+    }
+  ))
+  out <- minfi::RGChannelSetExtended(
+    Red = RedMean, 
+    Green = GreenMean,
+    RedSD = RedSD, 
+    GreenSD = GreenSD, 
+    NBeads = NBeads
+  )
+
   rownames(out) <- common_addresses
   
   p$pause(0.1)$tick()$print()
@@ -410,7 +406,6 @@ read_metharray <- function(basenames, extended = FALSE, n_cores = 1) {
 read_metharray_exp <- function(
   directory = NULL, 
   sample_sheet = NULL, 
-  extended = FALSE, 
   ignore.case = TRUE, 
   recursive = TRUE, 
   full.names = TRUE,
@@ -469,11 +464,7 @@ read_metharray_exp <- function(
       )
     }
     
-    rgSet <- read_metharray(
-      basenames = commonFiles, 
-      extended = extended,
-      n_cores = n_cores
-    )
+    rgSet <- read_metharray(basenames = commonFiles, n_cores = n_cores)
   } else {
     if (!"Basename" %in% names(sample_sheet)) {
       stop(
@@ -488,11 +479,7 @@ read_metharray_exp <- function(
       files <- sample_sheet$Basename
     }
     
-    rgSet <- read_metharray(
-      basenames = files, 
-      extended = extended,
-      n_cores = n_cores
-    )
+    rgSet <- read_metharray(basenames = files, n_cores = n_cores)
     
     pD <- sample_sheet
     pD$filenames <- files

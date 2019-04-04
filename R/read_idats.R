@@ -41,7 +41,7 @@ read_idats <- function(
   filter_xy = TRUE, 
   array_name = c("EPIC", "450k"), 
   annotation_version = c("ilm10b4.hg19", "ilmn12.hg19"),
-  extended = FALSE
+  extended = FALSE,
   n_cores = 1
 ) {
   stopifnot(suppressPackageStartupMessages(

@@ -9,10 +9,6 @@ pca_report <- function(
   outliers_threshold = 3,
   title_level = 2
 ) {
-  require(flashpcaR)
-  require(scales)
-  require(tidyverse)
-  
   if (!methods::is(design, "data.frame")) {
     design <- as.data.frame(design)
   }
@@ -86,7 +82,7 @@ pca_report <- function(
         ggplot2::stat_ellipse(type = "norm") +
         ggplot2::scale_colour_viridis_d() +
         ggplot2::labs(x = NULL, y = NULL) +
-        ggplot2::facet_grid(rows = vars(Y.PC), cols = vars(X.PC), scales = "free") +
+        ggplot2::facet_grid(rows = vars(Y.PC), cols = ggplot2::vars(X.PC), scales = "free") +
         ggplot2::guides(colour = ifelse(length(unique(pca_dfxy[, ivar])) <= 12, "legend", "none"))
       print(p)
       cat("\n")
@@ -96,9 +92,9 @@ pca_report <- function(
     p <- pca_dfxy %>%
       (function(.data) {
         lapply(seq_len(fig_n_comp), function(i) {
-          form <- as.formula(paste0("PC", i, " ~ ", paste(keep_technical, collapse = " + ")))
-          lm(form, data = .data) %>% 
-            anova() %>% 
+          form <- ggplot2::vars(paste0("PC", i, " ~ ", paste(keep_technical, collapse = " + ")))
+          stats::lm(form, data = .data) %>% 
+            stats::anova() %>% 
             tibble::rownames_to_column(var = "term") %>% 
             dplyr::mutate(PC = i)
         }) %>%
@@ -134,9 +130,9 @@ pca_report <- function(
       dplyr::mutate(
         BadSamplesLogical = 
           EuclideanDistance <= 
-            (median(EuclideanDistance) - outliers_threshold * IQR(EuclideanDistance)) |
+            (stats::median(EuclideanDistance) - outliers_threshold * stats::IQR(EuclideanDistance)) |
           EuclideanDistance >= 
-            (median(EuclideanDistance) + outliers_threshold * IQR(EuclideanDistance)),
+            (stats::median(EuclideanDistance) + outliers_threshold * stats::IQR(EuclideanDistance)),
         BadSamples = factor(ifelse(BadSamplesLogical, "BAD", "GOOD"), levels = c("BAD", "GOOD"))
       ) %>%
       tibble::column_to_rownames(var = id_var)
@@ -150,7 +146,7 @@ pca_report <- function(
     
     ivar <- "BadSamples"
     
-    p <- dplyr::bind_rows(apply(t(combn(paste0("PC", seq_len(fig_n_comp)), 2)), 1, function(icoord) {
+    p <- dplyr::bind_rows(apply(t(utils::combn(paste0("PC", seq_len(fig_n_comp)), 2)), 1, function(icoord) {
       tmp <- pca_dfxy[, c(ivar, icoord)]
       tmp[, ivar] <- as.factor(tmp[, ivar])
       colnames(tmp)[-seq_len(ncol(tmp) - 2)] <- c("X", "Y")
@@ -165,7 +161,7 @@ pca_report <- function(
       ggplot2::stat_ellipse(type = "norm") +
       ggplot2::scale_colour_viridis_d() +
       ggplot2::labs(x = NULL, y = NULL) +
-      ggplot2::facet_grid(rows = vars(Y.PC), cols = vars(X.PC), scales = "free")
+      ggplot2::facet_grid(rows = ggplot2::vars(Y.PC), cols = ggplot2::vars(X.PC), scales = "free")
     print(p)
     cat("\n")
     

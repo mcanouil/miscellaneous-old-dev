@@ -91,8 +91,10 @@ format_pval <- function(
 #' @return character
 #' @export
 capitalise <- function(x) {
-  s <- strsplit(x, " ")[[1]]
-  paste(toupper(substring(s, 1, 1)), substring(s, 2), sep = "", collapse = " ")
+  s <- strsplit(x, " ")
+  sapply(s, function(S) {
+    paste(toupper(substring(S, 1, 1)), substring(S, 2), sep = "", collapse = " ")
+  })
 }
 
 

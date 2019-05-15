@@ -13,6 +13,7 @@ params:
   author_affiliation: "Institution"
   author_email: "some@email.com"
   output_directory: "/EPIC_QC"
+  cache: FALSE
   show_code: FALSE
   n_cores: 20
   dpi: 120
@@ -61,7 +62,7 @@ options(stringsAsFactors = FALSE)
 
 output_directory <- params[["output_directory"]]
 
-dir.create(paste0(output_directory, "/KnitrFiles/"), recursive = TRUE, showWarnings = FALSE, mode = '0777')
+dir.create(paste0(output_directory, "/cache/"), recursive = TRUE, showWarnings = FALSE, mode = '0777')
 
 
 ### Load packages and functions
@@ -84,9 +85,9 @@ knitr::opts_chunk$set(
   autodep = TRUE,
   fig.align = "center",
   fig.pos = "!H",
-  cache = FALSE,
-  cache.path = paste0(output_directory, "/KnitrFiles/"),
-  fig.path = paste0(output_directory, "/KnitrFiles/")
+  cache = params[["cache"]],
+  cache.path = paste0(output_directory, "/cache/"),
+  fig.path = paste0(output_directory, "/cache/")
 )
 
 
@@ -147,10 +148,10 @@ do_cell_composition <- !is.null(params[["cell_tissue"]])
     * `filter_beads`  
         => remove probes with a beadcount less than 3
     * __Call Rate__  
-        => remove probes with less than the specified call rate for detection p-values below $\alpha=0.01$ (default)
+        => remove probes with less than the specified call rate (`r params[["callrate_probes"]]`) for detection p-values below $\alpha=`r params[["detection_pvalues"]]`$
 1. Filtering Samples
     * __Call Rate__  
-        => remove samples with less than the specified call rate for detection p-values below $\alpha=0.01$ (default)
+        => remove samples with less than the specified call rate (`r params[["callrate_samples"]]`) for detection p-values below $\alpha=`r params[["detection_pvalues"]]`$
     * __Gender~[Phenotype]~ $\neq$ Gender~[Probes]~__  
         => flag samples with gender discrepancy
 1. Normalisation
@@ -202,7 +203,7 @@ output <- utils::capture.output({
     filter_snps = params[["filter_snps"]], 
     population = params[["population"]], 
     filter_multihit = params[["filter_multihit"]],
-    filter_xy = params[["filter_xy"]], 
+    filter_xy = FALSE, 
     detection_pvalues = params[["detection_pvalues"]],
     filter_callrate = params[["filter_callrate"]],
     callrate_samples = params[["callrate_samples"]],
@@ -305,13 +306,13 @@ cell_comp <- switch(
     cat("No method defined yet")
   },
   {
-    cat("`RefFreeEWAS` package is used to estimate the cell composition. (Houseman et al., 2016; doi:10.1186/s12859-016-1140-4)\n\n")
     estimate_k_cluster <- function(Rmat, max_k = 25, n_cores = 1) {
+      cluster <- parallel::makeCluster(n_cores)
+      doParallel::registerDoParallel(cluster)
+
       svdRmat <- RefFreeEWAS::svdSafe(Rmat)
-      tmp <- do.call("rbind", parallel::mclapply(
+      tmp <- do.call("rbind", lapply(
         X = 0:max_k,
-        mc.preschedule = FALSE, 
-        mc.cores = n_cores,
         mc_Rmat = Rmat,
         mc_svdRmat = svdRmat,
         FUN = function(Ktest, mc_Rmat, mc_svdRmat) {
@@ -334,7 +335,9 @@ cell_comp <- switch(
               N2 * sum(log(tmpSigSq))
           )
       }))
-      
+
+      parallel::stopCluster(cluster)
+
       list(
         icTable = tmp, 
         best = tmp[c(AIC = which.min(tmp[, "AIC"]), BIC = which.min(tmp[, "BIC"])), "K"],
@@ -406,11 +409,12 @@ CARoT::ggheatmap(
   data = phenotypes %>% 
     as.data.frame() %>% 
     dplyr::select(Sample_ID, dplyr::starts_with("CellT_")) %>% 
-    tibble::column_to_rownames("Sample_ID"),
+    tibble::column_to_rownames(var = "Sample_ID") %>% 
+    tidyr::drop_na(), 
   dendrogram_columns = TRUE,
   dendrogram_rows = TRUE,
   line_size = 0.5,
-  fon_size = params[["gg_fontsize"]],
+  font_size = params[["gg_fontsize"]],
   font_size_x = def_label_gene_x,
   font_size_y = def_label_gene_y,
   distance_method = "euclidean",
@@ -441,7 +445,7 @@ phenotypes <- phenotypes %>%
       minfi::mapToGenome() %>% 
       minfi::getSex(cutoff = gender_threshold) %>% 
       as.data.frame() %>% 
-      dplyr::mutate(Sample_ID = phenotypes[,"Sample_ID"]) %>% 
+      dplyr::mutate(Sample_ID = minfi::sampleNames(data_mset)) %>% 
       dplyr::rename(
         qc_xmedian = xMed,
         qc_ymedian = yMed,
@@ -478,7 +482,6 @@ ggplot2::ggplot(
 ```
 
 ```{r gender_check_fig, eval = do_check_gender}
-plot_range <- range(as.data.frame(phenotypes[c("qc_xmedian", "qc_ymedian")]))
 ggplot2::ggplot(
   data = phenotypes %>% 
     as.data.frame() %>% 
@@ -562,6 +565,21 @@ phenotypes %>%
   pretty_kable(full_width = FALSE)
 ```
 
+```{r filter_xy, eval = params[["filter_xy"]]}
+switch(
+  EXPR = params[["array"]],
+  "450k" = utils::data("probe.features", package = "ChAMPdata"),
+  "EPIC" = utils::data("probe.features.epic", package = "ChAMPdata")
+)
+probe_features <- get("probe.features")
+autosomes <- probe_features[!probe_features$CHR %in% c("X", "Y"), ]
+mset_f2 <- data_mset[minfi::featureNames(data_mset) %in% rownames(autosomes), ]
+cat(
+  "Filtering probes on the X or Y chromosome:\n",
+  "  - ", scales::comma(dim(data_mset)[1] - dim(mset_f2)[1]), " probes were discarded"
+)
+data_mset <- mset_f2
+```
 
 ## Principal Component Analysis
 
@@ -587,6 +605,7 @@ data_mset@metadata[["norm_beta_values"]] <- norm_beta
 ```
 
 ```{r export}
+data_mset@metadata[["phenotypes"]] <- phenotypes
 readr::write_rds(x = data_mset, path = paste0(output_directory, "/", params[["array"]], "_mset.rds"))
 ```
 

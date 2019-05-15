@@ -30,38 +30,29 @@ estimate_ethnicity <- function(
   bin_path = list(
     vcftools = "/usr/bin/vcftools",
     bcftools = "/usr/bin/bcftools",
-    bgzip = "/usr/local/bin/bgzip",
-    tabix = "/usr/local/bin/tabix",
+    bgzip = "/usr/bin/bgzip",
+    tabix = "/usr/bin/tabix",
     plink1.9 = "/usr/bin/plink1.9"
   )
 ) {
+  list_input <- check_input(input = input_vcfs)
+  list_ref <- check_input(input = ref1kg_vcfs)
+
   if (!input_type%in%c("array", "sequencing")) {
     stop('[CARoT] "input_type" must be either "array" or "sequencing"!')
   }
-  if (!dir.exists(input_vcfs) & !file.exists(input_vcfs)) {
-    stop('[CARoT] A valid "input_vcfs" must be provided, either a directory (with VCF files) or a vcf file!')
-  }
-  if (!dir.exists(ref1kg_vcfs) & !file.exists(ref1kg_vcfs)) {
-    stop('[CARoT] A valid "ref1kg_vcfs" must be provided, either a directory (with VCF files) or a vcf file!')
-  }
 
-  if (dir.exists(input_vcfs)) {
-    list_input <- list.files(path = input_vcfs, pattern = ".vcf.gz$", full.names = TRUE)
-  } else {
-    list_input <- input_vcfs
+  if (input_type=="sequencing" & length(list_ref)!=1) {
+    stop(
+      '[CARoT] A unique vcf file ("ref1kg_vcfs") must be provided ',
+      'with `input_type = "sequencing"`!'
+    )
   }
-
-  if (dir.exists(ref1kg_vcfs)) {
-    list_ref <- list.files(path = ref1kg_vcfs, pattern = ".vcf.gz$", full.names = TRUE)
-  } else {
-    list_ref <- ref1kg_vcfs
-  }
-
-  if (length(list_ref)==0) {
-    stop('[CARoT] A valid "input_vcfs" must be provided, either a directory (with VCF files) or a vcf file!')
-  }
-  if (length(ref1kg_vcfs)==0) {
-    stop('[CARoT] A valid "ref1kg_vcfs" must be provided, either a directory (with VCF files) or a vcf file!')
+  if (input_type=="array" & splitted_by_chr & length(list_ref)!=1) {
+    stop(
+      '[CARoT] A unique vcf file ("ref1kg_vcfs") must be provided ',
+      'with `input_type = "array"` & `splitted_by_chr = FALSE`!'
+    )
   }
 
   ######################
@@ -119,6 +110,37 @@ estimate_ethnicity <- function(
     ref1kg_population = ref1kg_population
   )
 
+}
+
+
+#' check_input
+#'
+#' @param input A `character`
+#'
+#' @keywords internal
+check_input <- function(input) {
+  name <- deparse(substitute(input))
+  if (!fs::is_dir(input) & !fs::is_file(input)) {
+    stop(
+      '[CARoT] A valid "', name, '" must be provided, ',
+      'either a directory (with VCF files) or a vcf file!'
+    )
+  }
+  if (fs::is_dir(input)) {
+    list_input <- list.files(path = input, pattern = ".vcf.gz$", full.names = TRUE)
+  } else {
+    list_input <- input
+  }
+  if (!all(grepl(".vcf.gz$", list_input))) {
+    stop('[CARoT] VCF files must be compressed using bgzip!')
+  }
+  if (length(list_input)==0) {
+    stop(
+      '[CARoT] A valid "', name, '" must be provided, ',
+      'either a directory (with VCF files) or a vcf file!'
+    )
+  }
+  invisible(list_input)
 }
 
 
@@ -223,19 +245,22 @@ format_vcf <- function(
 #'
 #' @keywords internal
 merge_vcf <- function(input_vcfs, bin_path) {
-  if (length(input_vcfs)>1) {
-    output_temp <- paste(tempdir(), "/samples_merged.vcf.gz")
+  if (length(input_vcfs) > 1) {
+    output_temp <- paste0(tempdir(), "/samples_merged.vcf.gz")
+    vcf_list <- paste0(tempdir(), "/samples_merged.txt")
+    cat(input_vcfs, sep = "\n", file = vcf_list)
     system(
       ignore.stdout = TRUE, intern = TRUE, wait = TRUE, ignore.stderr = TRUE,
       command = paste(
         bin_path[["bcftools"]], "merge --merge none",
-        paste(input_vcfs, collapse = " "),
+        " --file-list", vcf_list,
         "--output-type z",
         "--output", output_temp,
         "&&",
         bin_path[["tabix"]], "-p vcf", output_temp
       )
     )
+    unlink(vcf_list)
   } else {
     output_temp <- input_vcfs
   }
@@ -253,17 +278,11 @@ format_array_chr <- function(
   input_vcfs,
   output_directory,
   ref1kg_vcfs,
-  ref1kg_maf = 0.05,
-  quality_tag = "INFO",
-  quality_threshold = 0.9,
-  n_cores = 6,
-  bin_path = list(
-    vcftools = "/usr/bin/vcftools",
-    bcftools = "/usr/bin/bcftools",
-    bgzip = "/usr/bin/bgzip",
-    tabix = "/usr/bin/tabix",
-    plink1.9 = "/usr/bin/plink1.9"
-  )
+  ref1kg_maf,
+  quality_tag,
+  quality_threshold,
+  n_cores,
+  bin_path
 ) {
   out <- parallel::mclapply(
     X = 1:22,
@@ -357,16 +376,10 @@ format_array_all <- function(
   input_vcfs,
   output_directory,
   ref1kg_vcfs,
-  ref1kg_maf = 0.05,
-  quality_tag = "INFO",
-  quality_threshold = 0.9,
-  bin_path = list(
-    vcftools = "/usr/bin/vcftools",
-    bcftools = "/usr/bin/bcftools",
-    bgzip = "/usr/bin/bgzip",
-    tabix = "/usr/bin/tabix",
-    plink1.9 = "/usr/bin/plink1.9"
-  )
+  ref1kg_maf,
+  quality_tag,
+  quality_threshold,
+  bin_path
 ) {
   format_vcf(
     input_vcfs = input_vcfs,
@@ -412,14 +425,8 @@ format_sequencing <- function(
   input_vcfs,
   output_directory,
   ref1kg_vcfs,
-  ref1kg_maf = 0.05,
-  bin_path = list(
-    vcftools = "/usr/bin/vcftools",
-    bcftools = "/usr/bin/bcftools",
-    bgzip = "/usr/bin/bgzip",
-    tabix = "/usr/bin/tabix",
-    plink1.9 = "/usr/bin/plink1.9"
-  )
+  ref1kg_maf,
+  bin_path
 ) {
   merged_vcfs <- merge_vcf(
     input_vcfs = input_vcfs,
@@ -429,9 +436,12 @@ format_sequencing <- function(
   format_vcf(
     input_vcfs = merged_vcfs,
     ref1kg_vcfs = ref1kg_vcfs,
+    ref1kg_maf = ref1kg_maf,
     ichr = "ALL",
     quality_tag = NULL,
-    output_directory = output_directory
+    quality_threshold = NULL,
+    output_directory = output_directory,
+    bin_path = bin_path
   )
 
   system(
@@ -582,7 +592,7 @@ compute_pca <- function(cohort_name, input_plink, output_directory, ref1kg_popul
   #################
   message("[CARoT] Exporting ...")
   ggplot2::ggsave(
-    filename = paste0(output_directory, "/", cohort_name, "_ethnicty.tiff"),
+    filename = paste0(output_directory, "/", cohort_name, "_ethnicity.tiff"),
     plot = p_ethni,
     width = 6.3,
     height = 4.7 * 1.5,
@@ -593,7 +603,7 @@ compute_pca <- function(cohort_name, input_plink, output_directory, ref1kg_popul
   invisible(
     readr::write_csv(
       x = pca_gg_pred,
-      path = paste0(output_directory, "/", cohort_name, "_ethnicty.csv")
+      path = paste0(output_directory, "/", cohort_name, "_ethnicity.csv")
     )
   )
 }

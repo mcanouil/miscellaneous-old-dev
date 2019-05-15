@@ -73,7 +73,8 @@ sqrtabs_trans <- function() {
       max <- ceiling(rng[2])
       min <- floor(rng[1])
       by <- floor((max - min) / n)
-      return(g(seq(min, max, by = by)))
+      by <- if (by>1) floor(by) else by
+      g(seq(min, max, by = by))
     }
   }
   scales::trans_new(

@@ -29,10 +29,10 @@ QuitChildProcessesOnExit: Yes
 " > ~/$project_name/$project_name.Rproj
 
 cat ~/DEV/make_project/default_script.R \
-  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/
+  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/default_script.R
 
 cat ~/DEV/make_project/default_script.Rmd \
-  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/
+  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/default_script.Rmd
 
 cat ~/DEV/make_project/default_script.sh \
   | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/_build.sh
@@ -68,10 +68,12 @@ echo '/*
 ' > ~/$project_name/.gitignore
 
 git -C ~/$project_name/ init
-git -C ~/$project_name/ remote add origin git@github.com:mcanouil/$project_name.git
 git -C ~/$project_name/ add --all
 git -C ~/$project_name/ commit -am 'create project'
-git -C /disks/PROJECT/$project_name/ config --local core.sharedRepository 0755
-# git push -u origin master
+git -C ~/$project_name/ config --local core.sharedRepository 0755
+# git -C ~/$project_name/ push --set-upstream git@github.com:mcanouil/$project_name.git master
+curl -u "mcanouil" https://api.github.com/user/repos -d "{\"name\":\"$project_name\"}"
+git -C ~/$project_name/ remote add origin git@github.com:mcanouil/$project_name.git
+git -C ~/$project_name/ push -u origin master
 
 # ~/DEV/make_project/make_project.sh ""

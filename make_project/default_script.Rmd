@@ -2,17 +2,19 @@
 title: 'PRJCT'
 author: 
 - name: "Mickaël Canouil, Ph.D."
-  affiliation: "Université de Lille, CNRS UMR 8199 - EGID, Institut Pasteur de Lille, Lille, France."
+  affiliation: "Université de Lille, CNRS, Institut Pasteur de Lille, UMR 8199 - EGID, F-59000, Lille, France."
   email: "mickael.canouil@cnrs.fr"
 date: '`r format(Sys.time(), "%B %d, %Y")`'
 monofont: 'Source Code Pro'
 monofontoptions: 'Scale=0.7'
 params:
-  output_code: FALSE
+  script_name: NULL
+  project_directory: "~/PRJCT"
+  working_directory: !r gsub("/PROJECT/", "/DATATMP/", params[["project_directory"]])
+  show_code: FALSE
   n_cores: !r parallel::detectCores()
   dpi: 120
   gg_fontsize: 12
-  theme_dark: TRUE
 output:
   bookdown::html_document2:
     theme: simplex
@@ -31,54 +33,73 @@ output:
 ```{r setup, include = FALSE}
 options(stringsAsFactors = FALSE)
 
-script_name <- ''
-project_directory <- '~/PRJCT'
-working_directory <- paste0(project_directory, '/Data')
-output_directory <- paste0(working_directory, script_name, sep = '/')
+output_directory <- paste(
+  params[["working_directory"]], 
+  params[["script_name"]], 
+  sep = "/")
 
-dir.create(paste0(output_directory, '/KnitrFiles/'), recursive = TRUE, showWarnings = FALSE, mode = '0777')
+dir.create(
+  path = paste0(output_directory, "/cache/"), 
+  recursive = TRUE, 
+  showWarnings = FALSE, 
+  mode = "0777"
+)
 
 
-### Load packages
+### Load packages and functions
 library(parallel)
-library(grid)
 library(tidyverse)
 library(scales)
+library(grid)
 
 devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/theme_black.R')
-devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/pretty_kable.R')
+
+pretty_kable <- function (
+  data, 
+  font_size = 12, 
+  format_args = list(scientific = -1, digits = 3, big.mark = ","), 
+  col.names = NA,
+  full_width = FALSE,
+  format = "html",
+  ...
+) {
+  output <- knitr::kable(
+    x = data, 
+    format.args = format_args, 
+    col.names = col.names,
+    ...
+  )
+  kableExtra::kable_styling(
+    kable_input = output,
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = full_width,
+    position = "center",
+    font_size = font_size
+  )
+}
 
 
 ### Set knitr rmarkdown chunk options
 knitr::opts_chunk$set(
-  results = 'asis',
-  dpi = params$dpi,
-  include = TRUE,
-  echo = params$output_code,
-  warning = params$output_code,
-  message = params$output_code,
+  results = "asis",
   size = 'small',
+  include = TRUE,
+  echo = params[["show_code"]],
+  warning = params[["show_code"]],
+  message = params[["show_code"]],
+  dpi = params[["dpi"]],
   tidy = FALSE,
   crop = TRUE,
   autodep = TRUE,
   fig.align = 'center',
   fig.pos = '!H',
   cache = FALSE,
-  cache.path = paste0(output_directory, '/KnitrFiles/'),
-  fig.path = paste0(output_directory, '/KnitrFiles/')
+  cache.path = paste0(output_directory, "/cache/"),
+  fig.path = paste0(output_directory, "/cache/")
 )
 
-
-### Define n_cores
-n_cores <- params$n_cores
-
-
 ### Define theme
-if (params$theme_dark) {
-  theme_set(theme_black(base_size = params$gg_fontsize))
-} else {
-  theme_set(theme_light(base_size = params$gg_fontsize))
-}
+theme_set(theme_light(base_size = params[["gg_fontsize"]]))
 ```
 
 # Summary
@@ -87,5 +108,6 @@ if (params$theme_dark) {
 # R session information
 
 ```{r session_info, results = "markup"}
+options("width" = 110)
 sessioninfo::session_info()
 ```

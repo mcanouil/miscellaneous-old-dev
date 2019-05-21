@@ -29,10 +29,10 @@ QuitChildProcessesOnExit: Yes
 " > ~/$project_name/$project_name.Rproj
 
 cat ~/DEV/make_project/default_script.R \
-  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/00-main.R
+  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/
 
 cat ~/DEV/make_project/default_script.Rmd \
-  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/00-main.Rmd
+  | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/
 
 cat ~/DEV/make_project/default_script.sh \
   | sed -e "s/PRJCT/$project_name/g" > ~/$project_name/Scripts/_build.sh
@@ -62,8 +62,8 @@ echo '/*
 **.pdf
 
 !/Scripts/
-!/Docs/*
-!/Report/*
+!/Docs/
+!/Report/
 !README.md
 ' > ~/$project_name/.gitignore
 

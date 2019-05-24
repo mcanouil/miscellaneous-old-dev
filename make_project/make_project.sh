@@ -73,7 +73,7 @@ git -C ~/$project_name/ commit -am 'create project'
 git -C ~/$project_name/ config --local core.sharedRepository 0755
 # git -C ~/$project_name/ push --set-upstream git@github.com:mcanouil/$project_name.git master
 curl -u "mcanouil" https://api.github.com/user/repos -d "{\"name\":\"$project_name\"}"
-git -C ~/$project_name/ remote add origin git@github.com:mcanouil/$project_name.git
+git -C ~/$project_name/ remote add origin  https://github.com/mcanouil/$project_name.git
 git -C ~/$project_name/ push -u origin master
 
 # ~/DEV/make_project/make_project.sh ""

@@ -77,7 +77,7 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
     data = data, 
     mapping = ggplot2::aes(x = x_pos, y = y_pval, colour = x_chr)
   ) +
-    ggplot2::geom_point(size = 1.5, shape = 21, na.rm = TRUE, show.legend = FALSE) +
+    ggplot2::geom_point(size = 1.5, shape = 1, na.rm = TRUE, show.legend = FALSE) +
     ggplot2::scale_colour_manual(
       values = rep(scales::viridis_pal(begin = 1/4, end = 3/4)(2), 12)
     ) +

@@ -1,16 +1,17 @@
 ---
-title: ''
-author: 'Mickaël CANOUIL, *Ph.D.*'
-date: ''
-monofont: 'Source Code Pro'
-monofontoptions: 'Scale=0.7'
+title: "title"
+author: "Mickaël CANOUIL, *Ph.D.*"
+date: "date"
+monofont: "Source Code Pro"
+monofontoptions: "Scale=0.7"
 csl: template/csl/apa.csl
 params:
+  output_directory: "./"
   eval: TRUE
 output:
   ioslides_presentation:
-    css: 'template/dark.css'
-    logo: 'template/logo_UMR.png'
+    css: "template/mc_theme.css"
+    logo: "template/logo_UMR.png"
     smaller: false
     self_contained: true
     mathjax: default
@@ -25,7 +26,7 @@ output:
 options(stringsAsFactors = FALSE)
 # Sys.setlocale("LC_TIME", "english_united kingdom.1252")
 
-output_directory <- ""
+output_directory <- params[["output_directory"]]
 
 ### Load packages and functions
 library(tidyverse)
@@ -37,7 +38,7 @@ library(knitr)
 library(rmarkdown)
 library(kableExtra)
 
-devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/theme_black.R')
+devtools::source_url("https://github.com/mcanouil/DEV/raw/master/R/theme_black.R")
 
 options("width" = 80)
 ### Set knitr rmarkdown chunk options
@@ -72,9 +73,7 @@ theme_set(theme_black(base_size = 11))
 
 
 
-
-
-# <img src="http://mickael.canouil.fr/img/IDPhotoBWlight.png" height = "150px"></img>__*Me?*__ {.flexbox .vcenter}
+# <img src="https://avatars1.githubusercontent.com/u/8896044?s=460&v=4" height = "150px" id = "picture"></img>__*Me?*__ {.flexbox .vcenter}
 
 <div class="auto-fadein">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/js/uikit.min.js"></script>
@@ -82,22 +81,22 @@ theme_set(theme_black(base_size = 11))
 <div class="columns-2">
 
 <span class="uk-icon-button" uk-icon="icon: receiver; ratio: 1"></span>
-    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="" target="_blank">+33 (0) 374 00 81 29</a> 
+    <a id="social-media" href="" target="_blank">+33 (0) 374 00 81 29</a> 
     
 <span class="uk-icon-button" uk-icon="icon: mail; ratio: 1"></span>
-    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="mailto:mickael.canouil@cnrs.fr" target="_blank">mickael.canouil@cnrs.fr</a> 
+    <a id="social-media" href="mailto:mickael.canouil@cnrs.fr" target="_blank">mickael.canouil@cnrs.fr</a> 
 
 <span class="uk-icon-button" uk-icon="icon: home; ratio: 1"></span>
-    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="http://mickael.canouil.fr" target="_blank">mickael.canouil.fr</a> 
+    <a id="social-media" href="http://mickael.canouil.fr" target="_blank">mickael.canouil.fr</a> 
 
 <span class="uk-icon-button" uk-icon="icon: linkedin; ratio: 1"></span>
-    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="https://www.linkedin.com/in/mickael-canouil" target="_blank">mickael-canouil</a> 
+    <a id="social-media" href="https://www.linkedin.com/in/mickael-canouil" target="_blank">mickael-canouil</a> 
 
 <span class="uk-icon-button" uk-icon="icon: github; ratio: 1"></span>
-    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="https://github.com/mcanouil" target="_blank">mcanouil</a> 
+    <a id="social-media" href="https://github.com/mcanouil" target="_blank">mcanouil</a> 
 
 <span class="uk-icon-button" uk-icon="icon: twitter; ratio: 1"></span>
-    <a style="border-bottom: none; font-size: 80%; vertical-align: text-top;" href="https://twitter.com/Coeos_" target="_blank">@Coeos_</a> 
+    <a id="social-media" href="https://twitter.com/mickaelcanouil" target="_blank">@mickaelcanouil</a> 
 
 </div>
 </div>

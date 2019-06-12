@@ -1,5 +1,5 @@
 :root {
-  --url-color: #4169e1;
+  --url-color: #a9a9a9;
   --bg-img: url(texturebg.png);
 }
 
@@ -11,7 +11,7 @@
   padding: 5pt;
 }
 
-#social-media {
+#social {
   border-bottom: none; 
   font-size: 80%; 
   vertical-align: text-top;

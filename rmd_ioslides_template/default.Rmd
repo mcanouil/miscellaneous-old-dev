@@ -1,7 +1,9 @@
 ---
-title: "title"
-author: "Mickaël CANOUIL, *Ph.D.*"
-date: "date"
+title: "Title"
+subtitle: "Subtitle"
+author: 
+- name: "Mickaël CANOUIL, *Ph.D.*"
+date: "Date"
 monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
 csl: template/csl/apa.csl
@@ -82,22 +84,22 @@ options(kableExtra.html.bsTable = TRUE)
 <div class="columns-2">
 
 <span class="uk-icon-button" uk-icon="icon: receiver; ratio: 1"></span>
-    <a id="social-media" href="" target="_blank">+33 (0) 374 00 81 29</a> 
+    <a id="social" href="" target="_blank">+33 (0) 374 00 81 29</a> 
     
 <span class="uk-icon-button" uk-icon="icon: mail; ratio: 1"></span>
-    <a id="social-media" href="mailto:mickael.canouil@cnrs.fr" target="_blank">mickael.canouil@cnrs.fr</a> 
+    <a id="social" href="mailto:mickael.canouil@cnrs.fr" target="_blank">mickael.canouil@cnrs.fr</a> 
 
 <span class="uk-icon-button" uk-icon="icon: home; ratio: 1"></span>
-    <a id="social-media" href="http://mickael.canouil.fr" target="_blank">mickael.canouil.fr</a> 
+    <a id="social" href="http://mickael.canouil.fr" target="_blank">mickael.canouil.fr</a> 
 
 <span class="uk-icon-button" uk-icon="icon: linkedin; ratio: 1"></span>
-    <a id="social-media" href="https://www.linkedin.com/in/mickael-canouil" target="_blank">mickael-canouil</a> 
+    <a id="social" href="https://www.linkedin.com/in/mickael-canouil" target="_blank">mickael-canouil</a> 
 
 <span class="uk-icon-button" uk-icon="icon: github; ratio: 1"></span>
-    <a id="social-media" href="https://github.com/mcanouil" target="_blank">mcanouil</a> 
+    <a id="social" href="https://github.com/mcanouil" target="_blank">mcanouil</a> 
 
 <span class="uk-icon-button" uk-icon="icon: twitter; ratio: 1"></span>
-    <a id="social-media" href="https://twitter.com/mickaelcanouil" target="_blank">@mickaelcanouil</a> 
+    <a id="social" href="https://twitter.com/mickaelcanouil" target="_blank">@mickaelcanouil</a> 
 
 </div>
 </div>

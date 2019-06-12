@@ -28,6 +28,7 @@
 
 a {
   color: var(--url-color);
+  text-decoration: none;
 }
 
 a:hover {

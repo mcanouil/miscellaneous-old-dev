@@ -1,7 +1,12 @@
+:root {
+  --url-color: #4169e1;
+  --bg-img: url(texturebg.png);
+}
+
 #picture {
   border-style: solid;
   border-width: 2pt;
-  border-color: #4169e1;
+  border-color: var(--url-color);
   border-radius: 50%;
   padding: 5pt;
 }
@@ -12,29 +17,21 @@
   vertical-align: text-top;
 }
 
-slide img {
-  max-width: 768px;
-  max-height: 460px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+#exe {
+  background-color: #f3f3f3;
+  padding: 5px 0 1px 0;
 }
 
 .notes {
   color: #000000;
 }
 
-#exe {
-  background-color: #f3f3f3;
-  padding: 5px 0 1px 0;
+a {
+  color: var(--url-color);
 }
 
 a:hover {
-  color: white !important;
-}
-
-a {
-  color: #4169e1;
+  color: #ffffff !important;
 }
 
 .uk-icon-button {
@@ -43,24 +40,14 @@ a {
   width: 30px;
   height: 30px;
   border-radius: 100%;
-  background: #eee;
+  background: #eeeeee;
   line-height: 34px;
-  color: #444;
+  color: #444444;
   text-align: center;
 }
 
 .references {
   font-size: 12px;
-}
-
-.gdbar img {
-  width: 305px !important;
-  height: 50px !important;
-  margin: 10px;
-}
-.gdbar {
-  width: 325px !important;
-  height: 70px !important;
 }
 
 ul {
@@ -93,7 +80,6 @@ pre {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   background-color: #fafafa;
-  /*overflow: hidden;*/
 }
 
 .prettyprint {
@@ -111,8 +97,8 @@ code {
   padding: 2px;
 }
 
-table.rmdtable td.highlight {
-  color: white;
+table.rmdtable td.highlight th {
+  color: #ffffff;
   font-size: 18px;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(40%, #666666), color-stop(80%, #333333)) no-repeat;
   background: -webkit-linear-gradient(top, #666666 40%, #333333 80%) no-repeat;
@@ -121,24 +107,8 @@ table.rmdtable td.highlight {
   background: linear-gradient(top, #666666 40%, #333333 80%) no-repeat;
 }
 
-.auto-fadein h2 {
-  text-align: center;
-}
-
-.auto-fadein h3 {
-  text-align: center;
-}
-
-.segue h3 {
-  color: #e6e6e6;
-  line-height: 1.5;
-  margin-top: 1.25em;
-}
-
-.segue hgroup {
-  bottom: 225px;
-  position: relative; 
-  top: 100px;
+table.rmdtable tr:nth-child(odd) {
+  background-color: #e6e6e6;
 }
 
 aside.gdbar {
@@ -167,7 +137,12 @@ aside.gdbar {
   -o-transition: all 0.5s ease-out 0.5s;
   transition: all 0.5s ease-out 0.5s;
   /* Better to transition only on background-size, but not sure how to do that with the mixin. */
-  background-image: url(texturebg.png);
+  background-image: var(--bg-img);
+}
+
+.gdbar {
+  width: 325px !important;
+  height: 70px !important;
 }
 
 .gdbar img {
@@ -176,9 +151,24 @@ aside.gdbar {
   margin: 10px;
 }
 
-.gdbar {
-  width: 325px !important;
-  height: 70px !important;
+.auto-fadein h2 {
+  text-align: center;
+}
+
+.auto-fadein h3 {
+  text-align: center;
+}
+
+.segue h3 {
+  color: #e6e6e6;
+  line-height: 1.5;
+  margin-top: 1.25em;
+}
+
+.segue hgroup {
+  bottom: 225px;
+  position: relative; 
+  top: 100px;
 }
 
 .title-slide hgroup {
@@ -189,32 +179,34 @@ aside.gdbar {
 }
 
 .title-slide hgroup h1 {
-  line-height: 1.4;
-  letter-spacing: -3px;
-  font-size: 45px;
-  background: #333333;
   color: #ffffff;
-  padding-top: 5px;
-  padding-right: 20px;
-  padding-bottom: 5px;
-  padding-left: 20px;
-  text-align: center;
-  border-radius: 10px 10px 10px 10px;
-  background-image: url(texturebg.png);
+  border-radius: 10px 10px 0px 0px;
+  background-image: var(--bg-img);
 }
 
-slides > slide.dark {
-  background-image: url(texturebg.png) !important;
+.title-slide hgroup h2 {
+  border-radius: 0px 0px 10px 10px;
+  background-image: var(--bg-img);
+}
+
+slide img {
+  max-width: 768px;
+  max-height: 460px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 slides > slide {
   z-index: 1;
-  background-image: url(texturebg.png);
+  background-image: var(--bg-img);
   background-position: 0 100%;
   background-repeat: repeat-x;
 }
 
-/*.title-slide*/
+slides > slide.dark {
+  background-image: var(--bg-img) !important;
+}
 
 slides > slide:not(.nobackground):before {
   background-size: 305px 50px;
@@ -226,4 +218,8 @@ slides > slide:not(.nobackground):before {
 slides > slide:not(.nobackground):after {
   color: #ffffff;
   bottom: 12px;
+}
+
+article.smaller pre {
+  font-size: 12px;
 }

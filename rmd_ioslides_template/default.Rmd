@@ -64,6 +64,7 @@ opts_chunk$set(
 theme_set(theme_black(base_size = 11))
 
 # options(tibble.print_max = 3, tibble.print_min = 3)
+options(kableExtra.html.bsTable = TRUE)
 ```
 
 # Title | Subtitle {.flexbox .vcenter}
@@ -73,7 +74,7 @@ theme_set(theme_black(base_size = 11))
 
 
 
-# <img src="https://avatars1.githubusercontent.com/u/8896044?s=460&v=4" height = "150px" id = "picture"></img>__*Me?*__ {.flexbox .vcenter}
+# <img src="https://avatars1.githubusercontent.com/u/8896044?s=460&v=4" height = "150px" id = "picture"></img> {.flexbox .vcenter}
 
 <div class="auto-fadein">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/js/uikit.min.js"></script>

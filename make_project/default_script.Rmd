@@ -1,16 +1,16 @@
 ---
-title: 'PRJCT'
+title: "PRJCT"
 author: 
-- name: "Mickaël Canouil, Ph.D."
+- name: "Mickaël Canouil, *Ph.D.*"
   affiliation: "Université de Lille, CNRS, Institut Pasteur de Lille, UMR 8199 - EGID, F-59000, Lille, France."
   email: "mickael.canouil@cnrs.fr"
 date: '`r format(Sys.time(), "%B %d, %Y")`'
-monofont: 'Source Code Pro'
-monofontoptions: 'Scale=0.7'
+monofont: "Source Code Pro"
+monofontoptions: "Scale=0.7"
 params:
   script_name: NULL
   project_directory: "~/PRJCT"
-  working_directory: !r gsub("/PROJECT/", "/DATATMP/", params[["project_directory"]])
+  working_directory: "~/PRJCT"
   show_code: FALSE
   n_cores: !r parallel::detectCores()
   dpi: 120
@@ -33,26 +33,11 @@ output:
 ```{r setup, include = FALSE}
 options(stringsAsFactors = FALSE)
 
-output_directory <- paste(
-  params[["working_directory"]], 
-  params[["script_name"]], 
-  sep = "/")
-
-dir.create(
-  path = paste0(output_directory, "/cache/"), 
-  recursive = TRUE, 
-  showWarnings = FALSE, 
-  mode = "0777"
-)
-
-
 ### Load packages and functions
 library(parallel)
 library(tidyverse)
 library(scales)
 library(grid)
-
-devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/theme_black.R')
 
 pretty_kable <- function (
   data, 
@@ -78,11 +63,23 @@ pretty_kable <- function (
   )
 }
 
+devtools::source_url("https://github.com/mcanouil/DEV/raw/master/R/theme_black.R")
 
 ### Set knitr rmarkdown chunk options
+output_directory <- paste(
+  params[["working_directory"]], 
+  params[["script_name"]], 
+  sep = "/"
+)
+dir.create(
+  path = paste0(output_directory, "/cache/"), 
+  recursive = TRUE, 
+  showWarnings = FALSE, 
+  mode = "0777"
+)
 knitr::opts_chunk$set(
   results = "asis",
-  size = 'small',
+  size = "small",
   include = TRUE,
   echo = params[["show_code"]],
   warning = params[["show_code"]],
@@ -91,12 +88,13 @@ knitr::opts_chunk$set(
   tidy = FALSE,
   crop = TRUE,
   autodep = TRUE,
-  fig.align = 'center',
-  fig.pos = '!H',
-  cache = FALSE,
+  fig.align = "center",
+  fig.pos = "!H",
+  cache = params[["cache"]],
   cache.path = paste0(output_directory, "/cache/"),
   fig.path = paste0(output_directory, "/cache/")
 )
+
 
 ### Define theme
 theme_set(theme_light(base_size = params[["gg_fontsize"]]))

@@ -35,10 +35,7 @@ commit <- paste0('-m "ANALYSIS done ', current_date, '"')
 fexsend <- "/disks/DATA/Softwares/FEX/fexsend"
 
 
-### Output
-file_name <- "default_script"
-archive_name <- paste(output_directory, paste0(current_date, "_", file_name, ".tar.gz"), sep = "/")
-
+### Analyses
 rmarkdown::render(
   input = paste0(project_directory, "/Scripts/", script_name, ".Rmd"), 
   output_file = paste0(file_name, ".html"), 
@@ -51,6 +48,10 @@ rmarkdown::render(
   )
 )
 
+
+### Output
+file_name <- script_name
+archive_name <- paste(output_directory, paste0(current_date, "_", file_name, ".tar.gz"), sep = "/")
 system(paste(
   "tar zcvf", archive_name, "-C", output_directory, paste0(file_name, ".html")
 ), intern = TRUE)

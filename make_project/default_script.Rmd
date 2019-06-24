@@ -9,6 +9,7 @@ monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
 params:
   script_name: NULL
+  data_directory: NULL
   project_directory: "~/PRJCT"
   working_directory: "~/PRJCT"
   show_code: FALSE
@@ -105,7 +106,7 @@ theme_set(theme_light(base_size = params[["gg_fontsize"]]))
 
 # R session information
 
-```{r session_info, results = "markup"}
+```{r session-info, results = "markup"}
 options("width" = 110)
 sessioninfo::session_info()
 ```

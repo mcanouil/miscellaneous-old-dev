@@ -2,7 +2,7 @@
 title: "Title"
 subtitle: "Subtitle"
 author: 
-- name: "Mickaël CANOUIL, *Ph.D.*"
+  - name: "Mickaël CANOUIL, *Ph.D.*"
 date: "Date"
 monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
@@ -21,11 +21,15 @@ output:
     fig_height: 3.30
     transition: 0.5
     incremental: false
+    code_download: true
 ---
 
 
 ```{r setup, include = FALSE}
 options(stringsAsFactors = FALSE)
+options(width = 80)
+options(kableExtra.html.bsTable = TRUE)
+# options(tibble.print_max = 3, tibble.print_min = 3)
 # Sys.setlocale("LC_TIME", "english_united kingdom.1252")
 
 output_directory <- params[["output_directory"]]
@@ -42,31 +46,27 @@ library(kableExtra)
 
 devtools::source_url("https://github.com/mcanouil/DEV/raw/master/R/theme_black.R")
 
-options("width" = 80)
 ### Set knitr rmarkdown chunk options
 opts_chunk$set(
   include = TRUE,
   echo = FALSE,
   warning = FALSE,
   message = FALSE,
-  eval = params$eval,
+  eval = params[["eval"]],
   tidy = FALSE,
   crop = TRUE,
   autodep = FALSE,
   dpi = 120,
   fig.path = "./images/",
-  cache = FALSE,
-  cache.path = NULL,
-  width = 80,
+  # cache = FALSE,
+  # cache.path = NULL,
+  width = getOption("width"),
   comment = "#>",
   results = "asis"
 )
 
 ### Define theme
 theme_set(theme_black(base_size = 11))
-
-# options(tibble.print_max = 3, tibble.print_min = 3)
-options(kableExtra.html.bsTable = TRUE)
 ```
 
 # Title | Subtitle {.flexbox .vcenter}

@@ -1,9 +1,9 @@
 ---
 title: "PRJCT"
 author: 
-- name: "Mickaël Canouil, *Ph.D.*"
-  affiliation: "Université de Lille, CNRS, Institut Pasteur de Lille, UMR 8199 - EGID, F-59000, Lille, France."
-  email: "mickael.canouil@cnrs.fr"
+  - name: "Mickaël Canouil, *Ph.D.*"
+    affiliation: "Université de Lille, CNRS, Institut Pasteur de Lille, UMR 8199 - EGID, F-59000, Lille, France."
+    email: "mickael.canouil@cnrs.fr"
 date: '`r format(Sys.time(), "%B %d, %Y")`'
 monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"

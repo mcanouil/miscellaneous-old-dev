@@ -33,7 +33,7 @@ deploy_site <- function(
     output_dir = dest_dir, 
     output_file = "index.html"
   )
-  if (is.null(dir_list)) {
+  if (!is.null(dir_list)) {
     sapply(
       X = dir_list, 
       FUN = file.copy, 

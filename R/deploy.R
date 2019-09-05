@@ -1,5 +1,6 @@
 deploy_site <- function(
   input = ".",
+  dir_list = NULL,
   ssh_id = Sys.getenv("id_rsa", ""),
   repo_slug = Sys.getenv("TRAVIS_REPO_SLUG", ""),
   commit_message = "",
@@ -32,6 +33,15 @@ deploy_site <- function(
     output_dir = dest_dir, 
     output_file = "index.html"
   )
+  if (is.null(dir_list)) {
+    sapply(
+      X = dir_list, 
+      FUN = file.copy, 
+      to = dest_dir, 
+      overwrite = TRUE, 
+      recursive = TRUE
+    )
+  }
   commit_message <- sprintf("Built site for %s: %s@%s", commit_message, Sys.Date(), substr(Sys.getenv("TRAVIS_COMMIT"), 1, 7))
   pkgdown:::github_push(dest_dir, commit_message)
   cli::rule("Deploy completed", line = 2)

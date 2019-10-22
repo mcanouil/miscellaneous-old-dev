@@ -1,19 +1,33 @@
 #!/bin/bash
 
 USER=$1
-PWD=$2
-ID=$3
+ID=$2
 
-mkdir /home/$USER \
-&& useradd -u $ID $USER --home /home/$USER \
-&& echo "$USER:$PWD" | chpasswd \
-&& chown -R $USER:staff /home/$USER \
-&& addgroup $USER staff \
-&& addgroup $USER root \
-&& adduser $USER sudo \
-&& usermod -g staff $USER \
-&& mkdir -p /home/$USER/.rstudio/monitored/user-settings \
-&& [ -f /home/$USER/.rstudio/monitored/user-settings/user-settings ] || echo 'alwaysSaveHistory="0" 
+if [ -d /media/User/$USER ]
+then
+  useradd \
+  --uid $ID \
+  --no-create-home \
+  --home /media/User/$USER \
+  --no-user-group \
+  --gid staff \
+  --groups staff,root,sudo \
+  $USER &&
+  echo "$USER:$USER" | chpasswd
+else
+    useradd \
+  --uid $ID \
+  --create-home \
+  --home /media/User/$USER \
+  --no-user-group \
+  --gid staff \
+  --groups staff,root,sudo \
+  $USER &&
+  echo "$USER:$USER" | chpasswd
+fi
+
+[ -d /media/User/$USER/.rstudio/monitored/user-settings ] || mkdir -p /media/User/$USER/.rstudio/monitored/user-settings \
+&& [ -f /media/User/$USER/.rstudio/monitored/user-settings/user-settings ] || echo 'alwaysSaveHistory="0" 
 cleanTexi2DviOutput="1" 
 cleanupAfterRCmdCheck="1" 
 cranMirrorCountry="us" 

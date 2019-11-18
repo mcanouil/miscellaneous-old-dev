@@ -4,6 +4,8 @@ deploy_site <- function(
   ssh_id = Sys.getenv("id_rsa", ""),
   repo_slug = Sys.getenv("TRAVIS_REPO_SLUG", ""),
   commit_message = "",
+  output_format = NULL,
+  output_file = "index.html",
   verbose = FALSE,
   ...
 ) {
@@ -31,7 +33,8 @@ deploy_site <- function(
   rmarkdown::render(
     input = input, 
     output_dir = dest_dir, 
-    output_file = "index.html"
+    output_format = output_format,
+    output_file = output_file
   )
   if (!is.null(dir_list)) {
     sapply(

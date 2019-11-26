@@ -38,12 +38,12 @@
 #'
 #' @export
 mist <- function(y, X, G, Z, method = "liu", model = c("guess", "continuous", "binary")) {
-  check_y <- c("continuous", "binary")[(length(unique(y))==2)+1]
+  check_y <- c("continuous", "binary")[(length(unique(y)) == 2) + 1]
   if (any(grepl("guess", model))) {
     message('[MiST] "y" seems to be "', check_y, '", model is set to "', check_y, '"!')
     model <- check_y
   }
-  if (model!=check_y) {
+  if (model != check_y) {
     warning('[MiST] "y" seems to be "', check_y,'" and model was set to "', model, '"!')
   }
   switch(
@@ -67,11 +67,11 @@ mist <- function(y, X, G, Z, method = "liu", model = c("guess", "continuous", "b
 #'
 #' @return list
 #' @export
-mist_print <- function(x) {
+print.mist <- mist_print <- function(x) {
   cluster_name <- gsub("^GZ", "", rownames(x$out_rare))
   rownames(x$out_rare) <- NULL
   stat_rare <- cbind.data.frame(
-    "SubClusters" = ifelse(cluster_name=="", "None", cluster_name),
+    "SubClusters" = ifelse(cluster_name == "", "None", cluster_name),
     x$out_rare
   )
 
@@ -156,7 +156,9 @@ mist_logit <- function(y, X, G, Z, method = "liu") {
   )
   rownames(out_rare) <- get_GZ
 
-  list(out_MiST = out_MiST, out_rare = out_rare)
+  output <- list(out_MiST = out_MiST, out_rare = out_rare)
+  class(output) <- "mist"
+  output
 }
 
 
@@ -228,5 +230,7 @@ mist_linear <- function(y, X, G, Z, method = "liu") {
   )
   rownames(out_rare) <- get_GZ
 
-  list(out_MiST = out_MiST, out_rare = out_rare)
+  output <- list(out_MiST = out_MiST, out_rare = out_rare)
+  class(output) <- "mist"
+  output
 }

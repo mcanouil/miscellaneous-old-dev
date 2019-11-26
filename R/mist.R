@@ -121,7 +121,7 @@ print.mist <- function(x) {
     sep = ""
   )
 }
-print.mist(x)
+
 
 #' mist_logit
 #'

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name - MiST: Mixed effects Score Test for continuous outcomes
+# Name - MiST: Mixed effects Score Test
 # Desc - Test for association between a set of SNPS/genes and continuous
 #        or binary outcomes by including variant characteristic information
 #        and using (weighted) score statistics.
@@ -20,7 +20,7 @@
 #' @param G [numeric] A numeric genotype matrix with rows for individuals and columns for SNPs.
 #'   Each SNP should be coded as 0, 1, and 2 for AA, Aa, aa, where A is a major allele and a is a minor allele.
 #'   Missing genotypes are not allowed.
-#' @param Z [numeric]a numeric matrix of second level covariates for variant characteristics.
+#' @param Z [numeric] a numeric matrix of second level covariates for variant characteristics.
 #'   Each row corresponds to a variant and each column corresponds to a variant characteristic.
 #'   If there is no second level covariates, a vector of 1 should be used.
 #' @param method [character] A method to compute the p-value and the default value is "liu".
@@ -29,9 +29,9 @@
 #' @param model [character]
 #'
 #' @return
-#' * S.tau score Statistic for the variant hetergenous effect.
+#' * S.tau score Statistic for the variant heterogenous effect.
 #' * S.pi score Statistic for the variant mean effect.
-#' * p.value.S.tau P-value for testing the variant hetergenous effect.
+#' * p.value.S.tau P-value for testing the variant heterogenous effect.
 #' * p.value.S.pi P-value for testing the variant mean effect.
 #' * p.value.overall Overall p-value for testing the association between the set of SNPS/genes and outcomes.
 #'   It combines p.value.S.pi and p.value.S.tau by using Fisher's procedure.
@@ -61,14 +61,14 @@ mist <- function(y, X, G, Z, method = "liu", model = c("guess", "continuous", "b
 }
 
 
-#' mist_print
+#' tidy_mist
 #'
 #' @param x [mist]
 #'
 #' @return list
 #' @export
-print.mist <- mist_print <- function(x) {
-  cluster_name <- gsub("^GZ", "", rownames(x$out_rare))
+tidy_mist <- function(x) {
+  cluster_name <- gsub("^M", "", rownames(x$out_rare))
   rownames(x$out_rare) <- NULL
   stat_rare <- cbind.data.frame(
     "SubClusters" = ifelse(cluster_name == "", "None", cluster_name),
@@ -78,6 +78,50 @@ print.mist <- mist_print <- function(x) {
   list(estimate = stat_rare, statistic = as.data.frame(x$out_MiST))
 }
 
+
+#' print.mist
+#'
+#' @param x [mist]
+#'
+#' @return list
+#' @export
+print.mist <- function(x) {
+  out <- tidy_mist(x)
+  out$estimate[, -1] <- signif(out$estimate[, -1], digits = 3)
+  cat(
+    "",
+    "MiST: Mixed effects Score Test",
+    "------------------------------",
+    "",
+    "- Estimate:",
+    "",
+    sep = "\n"
+  )
+  print.data.frame(out$estimate)
+  cat(
+    "\n",
+    "- Statistics:",
+    "\n\n",
+    "  + Overall effect: ",
+    "\n",
+    "    * P-value = ", signif(out$statistic[, "p.value.overall"], digits = 3),
+    "\n",
+    "  + PI (mean effect):  ", 
+    "\n",
+    "    * Score =  ", signif(out$statistic[, "S.pi"], digits = 3),
+    "\n",
+    "    * P-value = ", signif(out$statistic[, "p.value.S.pi"], digits = 3),
+    "\n",
+    "  + TAU (heterogenous effect):  ", 
+    "\n",
+    "    * Score =  ", signif(out$statistic[, "S.tau"], digits = 3),
+    "\n",
+    "    * P-value = ", signif(out$statistic[, "p.value.S.tau"], digits = 3),
+    "\n\n",
+    sep = ""
+  )
+}
+print.mist(x)
 
 #' mist_logit
 #'
@@ -146,7 +190,7 @@ mist_logit <- function(y, X, G, Z, method = "liu") {
     p.value.overall = p.value.overall
   )
 
-  get_GZ <- paste0("GZ", colnames(GZ))
+  get_GZ <- paste0("M", colnames(GZ))
   CI <- as.data.frame(stats::confint(fit.0a)[get_GZ, , drop = FALSE])
   colnames(CI) <- c("CI_2.5", "CI_97.5")
   out_rare <- cbind(
@@ -221,7 +265,7 @@ mist_linear <- function(y, X, G, Z, method = "liu") {
     p.value.overall = p.value.overall
   )
 
-  get_GZ <- paste0("GZ", colnames(GZ))
+  get_GZ <- paste0("M", colnames(GZ))
   CI <- as.data.frame(stats::confint(fit.0a)[get_GZ, , drop = FALSE])
   colnames(CI) <- c("CI_2.5", "CI_97.5")
   out_rare <- cbind(

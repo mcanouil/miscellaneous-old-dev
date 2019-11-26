@@ -77,6 +77,7 @@ tidy_mist <- function(x) {
 
   list(estimate = stat_rare, statistic = as.data.frame(x$out_MiST))
 }
+mist_print <- tidy_mist
 
 
 #' print.mist

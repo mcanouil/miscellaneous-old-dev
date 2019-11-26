@@ -29,9 +29,9 @@
 #' @param model [character]
 #'
 #' @return
-#' * S.tau score Statistic for the variant heterogenous effect.
+#' * S.tau score Statistic for the variant heterogeneous effect.
 #' * S.pi score Statistic for the variant mean effect.
-#' * p.value.S.tau P-value for testing the variant heterogenous effect.
+#' * p.value.S.tau P-value for testing the variant heterogeneous effect.
 #' * p.value.S.pi P-value for testing the variant mean effect.
 #' * p.value.overall Overall p-value for testing the association between the set of SNPS/genes and outcomes.
 #'   It combines p.value.S.pi and p.value.S.tau by using Fisher's procedure.
@@ -112,7 +112,7 @@ print.mist <- function(x) {
     "\n",
     "    * P-value = ", signif(out$statistic[, "p.value.S.pi"], digits = 3),
     "\n",
-    "  + TAU (heterogenous effect):  ", 
+    "  + TAU (heterogeneous effect):  ", 
     "\n",
     "    * Score =  ", signif(out$statistic[, "S.tau"], digits = 3),
     "\n",

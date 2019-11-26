@@ -190,7 +190,7 @@ mist_logit <- function(y, X, G, Z, method = "liu") {
     p.value.overall = p.value.overall
   )
 
-  get_GZ <- paste0("M", colnames(GZ))
+  get_GZ <- grep("GZ", names(fit.0a$coefficients), value = TRUE)
   CI <- as.data.frame(stats::confint(fit.0a)[get_GZ, , drop = FALSE])
   colnames(CI) <- c("CI_2.5", "CI_97.5")
   out_rare <- cbind(
@@ -198,7 +198,7 @@ mist_logit <- function(y, X, G, Z, method = "liu") {
     CI,
     OR = exp(stats::coef(fit.0a)[get_GZ])
   )
-  rownames(out_rare) <- get_GZ
+  rownames(out_rare) <- colnames(GZ)
 
   output <- list(out_MiST = out_MiST, out_rare = out_rare)
   class(output) <- "mist"
@@ -265,7 +265,7 @@ mist_linear <- function(y, X, G, Z, method = "liu") {
     p.value.overall = p.value.overall
   )
 
-  get_GZ <- paste0("M", colnames(GZ))
+  get_GZ <- sapply(colnames(GZ), grep, names(fit.0a$coefficients), value = TRUE)
   CI <- as.data.frame(stats::confint(fit.0a)[get_GZ, , drop = FALSE])
   colnames(CI) <- c("CI_2.5", "CI_97.5")
   out_rare <- cbind(

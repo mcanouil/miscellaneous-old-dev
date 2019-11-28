@@ -1,3 +1,3 @@
 #!/bin/sh
 
-Rscript 00-main.R
+nohup Rscript default_script.R > default_script.log

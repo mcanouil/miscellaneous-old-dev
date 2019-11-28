@@ -7,38 +7,25 @@ output_directory <- paste(working_directory, script_name, sep = "/")
 
 dir.create(path = output_directory, recursive = TRUE, showWarnings = FALSE, mode = "0777")
 
-# params <- list(
-#   n_cores = parallel::detectCores(),
-#   gg_fontsize = 12
-# )
+
+### Params
+fexsend <- "/disks/DATA/Softwares/FEX/fexsend"
+user <- "Mickaël Canouil"
+email <- "mickael.canouil@cnrs.fr"
 
 
 ### Load packages
-library(parallel)
 library(tidyverse)
-library(scales)
-library(grid)
-
-devtools::source_url('https://github.com/mcanouil/DEV/raw/master/R/theme_black.R')
 
 
 ### Define theme
-theme_set(theme_black(base_size = 12))
-
-
-### GIT parameters
-current_date <- format(Sys.Date(), format = "%Y%m%d")
-user <- "Mickaël Canouil"
-email <- "mickael.canouil@cnrs.fr"
-git <- paste0('git -c "user.name=', user, '" -c "user.email=', email, '" -C ', project_directory)
-commit <- paste0('-m "ANALYSIS done ', current_date, '"')
-fexsend <- "/disks/DATA/Softwares/FEX/fexsend"
+theme_set(theme_light(base_size = 12))
 
 
 ### Analyses
 rmarkdown::render(
   input = paste0(project_directory, "/Scripts/", script_name, ".Rmd"), 
-  output_file = paste0(file_name, ".html"), 
+  output_file = paste0(script_name, ".html"), 
   output_dir = paste(working_directory, script_name, sep = "/"),
   encoding = "UTF-8", 
   params = list(
@@ -50,10 +37,9 @@ rmarkdown::render(
 
 
 ### Output
-file_name <- script_name
-archive_name <- paste(output_directory, paste0(current_date, "_", file_name, ".tar.gz"), sep = "/")
-system(paste(
-  "tar zcvf", archive_name, "-C", output_directory, paste0(file_name, ".html")
-), intern = TRUE)
+archive_name <- file.path(
+  output_directory,
+  paste0(format(Sys.Date(), format = "%Y%m%d"), "_", basename(project_directory), ".tar.gz")
+)
+tar(tarfile = archive_name, files = paste0(c(paste0(script_name, ".html")), ".html"), compression = "gzip")
 fex_out <- system(paste(fexsend, archive_name, email), intern = TRUE)
-system(paste(git, "tag", paste(current_date, file_name, sep = "-"), commit), intern = TRUE)

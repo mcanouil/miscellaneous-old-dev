@@ -34,51 +34,30 @@ output:
 ```{r setup, include = FALSE}
 options(stringsAsFactors = FALSE)
 
-### Load packages and functions
-library(parallel)
-library(tidyverse)
-library(scales)
-library(grid)
 
-pretty_kable <- function (
-  data, 
-  font_size = 12, 
-  format_args = list(scientific = -1, digits = 3, big.mark = ","), 
-  col.names = NA,
-  full_width = FALSE,
-  format = "html",
-  ...
-) {
-  output <- knitr::kable(
-    x = data, 
-    format.args = format_args, 
-    col.names = col.names,
-    ...
-  )
-  kableExtra::kable_styling(
-    kable_input = output,
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = full_width,
-    position = "center",
-    font_size = font_size
-  )
+### Load packages and functions
+library(tidyverse)
+library(sessioninfo)
+library(knitr)
+library(kableExtra)
+
+bootstrap <- function(x) {
+  if (is_html_output()) {
+    kable_styling(
+      kable_input = x,
+      bootstrap_options = c("striped", "hover", "condensed", "responsive", "bordered"), 
+      full_width = TRUE
+    )
+  } else {
+    x
+  }
 }
 
-devtools::source_url("https://github.com/mcanouil/DEV/raw/master/R/theme_black.R")
 
 ### Set knitr rmarkdown chunk options
-output_directory <- paste(
-  params[["working_directory"]], 
-  params[["script_name"]], 
-  sep = "/"
-)
-dir.create(
-  path = paste0(output_directory, "/cache/"), 
-  recursive = TRUE, 
-  showWarnings = FALSE, 
-  mode = "0777"
-)
-knitr::opts_chunk$set(
+output_directory <- file.path(params[["working_directory"]], params[["script_name"]])
+dir.create(path = output_directory, recursive = TRUE, showWarnings = FALSE, mode = "0777")
+opts_chunk$set(
   results = "asis",
   size = "small",
   include = TRUE,
@@ -90,10 +69,7 @@ knitr::opts_chunk$set(
   crop = TRUE,
   autodep = TRUE,
   fig.align = "center",
-  fig.pos = "!H",
-  cache = params[["cache"]],
-  cache.path = paste0(output_directory, "/cache/"),
-  fig.path = paste0(output_directory, "/cache/")
+  fig.pos = "!H"
 )
 
 
@@ -108,5 +84,5 @@ theme_set(theme_light(base_size = params[["gg_fontsize"]]))
 
 ```{r session-info, results = "markup"}
 options("width" = 110)
-sessioninfo::session_info()
+session_info()
 ```

@@ -5,7 +5,7 @@
 #        and using (weighted) score statistics.
 # Version - 1.1.0
 # Author - Mickaël Canouil, Ph.D.
-# From - https://cran.r-project.org/package=MiST
+# From - https://cran.r-project.org/package=MiST (v1.0)
 # References - https://doi.org/10.1002/gepi.21717
 #-------------------------------------------------------------------------------
 
@@ -198,6 +198,7 @@ mist_print <- tidy_mist
 print.mist <- function(x) {
   out <- tidy_mist(x)
   out$estimate[, -1] <- signif(out$estimate[, -1], digits = 3)
+  
   cat(
     "",
     "MiST: Mixed effects Score Test",
@@ -207,7 +208,9 @@ print.mist <- function(x) {
     "",
     sep = "\n"
   )
+  
   print.data.frame(out$estimate)
+  
   cat(
     "\n",
     "- Statistics:",
@@ -230,6 +233,8 @@ print.mist <- function(x) {
     "\n\n",
     sep = ""
   )
+  
+  invisible(x)
 }
 
 

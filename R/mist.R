@@ -3,7 +3,7 @@
 # Desc - Test for association between a set of SNPS/genes and continuous
 #        or binary outcomes by including variant characteristic information
 #        and using (weighted) score statistics.
-# Version - 1.1.1
+# Version - 1.1.0
 # Author - Mickaël Canouil, Ph.D.
 # From - https://cran.r-project.org/package=MiST
 # References - https://doi.org/10.1002/gepi.21717

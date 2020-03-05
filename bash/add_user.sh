@@ -3,22 +3,22 @@
 USER=$1
 ID=$2
 
-if [ -d /media/User/$USER ]
+if [ -d /home/$USER ]
 then
   useradd \
   --uid $ID \
   --no-create-home \
-  --home /media/User/$USER \
+  --home /home/$USER \
   --no-user-group \
   --gid staff \
   --groups staff,root,sudo \
   $USER &&
   echo "$USER:$USER" | chpasswd
 else
-    useradd \
+  useradd \
   --uid $ID \
   --create-home \
-  --home /media/User/$USER \
+  --home /home/$USER \
   --no-user-group \
   --gid staff \
   --groups staff,root,sudo \
@@ -26,8 +26,8 @@ else
   echo "$USER:$USER" | chpasswd
 fi
 
-[ -d /media/User/$USER/.rstudio/monitored/user-settings ] || mkdir -p /media/User/$USER/.rstudio/monitored/user-settings \
-&& [ -f /media/User/$USER/.rstudio/monitored/user-settings/user-settings ] || echo 'alwaysSaveHistory="0" 
+[ -d /home/$USER/.rstudio/monitored/user-settings ] || mkdir -p /home/$USER/.rstudio/monitored/user-settings \
+&& [ -f /home/$USER/.rstudio/monitored/user-settings/user-settings ] || echo 'alwaysSaveHistory="0" 
 cleanTexi2DviOutput="1" 
 cleanupAfterRCmdCheck="1" 
 cranMirrorCountry="us" 
@@ -55,25 +55,39 @@ uiPrefs="{\\n    \"always_complete_characters\" : 3,\\n    \"always_complete_con
 useDevtools="1" 
 useInternet2="1"' > /home/$USER/.rstudio/monitored/user-settings/user-settings \
 && echo 'R_MAX_NUM_DLLS=300' > /home/$USER/.Renviron \
-&& [ -f /home/$USER/.bashrc ] || echo '
-# User specific aliases and functions
-### set locales
-export LANG="en_GB.UTF-8"
-export LANGUAGE="en_GB.UTF-8"
-export LC_CTYPE="en_GB.UTF-8"
-export LC_NUMERIC="en_GB.UTF-8"
-export LC_TIME="en_GB.UTF-8"
-export LC_COLLATE="en_GB.UTF-8"
-export LC_MONETARY="en_GB.UTF-8"
-export LC_MESSAGES="en_GB.UTF-8"
-export LC_PAPER="en_GB.UTF-8"
-export LC_NAME="en_GB.UTF-8"
-export LC_ADDRESS="en_GB.UTF-8"
-export LC_TELEPHONE="en_GB.UTF-8"
-export LC_MEASUREMENT="en_GB.UTF-8"
-export LC_IDENTIFICATION="en_GB.UTF-8"
-export LC_ALL="en_GB.UTF-8"
+&& [ -f /home/$USER/.bash_profile ] || echo '
+# .bash_profile
 
+
+### ================================================================================================
+### Set locales
+export LANG="en_US.UTF-8"
+export LANGUAGE="en_US.UTF-8"
+export LC_CTYPE="en_US.UTF-8"
+export LC_NUMERIC="en_US.UTF-8"
+export LC_TIME="en_US.UTF-8"
+export LC_COLLATE="en_US.UTF-8"
+export LC_MONETARY="en_US.UTF-8"
+export LC_MESSAGES="en_US.UTF-8"
+export LC_PAPER="en_US.UTF-8"
+export LC_NAME="en_US.UTF-8"
+export LC_ADDRESS="en_US.UTF-8"
+export LC_TELEPHONE="en_US.UTF-8"
+export LC_MEASUREMENT="en_US.UTF-8"
+export LC_IDENTIFICATION="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+
+
+### ================================================================================================
+### Set prompt
+export PS1="________________________________________________________________________________\n| \w @ \h (\u) \n| > "
+export PS2="| > "
+export EDITOR=/usr/bin/nano
+export BLOCKSIZE=1k
+
+
+### ================================================================================================
+### Set aliases
 alias R="R --no-save --no-restore-data"
 
 alias gaa="git add --all"
@@ -85,8 +99,8 @@ alias gss="git status"
 alias cp="cp -iv"                           # Nouvelle copie
 alias mv="mv -iv"                           # Nouveau move
 alias mkdir="mkdir -pv"                     # Nouvelle création de dossier
-alias ll="ls -FGlAhp --color=auto"               # Affiche fichier, dossier, et fichiers cachés
-alias l="ls -FGlhp --color=auto"                 # Affiche fichier et dossier
+alias ll="ls -FlAhp --color=auto"           # Affiche fichier, dossier, et fichiers cachés
+alias l="ls -Flhp --color=auto"             # Affiche fichier et dossier
 alias ls="ls --color=auto" 
 cd() { builtin cd "$@"; ll; }               # Changement de dossier
 alias cd..="cd ../"                         # Retour en arrière rapide
@@ -95,13 +109,35 @@ alias ...="cd ../../"                       # Retour rapide 2 niveaux
 alias .3="cd ../../../"                     # Retour rapide 3 niveaux
 alias .4="cd ../../../../"                  # Retour rapide 4 niveaux
 alias .5="cd ../../../../../"               # Retour rapide 5 niveaux
-' > /home/$USER/.bashrc \
-&& [ -f /home/$USER/.bash_profile ] || echo '
-# .bash_profile
+alias .6="cd ../../../../../../"            # Retour rapide 6 niveaux
 
-# Get the aliases and functions
-if [ -f ~/.bashrc ]; then
-	. ~/.bashrc
+
+### ================================================================================================
+### Set ssh agent with key for every VM at startup
+env=~/.ssh/agent_$(hostname).env
+
+agent_is_running() {
+  if [ "$SSH_AUTH_SOCK" ]; then
+    ssh-add -l >/dev/null 2>&1 || [ $? -eq 1 ]
+  else
+    false
+  fi
+}
+agent_has_keys() { ssh-add -l >/dev/null 2>&1; }
+agent_load_env() { . "$env" >/dev/null; }
+agent_start() { (umask 077; ssh-agent >"$env"); . "$env" >/dev/null; }
+
+if ! agent_is_running; then
+  agent_load_env
 fi
+
+if ! agent_is_running; then
+  agent_start
+  ssh-add ~/.ssh/egid
+elif ! agent_has_keys; then
+  ssh-add ~/.ssh/egid
+fi
+
+unset env
 ' > /home/$USER/.bash_profile \
 && chown -R $USER:staff /home/$USER

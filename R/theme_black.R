@@ -17,27 +17,27 @@ theme_black <- function(
   base_colours <- c("grey20", "grey50", "white")
   ggplot2::theme(
     line = ggplot2::element_line(
-      colour = base_colours[3], 
-      size = base_line_size, 
-      linetype = 1, 
+      colour = base_colours[3],
+      size = base_line_size,
+      linetype = 1,
       lineend = "butt"
     ),
     rect = ggplot2::element_rect(
-      fill = base_colours[1], 
-      colour = base_colours[3], 
-      size = base_rect_size, 
+      fill = base_colours[1],
+      colour = base_colours[3],
+      size = base_rect_size,
       linetype = 1
     ),
     text = ggplot2::element_text(
-      family = base_family, 
-      face = "plain", 
-      colour = base_colours[3], 
-      size = base_size, 
-      lineheight = 0.9, 
-      hjust = 0.5, 
-      vjust = 0.5, 
-      angle = 0, 
-      margin = ggplot2::margin(), 
+      family = base_family,
+      face = "plain",
+      colour = base_colours[3],
+      size = base_size,
+      lineheight = 0.9,
+      hjust = 0.5,
+      vjust = 0.5,
+      angle = 0,
+      margin = ggplot2::margin(),
       debug = FALSE
     ),
 
@@ -85,9 +85,9 @@ theme_black <- function(
 
     panel.background = ggplot2::element_rect(fill = base_colours[1], colour = NA),
     panel.border = ggplot2::element_rect(
-      fill = NA, 
-      colour = base_colours[3], 
-      size = 0.5, 
+      fill = NA,
+      colour = base_colours[3],
+      size = 0.5,
       linetype = "solid"
     ),
     panel.grid = ggplot2::element_line(colour = base_colours[2]),
@@ -100,8 +100,8 @@ theme_black <- function(
 
     strip.background = ggplot2::element_rect(fill = base_colours[1], colour = base_colours[3]),
     strip.text = ggplot2::element_text(
-      colour = base_colours[3], 
-      size = ggplot2::rel(0.8), 
+      colour = base_colours[3],
+      size = ggplot2::rel(0.8),
       margin = ggplot2::margin(0.8 * half_line, 0.8 * half_line, 0.8 * half_line, 0.8 * half_line)
     ),
     strip.text.x = NULL,
@@ -114,20 +114,20 @@ theme_black <- function(
 
     plot.background = ggplot2::element_rect(colour = base_colours[1]),
     plot.title = ggplot2::element_text(
-      size = ggplot2::rel(1.2), 
-      face = "bold", 
-      hjust = 0, 
-      vjust = 1, 
+      size = ggplot2::rel(1.2),
+      face = "bold",
+      hjust = 0,
+      vjust = 1,
       margin = ggplot2::margin(b = half_line)
     ),
     plot.subtitle = ggplot2::element_text(
-      hjust = 0, 
-      vjust = 1, 
+      hjust = 0,
+      vjust = 1,
       margin = ggplot2::margin(b = half_line)
     ),
     plot.caption = ggplot2::element_text(
-      size = ggplot2::rel(0.8), 
-      hjust = 1, vjust = 1, 
+      size = ggplot2::rel(0.8),
+      hjust = 1, vjust = 1,
       margin = ggplot2::margin(t = half_line)
     ),
     plot.tag = ggplot2::element_text(size = ggplot2::rel(1.2), hjust = 0.5, vjust = 0.5),
@@ -143,21 +143,8 @@ theme_black <- function(
 #' @param .theme a theme (a list of theme elements)
 #' @export
 dark_mode <- function(.theme) {
-  hijack <- function(fun, ...) {
-    .fun <- fun
-    args <- list(...)
-    invisible(lapply(seq_along(args), function(i) {
-      formals(.fun)[[names(args)[i]]] <<- args[[i]]
-    }))
-    .fun
-  }
-
-  compute_brightness <- function(colour) {
-    ((sum(range(grDevices::col2rgb(colour)))) * 100 * 0.5) / 255
-  }
-
   stopifnot(is.theme(.theme))
-  geom_names <- apropos("^Geom", ignore.case = FALSE)
+  geom_names <- utils::apropos("^Geom", ignore.case = FALSE)
   geoms <- list()
   namespaces <- loadedNamespaces()
   for (namespace in namespaces) {
@@ -172,51 +159,29 @@ dark_mode <- function(.theme) {
       }
     }
   }
+  pick_colour <- c("white", "black")[(compute_brightness(.theme$plot.background$colour) > 50) + 1]
   for (geom in geoms) {
     stopifnot(ggplot2::is.ggproto(geom))
     if (!is.null(geom$default_aes$fill)) {
-      geom$default_aes$fill <- c("white", "black")[(compute_brightness(.theme$plot.background$colour) > 50) + 1]
+      geom$default_aes$fill <-pick_colour
     }
     if (!is.null(geom$default_aes$colour)) {
-      geom$default_aes$colour <- c("white", "black")[(compute_brightness(.theme$plot.background$colour) > 50) + 1]
-    }
-  }
-  scale_parameters <- switch(
-    EXPR = as.character(
-      findInterval(
-        x = compute_brightness(.theme$plot.background$colour),
-        vec = c(25, 75)
-      )
-    ),
-    "0" = {
-      list(begin = 2 / 5, end = 1, direction = -1)
-    },
-    "1" = {
-      list(begin = 0, end = 1, direction = 1)
-    },
-    "2" = {
-      list(begin = 0, end = 4 / 5, direction = 1)
-    }
-  )
-  viridis_names <- apropos("viridis_", ignore.case = FALSE)
-  vscales <- list()
-  namespaces <- loadedNamespaces()
-  for (namespace in namespaces) {
-    viridis_in_namespace <- mget(viridis_names, envir = asNamespace(namespace), ifnotfound = list(NULL))
-    for (viridis_name in viridis_names) {
-      if (is.function(viridis_in_namespace[[viridis_name]])) {
-        vscales[[viridis_name]] <- hijack(
-          fun = viridis_in_namespace[[viridis_name]],
-          begin = scale_parameters[["begin"]],
-          end = scale_parameters[["end"]],
-          direction = scale_parameters[["direction"]]
-        )
-        assign(x = viridis_name, value = vscales[[viridis_name]], envir = .GlobalEnv)
-      }
+      geom$default_aes$colour <- pick_colour
     }
   }
 
   invisible(.theme)
+}
+
+#' compute_brightness
+#'
+#' @param colour vector of any of the three kinds of R color specifications,
+#'     *i.e.*, either a color name (as listed by colors()),
+#'     a hexadecimal string of the form "#rrggbb" or "#rrggbbaa" (see rgb).
+#'
+#' @keywords internal
+compute_brightness <- function(colour) {
+  ((sum(range(grDevices::col2rgb(colour)))) * 100 * 0.5) / 255
 }
 
 

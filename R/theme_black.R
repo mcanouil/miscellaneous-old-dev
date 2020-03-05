@@ -1,22 +1,47 @@
-# require(grid)
-# require(grDevices)
-# require(ggplot2)
-# require(scales)
-
+#' theme_black
+#'
+#' @param base_size base font size
+#' @param base_family base font family
+#' @param base_line_size base size for line elements
+#' @param base_rect_size base size for rect elements
+#'
+#' @export
+#' @import ggplot2
 theme_black <- function(
-  base_size = 11, 
-  base_family = "", 
-  base_line_size = base_size / 22, 
+  base_size = 11,
+  base_family = "",
+  base_line_size = base_size / 22,
   base_rect_size = base_size / 22
 ) {
   half_line <- base_size / 2
   base_colours <- c("grey20", "grey50", "white")
   ggplot2::theme(
-    line = ggplot2::element_line(colour = base_colours[3], size = base_line_size, linetype = 1, lineend = "butt"),
-    rect = ggplot2::element_rect(fill = base_colours[1], colour = base_colours[3], size = base_rect_size, linetype = 1),
-    text = ggplot2::element_text(family = base_family, face = "plain", colour = base_colours[3], size = base_size, lineheight = 0.9, hjust = 0.5, vjust = 0.5, angle = 0, margin = ggplot2::margin(), debug = FALSE),
-  
-    axis.line = ggplot2::element_blank(), 
+    line = ggplot2::element_line(
+      colour = base_colours[3], 
+      size = base_line_size, 
+      linetype = 1, 
+      lineend = "butt"
+    ),
+    rect = ggplot2::element_rect(
+      fill = base_colours[1], 
+      colour = base_colours[3], 
+      size = base_rect_size, 
+      linetype = 1
+    ),
+    text = ggplot2::element_text(
+      family = base_family, 
+      face = "plain", 
+      colour = base_colours[3], 
+      size = base_size, 
+      lineheight = 0.9, 
+      hjust = 0.5, 
+      vjust = 0.5, 
+      angle = 0, 
+      margin = ggplot2::margin(), 
+      debug = FALSE
+    ),
+
+    axis.line = ggplot2::element_blank(),
     axis.line.x = NULL,
     axis.line.y = NULL,
     axis.text = ggplot2::element_text(size = ggplot2::rel(0.8), colour = base_colours[3]),
@@ -59,17 +84,26 @@ theme_black <- function(
     legend.box.spacing = ggplot2::unit(2 * half_line, "pt"),
 
     panel.background = ggplot2::element_rect(fill = base_colours[1], colour = NA),
-    panel.border = ggplot2::element_rect(fill = NA, colour = base_colours[3], size = 0.5, linetype = "solid"),
+    panel.border = ggplot2::element_rect(
+      fill = NA, 
+      colour = base_colours[3], 
+      size = 0.5, 
+      linetype = "solid"
+    ),
     panel.grid = ggplot2::element_line(colour = base_colours[2]),
     panel.grid.major = ggplot2::element_line(colour = base_colours[2]),
     panel.grid.minor = ggplot2::element_line(colour = base_colours[2], size = ggplot2::rel(0.5)),
-    panel.spacing = unit(half_line, "pt"), 
+    panel.spacing = ggplot2::unit(half_line, "pt"),
     panel.spacing.x = NULL,
     panel.spacing.y = NULL,
     panel.ontop = FALSE,
 
     strip.background = ggplot2::element_rect(fill = base_colours[1], colour = base_colours[3]),
-    strip.text = ggplot2::element_text(colour = base_colours[3], size = ggplot2::rel(0.8), margin = margin(0.8 * half_line, 0.8 * half_line, 0.8 * half_line, 0.8 * half_line)),
+    strip.text = ggplot2::element_text(
+      colour = base_colours[3], 
+      size = ggplot2::rel(0.8), 
+      margin = ggplot2::margin(0.8 * half_line, 0.8 * half_line, 0.8 * half_line, 0.8 * half_line)
+    ),
     strip.text.x = NULL,
     strip.text.y = ggplot2::element_text(angle = -90),
     strip.placement = "inside",
@@ -79,10 +113,24 @@ theme_black <- function(
     strip.switch.pad.wrap = ggplot2::unit(half_line / 2, "pt"),
 
     plot.background = ggplot2::element_rect(colour = base_colours[1]),
-    plot.title = ggplot2::element_text(size = ggplot2::rel(1.2), face = "bold", hjust = 0, vjust = 1, margin = ggplot2::margin(b = half_line)),
-    plot.subtitle = ggplot2::element_text(hjust = 0, vjust = 1, margin = ggplot2::margin(b = half_line)),
-    plot.caption = ggplot2::element_text(size = ggplot2::rel(0.8), hjust = 1, vjust = 1, margin = ggplot2::margin(t = half_line)),
-    plot.tag = ggplot2::element_text(size = ggplot2::rel(1.2), hjust = 0.5, vjust = 0.5), 
+    plot.title = ggplot2::element_text(
+      size = ggplot2::rel(1.2), 
+      face = "bold", 
+      hjust = 0, 
+      vjust = 1, 
+      margin = ggplot2::margin(b = half_line)
+    ),
+    plot.subtitle = ggplot2::element_text(
+      hjust = 0, 
+      vjust = 1, 
+      margin = ggplot2::margin(b = half_line)
+    ),
+    plot.caption = ggplot2::element_text(
+      size = ggplot2::rel(0.8), 
+      hjust = 1, vjust = 1, 
+      margin = ggplot2::margin(t = half_line)
+    ),
+    plot.tag = ggplot2::element_text(size = ggplot2::rel(1.2), hjust = 0.5, vjust = 0.5),
     plot.tag.position = "topleft",
     plot.margin = ggplot2::margin(half_line, half_line, half_line, half_line),
 
@@ -90,6 +138,10 @@ theme_black <- function(
   )
 }
 
+#' dark_mode
+#'
+#' @param .theme a theme (a list of theme elements)
+#' @export
 dark_mode <- function(.theme) {
   hijack <- function(fun, ...) {
     .fun <- fun
@@ -99,46 +151,52 @@ dark_mode <- function(.theme) {
     }))
     .fun
   }
-  
+
   compute_brightness <- function(colour) {
     ((sum(range(grDevices::col2rgb(colour)))) * 100 * 0.5) / 255
   }
-  
+
   stopifnot(is.theme(.theme))
   geom_names <- apropos("^Geom", ignore.case = FALSE)
   geoms <- list()
   namespaces <- loadedNamespaces()
   for (namespace in namespaces) {
     geoms_in_namespace <- mget(
-      x = geom_names, 
-      envir = asNamespace(namespace), 
+      x = geom_names,
+      envir = asNamespace(namespace),
       ifnotfound = list(NULL)
     )
     for (geom_name in geom_names) {
-      if (is.ggproto(geoms_in_namespace[[geom_name]])) {
+      if (ggplot2::is.ggproto(geoms_in_namespace[[geom_name]])) {
         geoms[[geom_name]] <- geoms_in_namespace[[geom_name]]
       }
     }
   }
   for (geom in geoms) {
-    stopifnot(is.ggproto(geom))
+    stopifnot(ggplot2::is.ggproto(geom))
     if (!is.null(geom$default_aes$fill)) {
-      geom$default_aes$fill <- c("white", "black")[(compute_brightness(.theme$plot.background$colour)>50)+1]
+      geom$default_aes$fill <- c("white", "black")[(compute_brightness(.theme$plot.background$colour) > 50) + 1]
     }
     if (!is.null(geom$default_aes$colour)) {
-      geom$default_aes$colour <- c("white", "black")[(compute_brightness(.theme$plot.background$colour)>50)+1]
+      geom$default_aes$colour <- c("white", "black")[(compute_brightness(.theme$plot.background$colour) > 50) + 1]
     }
   }
   scale_parameters <- switch(
     EXPR = as.character(
       findInterval(
-        x = compute_brightness(.theme$plot.background$colour), 
+        x = compute_brightness(.theme$plot.background$colour),
         vec = c(25, 75)
       )
     ),
-    "0" = {list(begin = 2/5, end = 1, direction = -1)},
-    "1" = {list(begin = 0, end = 1, direction = 1)},
-    "2" = {list(begin = 0, end = 4/5, direction = 1)}
+    "0" = {
+      list(begin = 2 / 5, end = 1, direction = -1)
+    },
+    "1" = {
+      list(begin = 0, end = 1, direction = 1)
+    },
+    "2" = {
+      list(begin = 0, end = 4 / 5, direction = 1)
+    }
   )
   viridis_names <- apropos("viridis_", ignore.case = FALSE)
   vscales <- list()
@@ -148,7 +206,7 @@ dark_mode <- function(.theme) {
     for (viridis_name in viridis_names) {
       if (is.function(viridis_in_namespace[[viridis_name]])) {
         vscales[[viridis_name]] <- hijack(
-          fun =  viridis_in_namespace[[viridis_name]], 
+          fun = viridis_in_namespace[[viridis_name]],
           begin = scale_parameters[["begin"]],
           end = scale_parameters[["end"]],
           direction = scale_parameters[["direction"]]
@@ -161,7 +219,25 @@ dark_mode <- function(.theme) {
   invisible(.theme)
 }
 
-plot.ggplot <- print.ggplot <- function(x, newpage = is.null(vp), vp = NULL, ...) {
+
+#' Explicitly draw plot
+#'
+#' Generally, you do not need to print or plot a ggplot2 plot explicitly: the
+#' default top-level print method will do it for you. You will, however, need
+#' to call `print()` explicitly if you want to draw a plot inside a
+#' function or for loop.
+#'
+#' @param x plot to display
+#' @param newpage draw new (empty) page first?
+#' @param vp viewport to draw plot in
+#' @param ... other arguments not used by this method
+#' @keywords hplot
+#' @return Invisibly returns the result of [ggplot_build()], which
+#'   is a list with components that contain the plot itself, the data,
+#'   information about the scales, panels etc.
+#' @export
+#' @method print ggplot
+print.ggplot <- function(x, newpage = is.null(vp), vp = NULL, ...) {
   if (is.null(x$theme$plot.background$colour)) {
     base_colour <- ggplot2::theme_get()$plot.background$colour
     .theme <- ggplot2::theme_get()
@@ -194,20 +270,29 @@ plot.ggplot <- print.ggplot <- function(x, newpage = is.null(vp), vp = NULL, ...
     grid::grid.draw(gtable)
     grid::upViewport()
   }
-  
+
   invisible(x)
 }
 
+#' @rdname print.ggplot
+#' @method plot ggplot
+#' @export
+plot.ggplot <- print.ggplot
+
+#' ggsave
+#'
+#' @inheritParams ggplot2::ggsave
+#' @export
 ggsave <- function(
-  filename, 
-  plot = last_plot(), 
-  device = NULL, 
-  path = NULL, 
-  scale = 1, 
-  width = NA, 
-  height = NA, 
-  units = c("in", "cm", "mm"), 
-  dpi = 300, 
+  filename,
+  plot = ggplot2::last_plot(),
+  device = NULL,
+  path = NULL,
+  scale = 1,
+  width = NA,
+  height = NA,
+  units = c("in", "cm", "mm"),
+  dpi = 300,
   limitsize = TRUE,
   ...
 ) {
@@ -220,21 +305,25 @@ ggsave <- function(
   }
   dark_mode(.theme = .theme)
   ggplot2::ggsave(
-    filename = filename,  
-    plot = plot, 
-    device = device, 
-    path = path, 
-    scale = scale, 
-    width = width, 
-    height = height, 
-    units = units, 
-    dpi = dpi, 
+    filename = filename,
+    plot = plot,
+    device = device,
+    path = path,
+    scale = scale,
+    width = width,
+    height = height,
+    units = units,
+    dpi = dpi,
     limitsize = limitsize,
     bg = base_colour,
     ...
   )
 }
 
-theme_set <- function (new) {
+#' theme_set
+#'
+#' @inheritParams ggplot2::theme_set
+#' @export
+theme_set <- function(new) {
   ggplot2::theme_set(dark_mode(.theme = new))
 }

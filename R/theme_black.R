@@ -144,21 +144,8 @@ theme_black <- function(
 #' @param .theme a theme (a list of theme elements)
 #' @export
 dark_mode <- function(.theme) {
-  hijack <- function(fun, ...) {
-    .fun <- fun
-    args <- list(...)
-    invisible(lapply(seq_along(args), function(i) {
-      formals(.fun)[[names(args)[i]]] <<- args[[i]]
-    }))
-    .fun
-  }
-
-  compute_brightness <- function(colour) {
-    ((sum(range(grDevices::col2rgb(colour)))) * 100 * 0.5) / 255
-  }
-
   stopifnot(is.theme(.theme))
-  geom_names <- apropos("^Geom", ignore.case = FALSE)
+  geom_names <- utils::apropos("^Geom", ignore.case = FALSE)
   geoms <- list()
   namespaces <- loadedNamespaces()
   for (namespace in namespaces) {
@@ -173,51 +160,29 @@ dark_mode <- function(.theme) {
       }
     }
   }
+  pick_colour <- c("white", "black")[(compute_brightness(.theme$plot.background$colour) > 50) + 1]
   for (geom in geoms) {
     stopifnot(ggplot2::is.ggproto(geom))
     if (!is.null(geom$default_aes$fill)) {
-      geom$default_aes$fill <- c("white", "black")[(compute_brightness(.theme$plot.background$colour) > 50) + 1]
+      geom$default_aes$fill <-pick_colour
     }
     if (!is.null(geom$default_aes$colour)) {
-      geom$default_aes$colour <- c("white", "black")[(compute_brightness(.theme$plot.background$colour) > 50) + 1]
-    }
-  }
-  scale_parameters <- switch(
-    EXPR = as.character(
-      findInterval(
-        x = compute_brightness(.theme$plot.background$colour),
-        vec = c(25, 75)
-      )
-    ),
-    "0" = {
-      list(begin = 2 / 5, end = 1, direction = -1)
-    },
-    "1" = {
-      list(begin = 0, end = 1, direction = 1)
-    },
-    "2" = {
-      list(begin = 0, end = 4 / 5, direction = 1)
-    }
-  )
-  viridis_names <- apropos("viridis_", ignore.case = FALSE)
-  vscales <- list()
-  namespaces <- loadedNamespaces()
-  for (namespace in namespaces) {
-    viridis_in_namespace <- mget(viridis_names, envir = asNamespace(namespace), ifnotfound = list(NULL))
-    for (viridis_name in viridis_names) {
-      if (is.function(viridis_in_namespace[[viridis_name]])) {
-        vscales[[viridis_name]] <- hijack(
-          fun = viridis_in_namespace[[viridis_name]],
-          begin = scale_parameters[["begin"]],
-          end = scale_parameters[["end"]],
-          direction = scale_parameters[["direction"]]
-        )
-        assign(x = viridis_name, value = vscales[[viridis_name]], envir = .GlobalEnv)
-      }
+      geom$default_aes$colour <- pick_colour
     }
   }
 
   invisible(.theme)
+}
+
+#' compute_brightness
+#'
+#' @param colour vector of any of the three kinds of R color specifications,
+#'     *i.e.*, either a color name (as listed by colors()),
+#'     a hexadecimal string of the form "#rrggbb" or "#rrggbbaa" (see rgb).
+#'
+#' @keywords internal
+compute_brightness <- function(colour) {
+  ((sum(range(grDevices::col2rgb(colour)))) * 100 * 0.5) / 255
 }
 
 

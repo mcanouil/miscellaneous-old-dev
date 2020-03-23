@@ -92,13 +92,13 @@ ggmanhattan <- function(data, x_chr, x_pos, y_pval, y_trans = TRUE, x_space = 5e
     p <- p +
       ggplot2::scale_y_continuous(
         trans = pval_trans(), 
-        expand = ggplot2::expand_scale(mult = c(0, 0.10)), 
+        expand = ggplot2::expansion(mult = c(0, 0.10)), 
         limits = c(1, NA)
       )
   } else {
     p <- p +
       ggplot2::scale_y_continuous(
-        expand = ggplot2::expand_scale(mult = c(0, 0.10))
+        expand = ggplot2::expansion(mult = c(0, 0.10))
       )
   }
   

@@ -135,12 +135,13 @@ StatManhattan <- ggplot2::ggproto("StatManhattan", ggplot2::Stat,
   required_aes = c("x", "y", "colour"),
   default_aes = ggplot2::aes(group = ggplot2::stat(colour)),
   setup_data = function(data, params) {
+    map_chro <- c(seq(22), "X", "Y", "X", "Y") 
+    names(map_chro) <- c(seq(24), "X", "Y")
+      
     data %>%
       dplyr::mutate(
-        x_chr = factor(
-          x = c(seq(22), "X", "Y")[colour],
-          levels = c(seq(22), "X", "Y")
-        ),
+        x_chr = map_chro[colour],
+        x_chr = factor(x_chr, levels = unique(map_chro)),
         colour = x_chr,
         x_pos = as.integer(x),
         y_pval = as.numeric(y)
@@ -182,21 +183,21 @@ StatManhattan <- ggplot2::ggproto("StatManhattan", ggplot2::Stat,
 
 
 
-library(tidyverse)
-dta <- tibble(
-  chr = factor(x = c(seq(22), "X", "Y"), levels = c(seq(22), "X", "Y")),
-  pos = replicate(
-    n = length(chr), 
-    sort(sample(x = seq(1e4), size = runif(n = 1, min = 100, max = 1000)))
-  ),
-  pvalue = map(.x = pos, .f = ~minfi::ilogit2(rnorm(length(.x), mean = -10, sd = 10)))
-) %>%
-  unnest(c(pos, pvalue)) %>%
-  mutate(
-    label = ifelse(pvalue<1e-12, "sign", NA),
-    position = seq(n())
-  )
+# library(tidyverse)
+# dta <- tibble(
+#   chr = factor(x = c(seq(22), "X", "Y"), levels = c(seq(22), "X", "Y")),
+#   pos = replicate(
+#     n = length(chr), 
+#     sort(sample(x = seq(1e4), size = runif(n = 1, min = 100, max = 1000)))
+#   ),
+#   pvalue = map(.x = pos, .f = ~minfi::ilogit2(rnorm(length(.x), mean = -10, sd = 10)))
+# ) %>%
+#   unnest(c(pos, pvalue)) %>%
+#   mutate(
+#     label = ifelse(pvalue<1e-12, "sign", NA),
+#     position = seq(n())
+#   )
 
-ggplot(data = dta, mapping = aes(x = pos, y = pvalue, colour = chr)) +
-  geom_manhattan() + # ou stat_manhattan()
-  geom_label(mapping = aes(label = label), stat = "manhattan", fill = NA, na.rm = TRUE, show.legend = FALSE)
+# ggplot(data = dta, mapping = aes(x = pos, y = pvalue, colour = chr)) +
+#   geom_manhattan() + # ou stat_manhattan()
+#   geom_label(mapping = aes(label = label), stat = "manhattan", fill = NA, na.rm = TRUE, show.legend = FALSE)

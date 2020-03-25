@@ -140,7 +140,7 @@ StatManhattan <- ggplot2::ggproto("StatManhattan", ggplot2::Stat,
       
     data %>%
       dplyr::mutate(
-        x_chr = droplevels(factor(map_chro[colour], levels = unique(map_chro))),
+        x_chr = factor(map_chro[colour], levels = unique(map_chro)),
         colour = x_chr,
         x_pos = as.integer(x),
         y_pval = as.numeric(y)
@@ -151,6 +151,8 @@ StatManhattan <- ggplot2::ggproto("StatManhattan", ggplot2::Stat,
       dplyr::ungroup() %>%
       dplyr::mutate(x_pos = x_pos + as.integer(x_chr)) %>%
       dplyr::select(-x, -y, -group) %>%
+      dplyr::arrange(x_chr) %>% 
+      dplyr::mutate(x_chr = factor(x_chr, levels = unique(x_chr))) %>%
       dplyr::rename(x = x_pos, y = y_pval, group = x_chr)
   },
   compute_panel = function(data, scales, params) {

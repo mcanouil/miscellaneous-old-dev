@@ -118,6 +118,7 @@ geom_manhattan <- function(
       expand = ggplot2::expansion(mult = c(0, 0.10)),
       limits = c(1, NA)
     ),
+    ggplot2::scale_colour_manual(values = rep(scales::viridis_pal(begin = 1/4, end = 3/4)(2), 12)),
     ggplot2::theme(
       panel.grid.minor.x = ggplot2::element_blank()
     ),
@@ -140,7 +141,8 @@ StatManhattan <- ggplot2::ggproto("StatManhattan", ggplot2::Stat,
       
     data %>%
       dplyr::mutate(
-        x_chr = factor(map_chro[colour], levels = unique(map_chro)),
+        x_chr = map_chro[colour],
+        x_chr = factor(x_chr, levels = unique(map_chro)),
         colour = x_chr,
         x_pos = as.integer(x),
         y_pval = as.numeric(y)
@@ -151,8 +153,6 @@ StatManhattan <- ggplot2::ggproto("StatManhattan", ggplot2::Stat,
       dplyr::ungroup() %>%
       dplyr::mutate(x_pos = x_pos + as.integer(x_chr)) %>%
       dplyr::select(-x, -y, -group) %>%
-      dplyr::arrange(x_chr) %>% 
-      dplyr::mutate(x_chr = factor(x_chr, levels = unique(x_chr))) %>%
       dplyr::rename(x = x_pos, y = y_pval, group = x_chr)
   },
   compute_panel = function(data, scales, params) {
@@ -160,6 +160,26 @@ StatManhattan <- ggplot2::ggproto("StatManhattan", ggplot2::Stat,
   }
 )
 
+fortify.manhattan <- function(data, x, y, group) {
+  map_chro <- c(seq(22), "X", "Y", "X", "Y") 
+  names(map_chro) <- c(seq(24), "X", "Y")
+    
+  data %>%
+    dplyr::mutate(
+      x_chr = map_chro[.data[[group]]],
+      x_chr = factor(x_chr, levels = unique(map_chro)),
+      colour = x_chr,
+      x_pos = as.integer(.data[[x]]),
+      y_pval = as.numeric(.data[[y]])
+    ) %>%
+    dplyr::group_by(x_chr) %>%
+    dplyr::arrange(x_pos) %>%
+    dplyr::mutate(x_pos = scales::rescale(x = x_pos, to = c(-0.4, 0.4))) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(x_pos = x_pos + as.integer(x_chr)) %>%
+    dplyr::select(-x, -y, -group) %>%
+    dplyr::rename(x = x_pos, y = y_pval, group = x_chr)
+}
 
 # #' @rdname stat_manhattan
 # #'

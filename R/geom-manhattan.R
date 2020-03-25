@@ -141,7 +141,8 @@ StatManhattan <- ggplot2::ggproto("StatManhattan", ggplot2::Stat,
     data %>%
       dplyr::mutate(
         x_chr = map_chro[colour],
-        x_chr = factor(x_chr, levels = intersect(unique(map_chro), x_chr)),
+        x_chr = factor(x_chr, levels = unique(map_chro)),
+        x_chr = droplevels(x_chr),
         colour = x_chr,
         x_pos = as.integer(x),
         y_pval = as.numeric(y)

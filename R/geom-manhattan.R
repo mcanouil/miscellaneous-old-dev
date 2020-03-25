@@ -141,13 +141,13 @@ StatManhattan <- ggplot2::ggproto("StatManhattan", ggplot2::Stat,
     data %>%
       dplyr::mutate(
         x_chr = map_chro[colour],
-        x_chr = factor(x_chr, levels = unique(map_chro)),
+        x_chr = factor(x_chr, levels = intersect(unique(map_chro), x_chr)),
         colour = x_chr,
         x_pos = as.integer(x),
         y_pval = as.numeric(y)
       ) %>%
-      dplyr::arrange(x_chr, x_pos) %>%
       dplyr::group_by(x_chr) %>%
+      dplyr::arrange(x_pos) %>%
       dplyr::mutate(x_pos = scales::rescale(x = x_pos, to = c(-0.4, 0.4))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(x_pos = x_pos + as.integer(x_chr)) %>%

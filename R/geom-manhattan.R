@@ -23,7 +23,17 @@ pval_trans <- function() {
     breaks = neglog10_breaks(),
     format = function(x) {
       parse(
-        text = gsub("1 %*% ", "", gsub("e", " %*% 10^", gsub("1e+00", "1", scales::scientific_format()(x), fixed = TRUE)))
+        text = gsub(
+          "1 %*% ", "", 
+          gsub(
+            "e", " %*% 10^", 
+            gsub(
+             "1e+00", "1", 
+              scales::scientific_format()(x), 
+             fixed = TRUE
+            )), 
+          fixed = TRUE
+        )
       )
     },
     domain = c(0, 1)

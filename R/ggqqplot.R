@@ -62,9 +62,7 @@ ggqqplot <- function (data, col_names = colnames(data), point_size = 1) {
     dplyr::arrange(obspval) %>% 
     dplyr::mutate(
       exppval = (seq_len(dplyr::n()) - 0.5) / length(seq_len(dplyr::n())),
-      gc = median(qnorm(obspval/2)^2, na.rm = TRUE) / qchisq(0.5, df = 1),
-      logobspval = -log10(obspval),
-      logexppval = -log10(exppval)
+      gc = median(qnorm(obspval/2)^2, na.rm = TRUE) / qchisq(0.5, df = 1)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::mutate(

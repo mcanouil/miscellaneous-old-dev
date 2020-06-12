@@ -34,25 +34,28 @@ pow_trans <- function(power) {
 pval_trans <- function() {
   neglog10_breaks <- function(n = 5) {
     function(x) {
-      rng <- -log(range(x, na.rm = TRUE), base = 10)
-      min <- 0
-      max <- floor(rng[1])
-      if (max == min) {
-        10^-min
-      } else {
-        by <- floor((max - min) / n) + 1
-        10^-seq(min, max, by = by)
-      }
+      max <- floor(-log(min(x, na.rm = TRUE), base = 10))
+      if (max == 0) 1 else 10^-seq(0, max, by = floor(max / n) + 1)
     }
   }
   scales::trans_new(
     name = "pval",
-    transform = function(x) {-log(x, 10)},
+    transform = function(x) {x[x < .Machine$double.xmin] <- .Machine$double.xmin; -log(x, 10)},
     inverse = function(x) {10^-x},
     breaks = neglog10_breaks(),
     format = function(x) {
       parse(
-        text = gsub("e", " %*% 10^", gsub("1e+00", "1", scales::scientific_format()(x), fixed = TRUE))
+        text = gsub(
+          "1 %*% ", "",
+          gsub(
+            "e", " %*% 10^",
+            gsub(
+             "1e+00", "1",
+              scales::scientific_format()(x),
+             fixed = TRUE
+            )),
+          fixed = TRUE
+        )
       )
     },
     domain = c(0, 1)

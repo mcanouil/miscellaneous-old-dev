@@ -2,34 +2,58 @@
 #'
 #' @return trans
 #' @export
-pval_trans <- function() {
-  neglog10_breaks <- function(n = 5) {
-    function(x) {
-      max <- floor(-log(min(x, na.rm = TRUE), base = 10))
-      if (max == 0) 1 else 10^-seq(0, max, by = floor(max / n) + 1)
-    }
-  }
+pval_trans <- function(alpha = NULL, md = FALSE, prefix = FALSE) {
   scales::trans_new(
     name = "pval",
+    domain = c(0, 1),
     transform = function(x) {x[x < .Machine$double.xmin] <- .Machine$double.xmin; -log(x, 10)},
     inverse = function(x) {10^-x},
-    breaks = neglog10_breaks(),
-    format = function(x) {
-      parse(
-        text = gsub(
+    breaks = (function(n = 5) {
+      function(x) {
+        max <- floor(-log(min(c(x, alpha), na.rm = TRUE), base = 10))
+        if (max == 0) 1 else sort(unique(c(10^-seq(0, max, by = floor(max / n) + 1), alpha)))
+      }
+    })(),
+    format = (function(x) {
+      g <- function(x) {
+        gsub(
           "1 %*% ", "",
           gsub(
-            "e", " %*% 10^",
+            "(.*)e([-+]*)0*(.*)", "\\1 %*% 10^\\2\\3",
             gsub(
              "1e+00", "1",
-              scales::scientific_format()(x),
+              scales::scientific(x),
              fixed = TRUE
             )),
           fixed = TRUE
         )
-      )
-    },
-    domain = c(0, 1)
+      }
+      highlight_alpha <- function(x, md = FALSE, prefix = FALSE) {
+        if (md & nchar(system.file(package = "ggtext")) != 0) {
+          prefix_text <- if (prefix) "&alpha; = " else ""
+          out <- paste0(
+            "<b style = 'color:firebrick2;'>", 
+            gsub("(.*) [%][*][%] .*\\^(.*)", paste(prefix_text, "\\1 &times; 10<sup>\\2</sup>"), g(x)), 
+            "</b>"
+          )
+        } else {
+          prefix_text <- if (prefix) "alpha ==" else ""
+          out <- parse(text = paste(prefix_text, g(x)))
+        }
+        
+        out
+      }
+      
+      if (!is.null(alpha)) {
+        ifelse(
+          test = scales::scientific(x) == scales::scientific(alpha), 
+          yes = highlight_alpha(x, md, prefix), 
+          no = g(x)
+        )
+      } else {
+        parse(text = g(x))
+      }
+    })
   )
 }
 
@@ -99,7 +123,7 @@ geom_manhattan <- function(
       stat = StatManhattan,
       data = data,
       mapping = mapping,
-      geom = 'point',
+      geom = "point",
       position = position,
       show.legend = show.legend,
       inherit.aes = inherit.aes,

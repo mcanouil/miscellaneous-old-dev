@@ -1,26 +1,14 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param base_size PARAM_DESCRIPTION, Default: 11
-#' @param base_family PARAM_DESCRIPTION, Default: ''
-#' @param base_line_size PARAM_DESCRIPTION, Default: base_size/22
-#' @param base_rect_size PARAM_DESCRIPTION, Default: base_size/22
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname theme_black
-#' @export
+require(grid)
+require(grDevices)
+require(ggplot2)
+require(scales)
+
 theme_black <- function(
   base_size = 11,
   base_family = "",
   base_line_size = base_size / 22,
   base_rect_size = base_size / 22
 ) {
-  require(ggplot2)
   half_line <- base_size / 2
   base_colours <- c("grey20", "grey50", "white")
   ggplot2::theme(
@@ -96,25 +84,91 @@ theme_black <- function(
   )
 }
 
-plot.ggplot <- print.ggplot <- function (x, newpage = is.null(vp), vp = NULL, ...) {
-  require(grid)
-  require(grDevices)
-  require(ggplot2)
+dark_mode <- function(.theme) {
+  hijack <- function(FUN, ...) {
+    .FUN <- FUN
+    args <- list(...)
+    invisible(lapply(seq_along(args), function(i) {
+      formals(.FUN)[[names(args)[i]]] <<- args[[i]]
+    }))
+    return(.FUN)
+  }
+
+  compute_brightness <- function(colour) {
+    (
+      (sum(range(grDevices::col2rgb(colour)))) * 100 * 0.5
+    ) / 255
+  }
+
+  stopifnot(is.theme(.theme))
+  geom_names <- apropos("^Geom", ignore.case = FALSE)
+  geoms <- list()
+  namespaces <- loadedNamespaces()
+  for (namespace in namespaces) {
+    geoms_in_namespace <- mget(geom_names, envir = asNamespace(namespace), ifnotfound = list(NULL))
+    for (geom_name in geom_names) {
+      if (is.ggproto(geoms_in_namespace[[geom_name]])) {
+        geoms[[geom_name]] <- geoms_in_namespace[[geom_name]]
+      }
+    }
+  }
+  for (geom in geoms) {
+    stopifnot(is.ggproto(geom))
+    if (!is.null(geom$default_aes$fill)) {
+      geom$default_aes$fill <- c("white", "black")[(compute_brightness(.theme$plot.background$colour)>50)+1]
+    }
+    if (!is.null(geom$default_aes$colour)) {
+      geom$default_aes$colour <- c("white", "black")[(compute_brightness(.theme$plot.background$colour)>50)+1]
+    }
+  }
+  scale_parameters <- switch(
+    EXPR = as.character(
+      findInterval(
+        x = compute_brightness(.theme$plot.background$colour),
+        vec = c(25, 75)
+      )
+    ),
+    "0" = {list(begin = 2/5, end = 1, direction = -1)},
+    "1" = {list(begin = 0, end = 1, direction = 1)},
+    "2" = {list(begin = 0, end = 4/5, direction = 1)}
+  )
+  viridis_names <- apropos("viridis_", ignore.case = FALSE)
+  vscales <- list()
+  namespaces <- loadedNamespaces()
+  for (namespace in namespaces) {
+    viridis_in_namespace <- mget(viridis_names, envir = asNamespace(namespace), ifnotfound = list(NULL))
+    for (viridis_name in viridis_names) {
+      if (is.function(viridis_in_namespace[[viridis_name]])) {
+        vscales[[viridis_name]] <- hijack(
+          FUN =  viridis_in_namespace[[viridis_name]],
+          begin = scale_parameters[["begin"]],
+          end = scale_parameters[["end"]],
+          direction = scale_parameters[["direction"]]
+        )
+        assign(x = viridis_name, value = vscales[[viridis_name]], envir = .GlobalEnv)
+      }
+    }
+  }
+
+  return(invisible(.theme))
+}
+
+plot.ggplot <- print.ggplot <- function(x, newpage = is.null(vp), vp = NULL, ...) {
   if (is.null(x$theme$plot.background$colour)) {
     base_colour <- ggplot2::theme_get()$plot.background$colour
+    .theme <- ggplot2::theme_get()
   } else {
     base_colour <- x$theme$plot.background$colour
+    .theme <- x$theme
   }
+  dark_mode(.theme = .theme)
+
   ggplot2::set_last_plot(x)
   if (newpage) {
     grid::grid.newpage()
   }
-  grid:::grid.rect(
-    gp = grid::gpar(
-      fill = base_colour,
-      col = base_colour
-    )
-  )
+
+  grid:::grid.rect(gp = grid::gpar(fill = base_colour, col = base_colour))
   grDevices::recordGraphics(
     requireNamespace("ggplot2", quietly = TRUE),
     list(),
@@ -123,7 +177,7 @@ plot.ggplot <- print.ggplot <- function (x, newpage = is.null(vp), vp = NULL, ..
   data <- ggplot2::ggplot_build(x)
   gtable <- ggplot2::ggplot_gtable(data)
   if (is.null(vp)) {
-      grid::grid.draw(gtable)
+    grid::grid.draw(gtable)
   } else {
     if (is.character(vp)) {
       grid::seekViewport(vp)
@@ -138,7 +192,7 @@ plot.ggplot <- print.ggplot <- function (x, newpage = is.null(vp), vp = NULL, ..
 
 ggsave <- function(
   filename,
-  plot = ggplot2::last_plot(),
+  plot = last_plot(),
   device = NULL,
   path = NULL,
   scale = 1,
@@ -149,86 +203,29 @@ ggsave <- function(
   limitsize = TRUE,
   ...
 ) {
-  require(grDevices)
-  require(ggplot2)
   if (is.null(plot$theme$plot.background$colour)) {
     base_colour <- ggplot2::theme_get()$plot.background$colour
+    .theme <- ggplot2::theme_get()
   } else {
     base_colour <- plot$theme$plot.background$colour
+    .theme <- plot$theme
   }
-
-  ggsave_args <- c("plot", "path", "scale", "width", "height", "units", "dpi", "limitsize")
-  args <- as.list(match.call())
-  args[[1]] <- NULL
-  args <- args[na.omit(match(ggsave_args, names(args)))]
-  args_dotdotdot <- c(list(...), bg = base_colour)
-  if (is.null(device)) {
-    device <- tolower(tools::file_ext(filename))
-  }
-  if (identical(device, "pdf") || identical(device, grDevices::pdf)) {
-    if (!"useDingbats" %in% names(args_dotdotdot)) {
-      args_dotdotdot <- append(args_dotdotdot, list(useDingbats = FALSE))
-    }
-  }
-  args <- c(list(filename = filename), args, device = device, args_dotdotdot)
-  cur_dev <- grDevices::dev.cur()
-  x <- do.call(ggplot2::ggsave, args, envir = parent.frame())
-  grDevices::dev.set(cur_dev)
-  return(invisible(x))
+  dark_mode(.theme = .theme)
+  ggplot2::ggsave(
+    filename = filename,
+    plot = plot,
+    device = device,
+    path = path,
+    scale = scale,
+    width = width,
+    height = height,
+    units = units,
+    dpi = dpi,
+    limitsize = limitsize,
+    bg = base_colour,
+    ...
+  )
 }
 theme_set <- function (new) {
-  require(scales)
-  hijack <- function(FUN, ...) {
-    .FUN <- FUN
-    args <- list(...)
-    invisible(lapply(seq_along(args), function(i) {
-      formals(.FUN)[[names(args)[i]]] <<- args[[i]]
-    }))
-    return(.FUN)
-  }
-  compute_brightness <- function(colour) {
-    (
-      (sum(range(grDevices::col2rgb(colour)))) * 100 * 0.5
-    ) / 255
-  }
-
-  scale_parameters <- switch(
-    EXPR = as.character(
-      findInterval(
-        x = compute_brightness(new$plot.background$colour),
-        vec = c(25, 75)
-      )
-    ),
-    "0" = {list(option = "viridis", begin = 2/5, end = 1, direction = -1)},
-    "1" = {list(option = "viridis", begin = 0, end = 1, direction = 1)},
-    "2" = {list(option = "viridis", begin = 0, end = 4/5, direction = 1)}
-  )
-
-  scales_to_hijack <- c(
-    "scale_colour_viridis_c", "scale_colour_viridis_d", "scale_color_viridis_c",
-    "scale_color_viridis_d", "scale_fill_viridis_c", "scale_fill_viridis_d"
-  )
-  invisible(lapply(X = scales_to_hijack, FUN = function(x) {
-    y <- hijack(
-      FUN = eval(parse(text = paste0("ggplot2::", x))),
-      option = scale_parameters[["option"]],
-      begin = scale_parameters[["begin"]],
-      end = scale_parameters[["end"]],
-      direction = scale_parameters[["direction"]]
-    )
-    assign(x = x, value = y, envir = .GlobalEnv)
-  }))
-
-  invisible(lapply(X = "viridis_pal", FUN = function(x) {
-    y <- hijack(
-      FUN = eval(parse(text = paste0("scales::", x))),
-      option = scale_parameters[["option"]],
-      begin = scale_parameters[["begin"]],
-      end = scale_parameters[["end"]],
-      direction = scale_parameters[["direction"]]
-    )
-    assign(x = x, value = y, envir = .GlobalEnv)
-  }))
-
-  return(ggplot2::theme_set(new))
+  return(ggplot2::theme_set(dark_mode(.theme = new)))
 }

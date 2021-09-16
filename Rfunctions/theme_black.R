@@ -83,6 +83,8 @@ theme_black <- function(base_size = 11, base_family = "", base_line_size = base_
     plot.subtitle = element_text(size = rel(0.9), hjust = 0, vjust = 1, margin = margin(b = half_line * 0.9)),
     plot.caption = element_text(size = rel(0.9), hjust = 1, vjust = 1, margin = margin(t = half_line * 0.9)),
     plot.margin = margin(half_line, half_line, half_line, half_line),
+    plot.tag = element_text(size = rel(1.2), hjust = 0.5, vjust = 0.5),
+    plot.tag.position = "topleft",
 
     complete = TRUE
   )
@@ -163,4 +165,118 @@ ggsave <- function(
   x <- do.call(ggplot2::ggsave, args, envir = parent.frame())
   grDevices::dev.set(cur_dev)
   invisible(x)
+}
+
+gganimate <- function(
+         p = last_plot(), filename = NULL, saver = NULL, title_frame = TRUE, ...
+) {
+  if (is.null(p)) {
+    stop("no plot to animate")
+  }
+  gganimate_save <- function(g, filename = NULL, saver = NULL, fps = 1, loop = 0, ...) {
+    plot_ggplot_build <- function (b, newpage = is.null(vp), vp = NULL) {
+      if (is.null(b$theme$plot.background$colour)) {
+        base_colour <- ggplot2::theme_get()$plot.background$colour
+      } else {
+        base_colour <- b$theme$plot.background$colour
+      }
+      ggplot2::set_last_plot(b)
+      if (newpage) {
+        grid::grid.newpage()
+      }
+      grid:::grid.rect(
+        gp = grid::gpar(
+          fill = base_colour,
+          col = base_colour
+        )
+      )
+      grDevices::recordGraphics(
+        requireNamespace("ggplot2", quietly = TRUE),
+        list(),
+        getNamespace("ggplot2")
+      )
+      gtable <- ggplot2::ggplot_gtable(b)
+      if (is.null(vp)) {
+        grid::grid.draw(gtable)
+      } else {
+        if (is.character(vp)) {
+          grid::seekViewport(vp)
+        } else grid::pushViewport(vp)
+        grid::grid.draw(gtable)
+        grid::upViewport()
+      }
+    }
+    if (is.null(filename)) {
+      if (is.null(saver)) {
+        filename <- gganimate:::gganimate_tempfile(fileext = ".gif")
+      } else {
+        filename <- gganimate:::gganimate_tempfile(fileext = paste0(
+          ".",
+          saver
+        ))
+      }
+    }
+    s <- gganimate:::animation_saver(saver, filename)
+    withr::with_dir(dirname(filename), {
+      if (s$saver == "gif" && FALSE) {
+        gganimate:::save_gganimate_custom(g, filename = filename, ...)
+      } else {
+        s$func(for (pl in g$plots) {
+          plot_ggplot_build(pl)
+        }, basename(filename), autobrowse = FALSE, ...)
+      }
+    })
+    g$filename <- filename
+    if (!is.null(s$mime_type)) {
+      g$src <- base64enc::dataURI(file = filename, mime = s$mime_type)
+      g$mime_type <- s$mime_type
+    }
+    g$saved <- TRUE
+    g
+  }
+
+  built <- ggplot_build(p)
+  frames <- plyr::compact(lapply(built$data, function(d) d$frame))
+  if (length(frames) == 0) {
+    stop("No frame aesthetic found; cannot create animation")
+  }
+  if (is.factor(frames[[1]])) {
+    frames <- sort(unique(unlist(frames)))
+  } else {
+    frames <- sort(unique(do.call(c, frames)))
+  }
+  frames <- sort(unique(frames))
+  plots <- lapply(frames, function(f) {
+    b <- built
+    for (i in seq_along(b$data)) {
+      frame_vec <- b$data[[i]]$frame
+      if (!is.null(frame_vec)) {
+        sub <- (frame_vec == f | is.na(frame_vec))
+        if (!is.null(b$data[[i]]$cumulative)) {
+          sub <- sub | (b$data[[i]]$cumulative & (frame_vec <= f))
+        }
+        b$data[[i]] <- b$data[[i]][sub, ]
+      }
+    }
+    if (title_frame) {
+      if (!is.null(b$plot$labels$title)) {
+        b$plot$labels$title <- paste(
+          b$plot$labels$title,
+          f
+        )
+      } else {
+        b$plot$labels$title <- f
+      }
+    }
+    b
+  })
+  ret <- list(plots = plots, frames = frames)
+  class(ret) <- "gganimate"
+  if (!is.null(filename)) {
+    ret <- gganimate_save(ret, filename, saver, ...)
+  } else {
+    ret$ani_opts <- list(...)
+    ret$saved <- FALSE
+  }
+  ret
 }

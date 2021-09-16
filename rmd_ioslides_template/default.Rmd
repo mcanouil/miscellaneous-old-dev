@@ -16,6 +16,8 @@ output:
     mathjax: default
     fig_width: 5.94
     fig_height: 3.30
+    transition: 0.5
+    incremental: false
 ---
 
 

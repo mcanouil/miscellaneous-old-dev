@@ -104,8 +104,8 @@ dark_mode <- function(.theme) {
   namespaces <- loadedNamespaces()
   for (namespace in namespaces) {
     geoms_in_namespace <- mget(
-      x = geom_names, 
-      envir = asNamespace(namespace), 
+      x = geom_names,
+      envir = asNamespace(namespace),
       ifnotfound = list(NULL)
     )
     for (geom_name in geom_names) {
@@ -142,7 +142,7 @@ dark_mode <- function(.theme) {
     for (viridis_name in viridis_names) {
       if (is.function(viridis_in_namespace[[viridis_name]])) {
         vscales[[viridis_name]] <- hijack(
-          FUN =  viridis_in_namespace[[viridis_name]],
+          fun =  viridis_in_namespace[[viridis_name]],
           begin = scale_parameters[["begin"]],
           end = scale_parameters[["end"]],
           direction = scale_parameters[["direction"]]
@@ -189,7 +189,7 @@ plot.ggplot <- print.ggplot <- function(x, newpage = is.null(vp), vp = NULL, ...
     grid::grid.draw(gtable)
     grid::upViewport()
   }
-  
+
   invisible(x)
 }
 

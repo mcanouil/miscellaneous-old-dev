@@ -88,11 +88,7 @@ theme_black <- function(
     plot.subtitle = ggplot2::element_text(size = rel(0.9), hjust = 0, vjust = 1, margin = margin(b = half_line * 0.9)),
     plot.caption = ggplot2::element_text(size = rel(0.9), hjust = 1, vjust = 1, margin = margin(t = half_line * 0.9)),
     plot.margin = margin(half_line, half_line, half_line, half_line),
-<<<<<<< HEAD
-    plot.tag = element_text(size = rel(1.2), hjust = 0.5, vjust = 0.5),
-=======
     plot.tag = ggplot2::element_text(size = rel(1.2), hjust = 0.5, vjust = 0.5),
->>>>>>> be3dac4 (hijack scale viridis from ggplot2)
     plot.tag.position = "topleft",
 
     complete = TRUE
@@ -204,34 +200,11 @@ theme_set <- function (new) {
     "2" = {list(option = "viridis", begin = 0, end = 4/5, direction = 1)}
   )
 
-  # tibble(
-  #   f_names = c(
-  #     "scale_colour_viridis_c", "scale_colour_viridis_d", "scale_color_viridis_c",
-  #     "scale_color_viridis_d", "scale_fill_viridis_c", "scale_fill_viridis_d"
-  #   ),
-  #   f_internal = map(.x = f_names, .f = ~eval(parse(text = paste0("ggplot2::", .x)))),
-  #   f_modified = map(
-  #     .x = f_internal,
-  #     .f = hijack,
-  #     option = scale_parameters[["option"]],
-  #     begin = scale_parameters[["begin"]],
-  #     end = scale_parameters[["end"]],
-  #     direction = scale_parameters[["direction"]]
-  #   )
-  # ) %>%
-  #   mutate(
-  #     f_assign = map2(.x = f_names, .y = f_modified, .f = function(x, y) {
-  #       assign(x = x, value = y, envir = .GlobalEnv)
-  #    })
-  #   ) %>%
-  #   invisible()
-
-  functions_to_hijack <- c(
+  scales_to_hijack <- c(
     "scale_colour_viridis_c", "scale_colour_viridis_d", "scale_color_viridis_c",
     "scale_color_viridis_d", "scale_fill_viridis_c", "scale_fill_viridis_d"
   )
-
-  invisble(lapply(X = functions_to_hijack, FUN = function(x) {
+  invisble(lapply(X = scales_to_hijack, FUN = function(x) {
     y <- hijack(
       FUN = eval(parse(text = paste0("ggplot2::", x))),
       option = scale_parameters[["option"]],
